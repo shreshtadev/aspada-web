@@ -1,11 +1,61 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import Stats from "../components/Stats.astro";
+import Amenities from "../components/Amenities.astro";
+import ActionDock from "../components/ActionDock.astro";
+import Address from "../components/Address.astro";
+import Testimonials from "../components/Testimonials.astro";
+import Footer from "../components/Footer.astro";
+import ProjectGallery from "../components/ProjectGallery.astro";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Aspada Developers | Shivamogga's Finest">
+  <Navbar />
+
+  <main>
+    <Hero />
+
+    <section class="py-24 px-6 bg-white/[0.02]">
+      <div
+        class="max-w-7xl mx-auto flex flex-col md:flex-row gap-20 items-center"
+      >
+        <div class="flex-1 relative">
+          <div
+            class="absolute -inset-4 border border-aspada-gold/20 rounded-3xl translate-x-4 translate-y-4 -z-10"
+          >
+          </div>
+          <img
+            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+            alt="Luxury Project"
+            class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-1000"
+          />
+        </div>
+        <div class="flex-1 space-y-6">
+          <h2 class="text-5xl font-display font-bold leading-tight">
+            Crafting Legacies, <br /><span class="text-aspada-gold"
+              >Not Just Buildings.</span
+            >
+          </h2>
+          <p class="text-aspada-silver text-lg leading-relaxed">
+            From the meticulous planning of <strong
+              >Devagiri Residential Layout</strong
+            > to the architectural marvel of <strong
+              >Rushyashrunga Arcade</strong
+            >, we don't just develop land; we curate experiences.
+          </p>
+          <button class="btn-primary">Download Brochure</button>
+        </div>
+      </div>
+    </section>
+
+    <ProjectGallery /><Stats />
+    <Amenities />
+    <Testimonials />
+
+    <Address />
+  </main>
+  <Footer />
+  <ActionDock />
 </Layout>

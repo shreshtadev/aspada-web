@@ -1,0 +1,52 @@
+---
+const amenities = [
+  {
+    name: "Infinity Pool",
+    icon: "i-lucide-waves",
+    class: "md:col-span-2 md:row-span-2",
+  },
+  { name: "Fitness Center", icon: "i-lucide-dumbbell", class: "col-span-1" },
+  { name: "Green Spaces", icon: "i-lucide-leaf", class: "col-span-1" },
+  { name: "Kids Play Area", icon: "i-lucide-smile", class: "md:col-span-2" },
+  { name: "EV Charging", icon: "i-lucide-zap", class: "col-span-1" },
+  { name: "24/7 Security", icon: "i-lucide-shield-check", class: "col-span-1" },
+];
+---
+
+<section class="py-24 px-6 bg-aspada-navy">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-16">
+      <span class="text-aspada-gold font-bold tracking-widest uppercase text-xs"
+        >Exclusively for Residents</span
+      >
+      <h2
+        class="text-4xl md:text-6xl font-display font-bold mt-4 text-aspada-cream"
+      >
+        World-Class <br />
+        <span class="italic text-aspada-silver">Amenities</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {
+        amenities.map((item) => (
+          <div
+            class={`group relative overflow-hidden glass-card flex flex-col justify-end min-h-[160px] p-8 transition-all duration-500 hover:border-aspada-gold/50 ${item.class}`}
+          >
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-aspada-gold/5 blur-[50px] group-hover:bg-aspada-gold/20 transition-all" />
+
+            <div
+              class={`${item.icon} text-4xl text-aspada-gold mb-4 transition-transform duration-500 group-hover:-translate-y-2 group-hover:scale-110`}
+            />
+
+            <h3 class="text-lg font-bold tracking-tight text-aspada-cream group-hover:text-white transition-colors">
+              {item.name}
+            </h3>
+
+            <div class="w-0 group-hover:w-full h-0.5 bg-aspada-gold transition-all duration-500 mt-2" />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

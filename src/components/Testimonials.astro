@@ -1,0 +1,118 @@
+---
+const testimonials = [
+  {
+    name: "Dr. Rajesh Kumar",
+    role: "Property Owner",
+    text: "The transparency and professionalism at Aspada Developers is unmatched. They didn't just sell me a plot; they helped me build a future.",
+    avatar: "https://i.pravatar.cc/150?u=1",
+  },
+  {
+    name: "Priya Hegde",
+    role: "Investment Partner",
+    text: "I've invested in three layouts by Aspada. Their eye for strategic locations like Devagiri has yielded incredible returns.",
+    avatar: "https://i.pravatar.cc/150?u=2",
+  },
+  {
+    name: "Suresh Murthy",
+    role: "Resident",
+    text: "Moving into Samartha Samuchaya was the best decision. The quality of construction is truly world-class.",
+    avatar: "https://i.pravatar.cc/150?u=3",
+  },
+];
+---
+
+<section class="py-32 px-6 bg-aspada-navy overflow-hidden">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div class="space-y-6">
+      <h2 class="text-5xl font-display font-bold text-white">
+        Voice of <br />
+        <span class="text-aspada-gold italic">Confidence.</span>
+      </h2>
+      <p class="text-aspada-silver text-lg">
+        Click the cards to shuffle through our client stories.
+      </p>
+    </div>
+
+    <div
+      class="relative h-[400px] w-full max-w-md mx-auto lg:mx-0"
+      id="card-stack"
+    >
+      {
+        testimonials.map((t, i) => (
+          <div
+            data-testimonial-card
+            class="absolute inset-0 glass-card p-8 cursor-pointer select-none transition-all duration-500 ease-out border-aspada-gold/10 shadow-2xl"
+            style={`z-index: ${testimonials.length - i}; transform: translateY(${i * 20}px) scale(${1 - i * 0.05}); opacity: ${1 - i * 0.2};`}
+          >
+            <div class="flex items-center gap-4 mb-6">
+              <img
+                src={t.avatar}
+                class="w-12 h-12 rounded-full border-2 border-aspada-gold"
+                alt={t.name}
+              />
+              <div>
+                <h4 class="font-bold text-white">{t.name}</h4>
+                <p class="text-[10px] uppercase text-aspada-gold tracking-widest">
+                  {t.role}
+                </p>
+              </div>
+            </div>
+            <p class="text-aspada-cream italic font-serif text-lg leading-relaxed">
+              "{t.text}"
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  function setupStack() {
+    const cards = document.querySelectorAll("[data-testimonial-card]");
+    const stack = document.getElementById("card-stack");
+    const nextBtn = document.getElementById("next-btn");
+    const prevBtn = document.getElementById("prev-btn");
+
+    let currentIndex = 0;
+
+    function updateStack() {
+      cards.forEach((card, i) => {
+        // Calculate the relative position from the current top card
+        const relIndex = (i - currentIndex + cards.length) % cards.length;
+
+        // Applying the 3D stack effect
+        (card as HTMLElement).style.zIndex = `${cards.length - relIndex}`;
+        (card as HTMLElement).style.transform =
+          `translateY(${relIndex * 20}px) scale(${1 - relIndex * 0.05})`;
+        (card as HTMLElement).style.opacity =
+          relIndex > 2 ? "0" : `${1 - relIndex * 0.3}`;
+        (card as HTMLElement).style.pointerEvents =
+          relIndex === 0 ? "auto" : "none";
+      });
+    }
+
+    function rotate() {
+      const topCard = cards[currentIndex] as HTMLElement;
+      // Throw card animation
+      topCard.style.transform = "translateX(120%) rotate(15deg)";
+      topCard.style.opacity = "0";
+
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % cards.length;
+        updateStack();
+      }, 300);
+    }
+
+    nextBtn?.addEventListener("click", rotate);
+    // Also rotate when clicking the top card directly
+    stack?.addEventListener("click", rotate);
+
+    // Initialize
+    updateStack();
+  }
+
+  // Runs on initial load and after Astro View Transitions
+  document.addEventListener("astro:page-load", setupStack);
+  setupStack();
+</script>

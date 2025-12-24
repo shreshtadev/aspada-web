@@ -1,0 +1,147 @@
+---
+const projects = [
+  {
+    name: "Samartha Samuchaya",
+    type: "Luxury Apartments",
+    image:
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+    description: "Modern living in the heart of the city.",
+  },
+  {
+    name: "Devagiri Layout",
+    type: "Premium Plots",
+    image:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
+    description: "Sprawling green landscapes for your dream home.",
+  },
+  {
+    name: "Rushyashrunga Arcade",
+    type: "Commercial Space",
+    image:
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+    description: "The new business landmark of Shivamogga.",
+  },
+];
+---
+
+<section class="py-32 px-6 bg-black overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
+    >
+      <div>
+        <span
+          class="text-aspada-gold font-bold tracking-[0.3em] uppercase text-xs"
+          >Portfolio</span
+        >
+        <h2 class="text-5xl font-display font-bold text-white mt-4">
+          Landmark <span class="text-aspada-silver italic">Creations</span>
+        </h2>
+      </div>
+      <div class="flex gap-4">
+        <button
+          id="gal-prev"
+          class="w-14 h-14 rounded-full border border-white/10 flex-center hover:bg-white hover:text-black transition-all"
+        >
+          <span class="i-lucide-chevron-left text-xl"></span>
+        </button>
+        <button
+          id="gal-next"
+          class="w-14 h-14 rounded-full border border-white/10 flex-center hover:bg-white hover:text-black transition-all"
+        >
+          <span class="i-lucide-chevron-right text-xl"></span>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="relative h-[500px] md:h-[650px] perspective-1000"
+      id="gallery-stage"
+    >
+      {
+        projects.map((project, i) => (
+          <div
+            data-project-card
+            class="absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer"
+            style={`z-index: ${projects.length - i}; transform: translateZ(${-i * 100}px) translateY(${i * 20}px); opacity: ${1 - i * 0.3};`}
+          >
+            <div class="relative w-full h-full rounded-3xl overflow-hidden group">
+              <img
+                src={project.image}
+                alt={project.name}
+                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-12 flex flex-col justify-end">
+                <span class="text-aspada-gold font-bold uppercase tracking-widest text-sm mb-2">
+                  {project.type}
+                </span>
+                <h3 class="text-4xl md:text-6xl font-display font-bold text-white mb-4">
+                  {project.name}
+                </h3>
+                <p class="text-aspada-silver max-w-lg mb-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  {project.description}
+                </p>
+                <div class="flex gap-4">
+                  <button class="btn-primary py-2 text-xs">
+                    Explore Project
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .perspective-1000 {
+    perspective: 1200px;
+  }
+</style>
+
+<script>
+  function initGallery() {
+    const cards = document.querySelectorAll("[data-project-card]");
+    const nextBtn = document.getElementById("gal-next");
+    const prevBtn = document.getElementById("gal-prev");
+    let activeIndex = 0;
+
+    function updateGallery() {
+      cards.forEach((card, i) => {
+        const relIndex = (i - activeIndex + cards.length) % cards.length;
+
+        // 2026 3D logic: Active card is center, others recede into the distance
+        const zValue = -relIndex * 150;
+        const yValue = relIndex * 25;
+        const opacity = relIndex === 0 ? 1 : relIndex === 1 ? 0.4 : 0;
+        const pointer = relIndex === 0 ? "auto" : "none";
+
+        (card as HTMLElement).style.transform =
+          `translateZ(${zValue}px) translateY(${yValue}px)`;
+        (card as HTMLElement).style.opacity = opacity.toString();
+        (card as HTMLElement).style.pointerEvents = pointer;
+        (card as HTMLElement).style.zIndex = (
+          cards.length - relIndex
+        ).toString();
+      });
+    }
+
+    nextBtn?.addEventListener("click", () => {
+      activeIndex = (activeIndex + 1) % cards.length;
+      updateGallery();
+    });
+
+    prevBtn?.addEventListener("click", () => {
+      activeIndex = (activeIndex - 1 + cards.length) % cards.length;
+      updateGallery();
+    });
+
+    updateGallery();
+  }
+
+  document.addEventListener("astro:page-load", initGallery);
+  initGallery();
+</script>
