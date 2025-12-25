@@ -3,8 +3,8 @@ import {
 	presetAttributify,
 	presetIcons,
 	presetTypography,
-	presetUno,
 	presetWebFonts,
+	presetWind4,
 	transformerDirectives,
 	transformerVariantGroup,
 } from "unocss";
@@ -44,11 +44,11 @@ export default defineConfig({
 		},
 	},
 	presets: [
-		presetUno(),
+		presetWind4(),
 		presetAttributify(),
 		presetIcons({
 			scale: 1.2,
-			cdn: "https://esm.sh/", // Faster loading in 2026
+			cdn: "https://esm.sh/",
 			extraProperties: {
 				display: "inline-block",
 				"vertical-align": "middle",

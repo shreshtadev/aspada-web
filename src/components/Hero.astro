@@ -1,54 +1,73 @@
-<section
-  class="relative h-[110vh] w-full flex items-center justify-center overflow-hidden"
->
-  <video
-    autoplay
-    muted
-    loop
-    playsinline
-    class="absolute inset-0 w-full h-full object-cover scale-110"
-    src="https://cdn.pixabay.com/video/2021/09/11/88166-604555811_large.mp4"
-  ></video>
+---
+import landingbgmp from "../assets/landingbg.mp4";
+import landingbgwm from "../assets/landingbg.webm";
+---
 
-  <div
-    class="absolute inset-0 bg-gradient-to-b from-aspada-navy/80 via-transparent to-aspada-navy"
-  >
+<section
+  class="relative h-[110vh] w-full flex items-center justify-center overflow-hidden bg-[#0a1120]"
+>
+  <div class="absolute inset-0 z-0">
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+      class="w-full h-full object-cover grayscale brightness-40 contrast-110"
+    >
+      <source src={landingbgwm} type="video/webm" />
+      <source src={landingbgmp} type="video/mp4" />
+    </video>
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-[#0a1120]/80 via-transparent to-[#0a1120]"
+    >
+    </div>
   </div>
 
-  <div
-    class="relative z-10 glass-card p-8 md:p-16 max-w-5xl mx-4 text-center border-white/5 animate-fade-in"
-  >
-    <div class="flex-center mb-6">
+  <div class="relative z-10 w-full max-w-5xl mx-4 text-center">
+    <div class="flex justify-center mb-8">
       <span
-        class="px-4 py-1 border border-aspada-gold/30 rounded-full text-aspada-gold text-[10px] uppercase tracking-[0.4em] backdrop-blur-md"
+        class="px-5 py-1.5 border border-[#d4af37]/30 rounded-full text-[#d4af37] text-[10px] uppercase tracking-[0.5em] bg-black/20 backdrop-blur-md"
       >
         Established 2010
       </span>
     </div>
 
     <h1
-      class="text-6xl md:text-9xl font-display font-black leading-[0.9] mb-8 text-white"
+      class="text-6xl md:text-9xl font-bold leading-[0.85] mb-8 text-white tracking-tighter"
     >
       SHAPING <br />
       <span
-        class="text-transparent bg-clip-text bg-gradient-to-b from-aspada-gold via-aspada-silver to-aspada-gold/50"
-        >SILHOUETTES</span
+        class="bg-gradient-to-b from-[#d4af37] via-[#f1e5ac] to-[#b8962e] bg-clip-text text-transparent"
       >
+        SILHOUETTES
+      </span>
     </h1>
 
     <p
-      class="text-aspada-cream/80 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-10"
+      class="text-gray-300 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
     >
       Experience the harmony of modern engineering and royal aesthetics in the
-      heart of Shivamogga.
+      heart of <span class="text-white font-medium">Shivamogga</span>.
     </p>
 
-    <div class="flex-center gap-6">
-      <div class="w-12 h-px bg-aspada-gold/50"></div>
-      <button
-        class="i-lucide-mouse-wheel text-aspada-gold text-2xl animate-bounce"
-      ></button>
-      <div class="w-12 h-px bg-aspada-gold/50"></div>
+    <div class="flex items-center justify-center gap-6">
+      <div class="w-16 h-px bg-[#d4af37]/40"></div>
+      <div class="animate-bounce">
+        <div
+          class="i-lucide-mouse-pointer-2 text-[#d4af37] text-2xl rotate-180"
+        >
+        </div>
+        <div
+          class="w-1 h-10 border-1 border-[#d4af37]/30 rounded-full relative overflow-hidden mx-auto"
+        >
+          <div
+            class="w-full h-3 bg-[#d4af37] absolute top-0 animate-scroll-down"
+          >
+          </div>
+        </div>
+      </div>
+      <div class="w-16 h-px bg-[#d4af37]/40"></div>
     </div>
   </div>
 </section>
