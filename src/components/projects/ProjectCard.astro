@@ -1,0 +1,55 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+    project: {
+        id: string;
+        name: string;
+        type: string;
+        image?: string;
+    };
+}
+
+const { project } = Astro.props;
+---
+
+<a
+    href={`/projects/${project.id}`}
+    class="block group relative overflow-hidden rounded-3xl bg-aspada-silver/5 hover:bg-aspada-silver/10 transition-colors border border-white/10"
+>
+    <div class="aspect-[4/3] overflow-hidden">
+        {
+            project.image && (
+                <img
+                    src={project.image}
+                    alt={project.name}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                />
+            )
+        }
+    </div>
+
+    <div class="p-8">
+        <div class="flex justify-between items-start mb-4">
+            <span
+                class="text-[#d4af37] text-xs font-bold tracking-[0.2em] uppercase"
+            >
+                {project.type}
+            </span>
+            <div
+                class="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center group-hover:border-[#d4af37] transition-colors"
+            >
+                <span
+                    class="i-lucide-arrow-up-right text-white group-hover:text-[#d4af37] block text-lg"
+                ></span>
+            </div>
+        </div>
+
+        <h3
+            class="text-2xl font-bold text-aspada-steel mb-3 group-hover:text-[#d4af37] transition-colors"
+        >
+            {project.name}
+        </h3>
+    </div>
+</a>

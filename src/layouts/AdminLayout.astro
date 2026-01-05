@@ -1,0 +1,43 @@
+---
+import { actions } from "astro:actions";
+const result = Astro.getActionResult(actions.logout);
+---
+
+<div class="flex min-h-screen bg-aspada-silver/10">
+  {
+    result && !result.error && (
+      <script>window.location.href = "/admin/login";</script>
+    )
+  }
+  <aside class="w-64 bg-aspada-cream/10 text-aspada-steel p-6 flex flex-col">
+    <div class="flex-1">
+      <h2 class="text-aspada-steel font-bold text-xl mb-10">ASPADA ADMIN</h2>
+      <nav class="space-y-4">
+        <a href="/admin/projects" class="block hover:text-aspada-steel"
+          >Projects</a
+        >
+        <a href="/admin/amenities" class="block hover:text-aspada-steel"
+          >Amenities</a
+        >
+        <a href="/admin/specifications" class="block hover:text-aspada-steel"
+          >Specifications</a
+        >
+        <a href="/admin/testimonials" class="block hover:text-[#d4af37]"
+          >Testimonials</a
+        >
+      </nav>
+    </div>
+
+    <form method="POST" action={actions.logout}>
+      <button
+        type="submit"
+        class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-bold transition-colors cursor-pointer"
+      >
+        Logout
+      </button>
+    </form>
+  </aside>
+  <main class="flex-1 p-10">
+    <slot />
+  </main>
+</div>

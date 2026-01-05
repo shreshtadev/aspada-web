@@ -1,0 +1,78 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout>
+  <section class="space-y-8">
+    <header>
+      <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">
+        Admin Dashboard
+      </h1>
+      <p class="text-aspada-steel mt-2">
+        Manage projects, amenities, specifications, and testimonials.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <!-- Projects -->
+      <a
+        href="/admin/projects"
+        class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
+      >
+        <h2
+          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
+        >
+          Projects
+        </h2>
+        <p class="mt-2 text-aspada-steel">
+          Create, edit, and manage property projects.
+        </p>
+      </a>
+
+      <!-- Amenities -->
+      <a
+        href="/admin/amenities"
+        class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
+      >
+        <h2
+          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
+        >
+          Amenities
+        </h2>
+        <p class="mt-2 text-aspada-steel">
+          Manage amenities linked to projects.
+        </p>
+      </a>
+
+      <!-- Specifications -->
+      <a
+        href="/admin/specifications"
+        class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
+      >
+        <h2
+          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
+        >
+          Specifications
+        </h2>
+        <p class="mt-2 text-aspada-steel">
+          Define technical and design specifications.
+        </p>
+      </a>
+
+      <!-- Testimonials -->
+      <a
+        href="/admin/testimonials"
+        class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
+      >
+        <h2
+          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
+        >
+          Testimonials
+        </h2>
+        <p class="mt-2 text-aspada-steel">
+          Manage customer testimonials and ratings.
+        </p>
+      </a>
+    </div>
+  </section>
+</AdminLayout>

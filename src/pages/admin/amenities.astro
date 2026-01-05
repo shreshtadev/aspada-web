@@ -1,0 +1,12 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AmenityEditor from "../../components/admin/AmenityEditor.svelte";
+---
+
+<AdminLayout>
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-slate-900">Manage Amenities</h1>
+  </header>
+
+  <AmenityEditor client:load />
+</AdminLayout>

@@ -1,20 +1,26 @@
-<footer class="bg-black pt-20 pb-10 px-6 border-t border-white/5">
+---
+const currYear = new Date().getFullYear();
+---
+
+<footer
+  class="pt-20 pb-10 px-6 border-t border-aspada-silver/5 bg-aspada-silver/10"
+>
   <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
     <div class="md:col-span-2">
-      <h3 class="font-display font-black text-3xl text-white mb-6">
+      <h3 class="font-display font-black text-3xl text-aspada-navy mb-6">
         ASPADA <span class="text-aspada-gold">DEVELOPERS</span>
       </h3>
-      <p class="text-aspada-silver max-w-sm leading-relaxed mb-8">
+      <p class="text-aspada-steel max-w-sm leading-relaxed mb-8">
         Established in 2010, we have been the cornerstone of trust in
         Shivamogga's real estate, delivering 1700+ homes with 100% legal
         clarity.
       </p>
       <div class="flex gap-4">
         {
-          ["facebook", "instagram", "linkedin", "youtube"].map((social) => (
+          ["facebook", "instagram", "youtube"].map((social) => (
             <a
-              href="#"
-              class={`i-lucide-${social} text-aspada-silver hover:text-aspada-gold transition-colors text-xl`}
+              href={`https://${social}.com/${social == "youtube" ? "@" : ""}aspadadevelopers${social == "youtube" ? "/videos" : social == "instagram" ? "/" : ""}`}
+              class={`i-lucide-${social} text-aspada-steel hover:text-aspada-gold transition-colors text-xl`}
             />
           ))
         }
@@ -22,55 +28,45 @@
     </div>
 
     <div>
-      <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-[0.2em]">
+      <h4
+        class="text-aspada-navy font-bold mb-6 uppercase text-xs tracking-[0.2em]"
+      >
         Quick Links
       </h4>
-      <ul class="space-y-4 text-aspada-silver text-sm font-medium">
+      <ul class="space-y-4 text-aspada-steel text-sm font-medium">
         <li>
           <a
-            href="#"
-            class="hover:text-aspada-gold text-aspada-cream transition-colors"
+            href="/projects"
+            class="hover:text-aspada-steel/60 text-aspada-steel transition-colors"
             >Residential Layouts</a
           >
         </li>
         <li>
           <a
-            href="#"
-            class="hover:text-aspada-gold text-aspada-cream transition-colors"
+            href="/projects"
+            class="hover:text-aspada-steel/60 text-aspada-steel transition-colors"
             >Commercial Projects</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            class="hover:text-aspada-gold text-aspada-cream transition-colors"
-            >RERA Status</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            class="hover:text-aspada-gold text-aspada-cream transition-colors"
-            >Career</a
           >
         </li>
       </ul>
     </div>
 
     <div>
-      <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-[0.2em]">
+      <h4
+        class="text-aspada-navy font-bold mb-6 uppercase text-xs tracking-[0.2em]"
+      >
         Contact Support
       </h4>
-      <p class="text-aspada-silver text-sm mb-2">General Enquiries:</p>
+      <p class="text-aspada-steel text-sm mb-2">General Enquiries:</p>
       <a
         href="mailto:info@aspadadevelopers.com"
-        class="text-white font-bold hover:text-aspada-gold transition-colors"
+        class="text-aspada-navy/70 font-bold hover:text-aspada-steel/60 transition-colors"
         >info@aspada.com</a
       >
-      <p class="text-aspada-silver text-sm mt-4 mb-2">Sales Support:</p>
+      <p class="text-aspada-steel text-sm mt-4 mb-2">Sales Support:</p>
       <a
         href="tel:+918123444622"
-        class="text-white font-bold hover:text-aspada-gold transition-colors"
+        class="text-aspada-navy/70 font-bold hover:text-aspada-steel/60 transition-colors"
         >+91 81234 44622</a
       >
     </div>
@@ -79,16 +75,21 @@
   <div
     class="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6"
   >
-    <p class="text-aspada-silver/40 text-[10px] uppercase tracking-widest">
-      © 2026 Aspada Developers. Designed for the Future of Living.
+    <p
+      class="text-aspada-navy/60 text-[10px] font-bold uppercase tracking-widest"
+    >
+      © {currYear} Aspada Developers. Designed for the Future of Living.
     </p>
     <div
-      class="flex gap-8 text-[10px] uppercase tracking-widest text-aspada-silver/40"
+      class="flex gap-6 text-[10px] uppercase tracking-widest text-aspada-navy/60"
     >
-      <a href="#" class="hover:text-aspada-gold text-aspada-cream"
+      <a href="/disclaimer" class="hover:text-aspada-steel font-semibold"
+        >Official Disclaimer</a
+      >
+      <a href="/privacy" class="hover:text-aspada-steel font-semibold"
         >Privacy Policy</a
       >
-      <a href="#" class="hover:text-aspada-gold text-aspada-cream"
+      <a href="/terms" class="hover:text-aspada-steel font-semibold"
         >Terms of Service</a
       >
     </div>

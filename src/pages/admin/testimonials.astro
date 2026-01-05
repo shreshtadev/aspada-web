@@ -1,0 +1,17 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import TestimonialManager from "../../components/admin/TestimonialManager.svelte";
+---
+
+<AdminLayout>
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-aspada-steel uppercase tracking-tight">
+      Client <span class="text-aspada-gold">Testimonials</span>
+    </h1>
+    <p class="text-aspada-steel/90 text-sm mt-1">
+      Manage and approve feedback from your property buyers.
+    </p>
+  </div>
+
+  <TestimonialManager client:load />
+</AdminLayout>

@@ -1,0 +1,80 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import ActionDock from "../../components/ActionDock.astro";
+import ProjectList from "../../components/projects/ProjectList.astro";
+import pb from "../../lib/pb";
+
+// Fetch projects
+// Using fullList to get all projects for the index page.
+// Can be paginated if needed later.
+let projects: string | any[] = [];
+try {
+    const records = await pb.collection("projects").getFullList({
+        sort: "-created",
+    });
+
+    projects = records.map((record) => {
+        const coverImageUrl = pb.files.getURL(record, record.coverImage, {
+            thumb: "800x600",
+            quality: 80,
+        });
+
+        return {
+            id: record.id,
+            name: record.title,
+            slug: record.slug,
+            type: record.category || "Residential",
+            image: coverImageUrl,
+            description: record.description,
+        };
+    });
+} catch (e) {
+    console.error("Error fetching projects:", e);
+}
+---
+
+<Layout title="Our Projects | Aspada Developers">
+    <Navbar />
+
+    <main class="pt-32 pb-20 px-6 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 text-center max-w-3xl mx-auto">
+                <span
+                    class="text-[#d4af37] font-bold tracking-[0.3em] uppercase text-xs"
+                    >Portolio</span
+                >
+                <h1
+                    class="text-5xl md:text-7xl font-bold mt-6 text-aspada-steel mb-8"
+                >
+                    Our <span class="text-aspada-gold/70 italic font-light"
+                        >Creations</span
+                    >
+                </h1>
+                <p class="text-aspada-steel/60 text-xl leading-relaxed">
+                    Explore our portfolio of meticulously crafted residential
+                    layouts and commercial spaces that redefine modern living.
+                </p>
+            </div>
+
+            {
+                projects.length > 0 ? (
+                    <ProjectList projects={projects} />
+                ) : (
+                    <div class="text-center py-20 bg-aspada-silver/5 rounded-3xl border border-white/10">
+                        <p class="text-aspada-steel/50 text-xl">
+                            No projects found at the moment.
+                        </p>
+                        <p class="text-sm mt-2 text-aspada-steel/40">
+                            Please check back soon.
+                        </p>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+
+    <Footer />
+    <ActionDock />
+</Layout>

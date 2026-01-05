@@ -1,10 +1,32 @@
 ---
-import landingbgmp from "../assets/landingbg.mp4";
-import landingbgwm from "../assets/landingbg.webm";
+interface HeroProps {
+  posterUrl: string;
+  videoMp4Url?: string;
+  videoWebmUrl?: string;
+}
+const { posterUrl, videoMp4Url, videoWebmUrl } = Astro.props;
 ---
 
+<style>
+  @keyframes fadeOut {
+    from {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+
+  .animate-fade-out {
+    animation: fadeOut 1.2s ease-in forwards;
+    animation-delay: 0.5s;
+  }
+</style>
 <section
-  class="relative h-[110vh] w-full flex items-center justify-center overflow-hidden bg-[#0a1120]"
+  class="relative h-[110vh] w-full flex items-center justify-center overflow-hidden"
 >
   <div class="absolute inset-0 z-0">
     <video
@@ -12,59 +34,51 @@ import landingbgwm from "../assets/landingbg.webm";
       loop
       muted
       playsinline
-      poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
-      class="w-full h-full object-cover grayscale brightness-40 contrast-110"
+      poster={posterUrl}
+      class="w-full h-full object-cover grayscale-10 brightness-40 contrast-110"
     >
-      <source src={landingbgwm} type="video/webm" />
-      <source src={landingbgmp} type="video/mp4" />
+      <source src={videoWebmUrl} type="video/webm" />
+      <source src={videoMp4Url} type="video/mp4" />
     </video>
     <div
-      class="absolute inset-0 bg-gradient-to-b from-[#0a1120]/80 via-transparent to-[#0a1120]"
+      class="absolute inset-0 bg-gradient-to-b from-aspada-navy/80 via-transparent to-aspada-navy/20"
     >
     </div>
   </div>
 
-  <div class="relative z-10 w-full max-w-5xl mx-4 text-center">
+  <div class="relative z-10 w-full max-w-5xl mx-4 text-center animate-fade-out">
     <div class="flex justify-center mb-8">
       <span
-        class="px-5 py-1.5 border border-[#d4af37]/30 rounded-full text-[#d4af37] text-[10px] uppercase tracking-[0.5em] bg-black/20 backdrop-blur-md"
+        class="px-5 py-1.5 border border-aspada-gold/30 rounded-full text-aspada-gold text-[10px] uppercase tracking-[0.5em] bg-black/20 backdrop-blur-md"
       >
         Established 2010
       </span>
     </div>
 
     <h1
-      class="text-6xl md:text-9xl font-bold leading-[0.85] mb-8 text-white tracking-tighter"
+      class="text-6xl md:text-9xl font-bold leading-[0.85] mb-8 text-aspada-cream tracking-tighter"
     >
       SHAPING <br />
       <span
-        class="bg-gradient-to-b from-[#d4af37] via-[#f1e5ac] to-[#b8962e] bg-clip-text text-transparent"
+        class="bg-gradient-to-b from-aspada-gold via-aspada-gold/80 to-aspada-gold bg-clip-text text-transparent"
       >
         SILHOUETTES
       </span>
     </h1>
 
     <p
-      class="text-gray-300 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
+      class="text-aspada-silver text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
     >
       Experience the harmony of modern engineering and royal aesthetics in the
-      heart of <span class="text-white font-medium">Shivamogga</span>.
+      heart of <span class="text-aspada-cream font-medium">Shivamogga</span>.
     </p>
 
     <div class="flex items-center justify-center gap-6">
       <div class="w-16 h-px bg-[#d4af37]/40"></div>
-      <div class="animate-bounce">
+      <div class="hover:animate-tada">
         <div
-          class="i-lucide-mouse-pointer-2 text-[#d4af37] text-2xl rotate-180"
+          class="i-lucide-mouse-pointer-2 text-[#d4af37] text-2xl rotate-220"
         >
-        </div>
-        <div
-          class="w-1 h-10 border-1 border-[#d4af37]/30 rounded-full relative overflow-hidden mx-auto"
-        >
-          <div
-            class="w-full h-3 bg-[#d4af37] absolute top-0 animate-scroll-down"
-          >
-          </div>
         </div>
       </div>
       <div class="w-16 h-px bg-[#d4af37]/40"></div>

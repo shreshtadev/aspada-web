@@ -1,0 +1,17 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import SpecificationManager from "../../components/admin/SpecificationManager.svelte";
+---
+
+<AdminLayout>
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tight">
+      Technical <span class="text-[#d4af37]">Specifications</span>
+    </h1>
+    <p class="text-slate-500 text-sm mt-1">
+      Define materials and construction standards for each project.
+    </p>
+  </div>
+
+  <SpecificationManager client:load />
+</AdminLayout>

@@ -30,10 +30,10 @@ export default defineConfig({
 		colors: {
 			aspada: {
 				gold: "#D4AF37", // Main Logo Gold
-				navy: "#0A192F", // Primary Background (Midnight)
-				cream: "#F5EEDC", // Secondary Text/BG (Vanilla)
-				steel: "#1B3B5A", // Accent 1
-				silver: "#C0C0C0", // Accent 2 (Champagne)
+				navy: "#162A47", // Primary Background (Midnight)
+				cream: "#FFF9EB", // Secondary Text/BG (Vanilla)
+				steel: "#2E5A88", // Accent 1
+				silver: "#E0E0E0", // Accent 2 (Champagne)
 			},
 		},
 		breakpoints: {
@@ -45,6 +45,7 @@ export default defineConfig({
 	},
 	presets: [
 		presetWind4(),
+		presetTypography(),
 		presetAttributify(),
 		presetIcons({
 			scale: 1.2,
@@ -58,10 +59,17 @@ export default defineConfig({
 		presetWebFonts({
 			provider: "google",
 			fonts: {
-				// Modern Real Estate Fonts
-				sans: "Inter:400,600,700",
-				display: "Lexend:700,800",
-				serif: "Playfair Display:400,700",
+				// Modern & Catchy: Rounded Geometric Sans
+				// 'Outfit' is very circular and high-end.
+				sans: "Outfit:300,400,600,700",
+
+				// Display: Bold & Friendly
+				// 'Urbanist' or 'Plus Jakarta Sans' offer that trendy, rounded tech-luxury look.
+				display: "Plus Jakarta Sans:700,800",
+
+				// Serif: Elegant & Sophisticated
+				// 'Instrument Serif' is thinner and more modern than Playfair.
+				serif: "Instrument Serif:400",
 			},
 		}),
 	],

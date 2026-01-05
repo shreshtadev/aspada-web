@@ -1,0 +1,40 @@
+---
+import Layout from "../../layouts/Layout.astro"; // Your main site layout
+import LoginForm from "../../components/admin/LoginForm.svelte";
+---
+
+<Layout title="Admin Login | Aspada Developers">
+  <section
+    class="min-h-[80vh] flex items-center justify-center bg-aspada-cream px-6"
+  >
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <div
+          class="inline-block p-4 rounded-full bg-slate-900 mb-4 shadow-xl shadow-aspada-gold/10"
+        >
+          <div
+            class="w-12 h-12 border-2 border-aspada-gold rounded-sm rotate-45 flex items-center justify-center"
+          >
+            <span class="text-aspada-gold -rotate-45 font-bold text-xl">AD</span
+            >
+          </div>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">
+          Portal <span class="text-aspada-gold">Access</span>
+        </h1>
+        <p class="text-aspada-steel text-sm mt-2">Internal Management System</p>
+      </div>
+
+      <LoginForm client:load />
+
+      <div class="mt-8 text-center">
+        <a
+          href="/"
+          class="text-xs text-aspada-steel hover:text-aspada-gold transition-colors"
+        >
+          &larr; Back to Public Website
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

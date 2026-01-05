@@ -1,43 +1,196 @@
-<nav class="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-7xl z-50">
+---
+import { Image } from "astro:assets";
+import logo from "../assets/Logo.png";
+import MobileMenu from "./MobileMenu.astro";
+---
+
+<nav
+  class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-100 leading-tight tracking-tighter"
+>
   <div
-    class="bg-aspada-cream/10 backdrop-blur-2xl border border-white/10 rounded-2xl px-6 py-4 flex justify-between items-center shadow-2xl"
+    class="bg-aspada-steel/40 backdrop-blur-2xl border border-aspada-cream/10 rounded-2xl px-6 py-3 flex justify-between items-center shadow-2xl"
   >
-    <div class="flex items-center gap-3">
+    <a href="/" class="flex items-center gap-3 group">
       <div
-        class="w-8 h-8 bg-gradient-to-tr from-aspada-gold to-aspada-silver rounded-lg rotate-12 flex-center shadow-lg shadow-aspada-gold/20"
+        class="w-12 h-12 bg-aspada-cream/20 rounded-lg flex items-center justify-center shadow-lg shadow-aspada-gold/20 group-hover:rotate-6 transition-transform"
       >
-        <span class="text-aspada-navy font-black -rotate-12">A</span>
+        <Image
+          class="w-auto h-30 object-contain"
+          src={logo}
+          alt="Aspada Developers"
+        />
       </div>
-      <span
-        class="font-display font-black text-lg tracking-tighter uppercase bg-clip-text text-transparent bg-gradient-to-r from-aspada-gold via-aspada-cream to-aspada-gold"
-      >
-        Aspada Developers
-      </span>
-    </div>
+      <div class="hidden sm:flex flex-col">
+        <span
+          class="font-bold text-aspada-silver tracking-tighter leading-none text-lg uppercase"
+          >Aspada</span
+        >
+        <span class="text-[9px] text-aspada-gold tracking-[0.3em] uppercase"
+          >Developers</span
+        >
+      </div>
+    </a>
 
     <div
-      class="hidden md:flex gap-10 items-center font-bold uppercase text-[10px] tracking-[0.2em] text-aspada-cream/70"
+      class="hidden md:flex gap-2 items-center bg-white/5 rounded-xl p-1 border border-white/5"
     >
       <a
         href="/"
-        class="hover:text-aspada-gold transition-all hover:tracking-[0.3em] text-aspada-cream"
-        >Home</a
+        class="px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver hover:bg-white/10 transition-all"
       >
+        Home
+      </a>
+
+      <div class="relative group/menu">
+        <button
+          id="projects-btn"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver/60 group-hover/menu:text-aspada-cream transition-all outline-none cursor-pointer"
+        >
+          Projects <div
+            class="i-lucide-chevron-down text-[10px] transition-transform group-focus-within/menu:rotate-180"
+          >
+          </div>
+        </button>
+
+        <div
+          class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[400px] bg-aspada-steel border border-white/10 rounded-2xl p-5 shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover/menu:opacity-100 group-focus-within/menu:opacity-100 group-hover/menu:translate-y-0 group-focus-within/menu:translate-y-0 group-hover/menu:pointer-events-auto group-focus-within/menu:pointer-events-auto transition-all duration-300"
+        >
+          <div class="grid grid-cols-1 gap-2">
+            <a
+              href="/projects"
+              class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition group/item"
+            >
+              <div
+                class="w-10 h-10 rounded-lg bg-aspada-silver/30 flex items-center justify-center text-aspada-cream i-lucide-home"
+              >
+              </div>
+              <div>
+                <div
+                  class="text-xs font-bold text-aspada-silver uppercase tracking-wider"
+                >
+                  Residential
+                </div>
+                <div class="text-[10px] text-aspada-silver/80 uppercase">
+                  Luxury Homes & Apartments
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="/projects"
+              class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition group/item"
+            >
+              <div
+                class="w-10 h-10 rounded-lg bg-aspada-silver/30 flex items-center justify-center text-purple-500 i-lucide-building-2"
+              >
+              </div>
+              <div>
+                <div
+                  class="text-xs font-bold text-aspada-silver uppercase tracking-wider"
+                >
+                  Commercial
+                </div>
+                <div class="text-[10px] text-aspada-silver/80 uppercase">
+                  Retail & Office Spaces
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="/projects"
+              class="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition group/item"
+            >
+              <div
+                class="w-10 h-10 rounded-lg bg-aspada-silver/30 flex items-center justify-center text-[#d4af37] i-lucide-map"
+              >
+              </div>
+              <div>
+                <div
+                  class="text-xs font-bold text-aspada-silver uppercase tracking-wider"
+                >
+                  Plots
+                </div>
+                <div class="text-[10px] text-aspada-silver/80 uppercase">
+                  Premium Land Layouts
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
       <a
-        href="/projects"
-        class="hover:text-aspada-gold transition-all hover:tracking-[0.3em] text-aspada-cream"
-        >Landmarks</a
+        href="/"
+        class="px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver hover:bg-white/10 transition-all"
       >
-      <a
-        href="/about"
-        class="hover:text-aspada-gold transition-all hover:tracking-[0.3em] text-aspada-cream"
-        >Our Story</a
+        Latest News
+      </a>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div
+        class="hidden lg:flex gap-3 mr-4 border-r border-white/10 pr-4 text-aspada-silver/40"
       >
+        <a
+          href="https://instagram.com/aspadadevelopers/"
+          class="i-lucide-instagram hover:text-aspada-cream transition"></a>
+        <a
+          href="https://facebook.com/aspadadevelopers"
+          class="i-lucide-facebook hover:text-aspada-cream transition"></a>
+        <a
+          href="https://youtube.com/@aspadadevelopers/videos"
+          class="i-lucide-youtube hover:text-aspada-cream transition"></a>
+        <a
+          href="/admin/login"
+          class="i-lucide-log-in hover:text-aspada-cream transition"></a>
+      </div>
       <button
-        class="bg-aspada-gold text-aspada-navy px-5 py-2 rounded-lg hover:brightness-110 transition-all shadow-lg shadow-aspada-gold/10 cursor-pointer font-bold uppercase tracking-[0.2em]"
+        id="mobile-menu-toggle"
+        class="md:hidden text-aspada-silver p-2 text-2xl"
+        aria-label="Toggle Menu"
       >
-        Book Tour
+        <div class="i-lucide-menu" id="menu-icon"></div>
       </button>
     </div>
   </div>
+
+  <MobileMenu />
 </nav>
+
+<script>
+  function initNav() {
+    const toggle = document.getElementById("mobile-menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    const icon = document.getElementById("menu-icon");
+
+    if (toggle && menu && icon) {
+      toggle.addEventListener("click", () => {
+        const isOpen = menu.classList.contains("opacity-100");
+        if (isOpen) {
+          menu.classList.replace("opacity-100", "opacity-0");
+          menu.classList.replace("translate-y-0", "translate-y-4");
+          menu.classList.add("pointer-events-none");
+          icon.classList.replace("i-lucide-x", "i-lucide-menu");
+        } else {
+          menu.classList.replace("opacity-0", "opacity-100");
+          menu.classList.replace("translate-y-4", "translate-y-0");
+          menu.classList.remove("pointer-events-none");
+          icon.classList.replace("i-lucide-menu", "i-lucide-x");
+        }
+      });
+    }
+
+    // Dropdown clickable logic for touch devices
+    const portfolioBtn = document.getElementById("portfolio-btn");
+    portfolioBtn?.addEventListener("click", (e) => {
+      if (window.innerWidth < 768) return; // Let mobile menu handle it
+      // Toggle focus to show dropdown on click for desktop/hybrid devices
+      const parent = portfolioBtn.parentElement;
+      parent?.classList.toggle("focus-within");
+    });
+  }
+
+  // Initialize on load
+  initNav();
+  // Re-init if using Astro View Transitions
+  document.addEventListener("astro:after-swap", initNav);
+</script>
