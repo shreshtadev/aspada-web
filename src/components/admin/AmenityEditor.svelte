@@ -9,7 +9,9 @@
 
   async function loadData() {
     try {
-      const amenitiesList = await pb.collection("amenities").getFullList();
+      const amenitiesList = await pb.collection("metadata").getFullList({
+        filter: "categoryType = 'amenity'",
+      });
       amenities = amenitiesList;
     } catch (err) {
       console.error("Failed to load data:", err);
@@ -37,18 +39,18 @@
     }
 
     loading = true;
-    const data = { title: formTitle };
+    const data = { title: formTitle, categoryType: "amenity" };
 
     try {
       if (selectedId) {
         const updated = await pb
-          .collection("amenities")
+          .collection("metadata")
           .update(selectedId, data);
         amenities = amenities.map((it) =>
           it.id === selectedId ? updated : it,
         );
       } else {
-        const created = await pb.collection("amenities").create(data);
+        const created = await pb.collection("metadata").create(data);
         amenities = [created, ...amenities];
         selectAmenity(created);
       }
@@ -62,7 +64,7 @@
   async function deleteAmenity(id) {
     if (!confirm("Delete this amenity?")) return;
     try {
-      await pb.collection("amenities").delete(id);
+      await pb.collection("metadata").delete(id);
       amenities = amenities.filter((a) => a.id !== id);
       if (selectedId === id) newAmenity();
     } catch (err) {
@@ -102,9 +104,8 @@
         >
           <div>
             <div class="font-medium">{a.title}</div>
-            <div class="text-xs text-slate-500">
-              {(typeof a.project === "object" ? a.project?.title : a.project) ||
-                "Global"}
+            <div class="text-xs uppercase text-slate-500">
+              {a.categoryType}
             </div>
           </div>
           <div class="flex items-center gap-2">

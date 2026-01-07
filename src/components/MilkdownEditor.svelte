@@ -4,6 +4,7 @@
     import "@milkdown/crepe/theme/common/style.css";
     import "@milkdown/crepe/theme/frame.css";
     import { onMount, onDestroy } from "svelte";
+    import { markdownAttachmentUploader } from "../lib/utils";
 
     let {
         value = $bindable(""),
@@ -37,6 +38,12 @@
         crepe = new Crepe({
             root: editorElement,
             defaultValue: value,
+            features: {
+                "image-block": false,
+                table: false,
+                latex: false,
+                "code-mirror": false,
+            },
             featureConfigs: {
                 [Crepe.Feature.Placeholder]: {
                     text: placeholder,

@@ -1,0 +1,25 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import ContentManager from "../../components/admin/ContentManager.svelte";
+
+// Protect this page - simple check for now, real auth handled by middleware usually
+// But since this is a client-side heavy component, most logic is there.
+---
+
+<AdminLayout title="Admin Content Manager">
+    <main class="min-h-screen p-8">
+        <div class="max-w-6xl mx-auto">
+            <header class="mb-10">
+                <h1 class="text-4xl font-bold text-aspada-navy mb-2">
+                    Content Management
+                </h1>
+                <p class="text-slate-600">
+                    Manage your blog posts, categories, and tags from a single
+                    dashboard.
+                </p>
+            </header>
+
+            <ContentManager client:load />
+        </div>
+    </main>
+</AdminLayout>

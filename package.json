@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@astrojs/netlify": "^6.6.3",
+    "@astrojs/sitemap": "^3.6.0",
     "@astrojs/svelte": "^7.2.4",
     "@milkdown/crepe": "^7.18.0",
     "@milkdown/kit": "^7.18.0",
+    "@milkdown/plugin-upload": "^7.18.0",
     "astro": "^5.16.6",
+    "marked": "^17.0.1",
     "pocketbase": "^0.26.5",
     "svelte": "^5.46.1",
     "typescript": "^5.9.3"

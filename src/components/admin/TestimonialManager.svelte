@@ -1,5 +1,25 @@
 <script>
   import pb from "../../lib/pb";
+  import { uploadAttachment, deleteAttachment } from "../../lib/utils";
+  import MilkdownEditor from "../MilkdownEditor.svelte";
+
+  const authorRoles = [
+    "property-owner",
+    "contractor",
+    "investor",
+    "agent",
+    "buyer",
+    "seller",
+  ];
+
+  const authorRoleOptions = authorRoles.map((role) => ({
+    value: role,
+    label: (role.charAt(0).toUpperCase() + role.slice(1)).replace("-", " "),
+  }));
+
+  const findRoleLabelByValue = (value) => {
+    return authorRoleOptions.find((option) => option.value === value)?.label;
+  };
 
   // Master list state
   let testimonials = $state([]);
@@ -12,21 +32,23 @@
   let formRating = $state(5);
   let formProject = $state("");
   let avatarFile = $state(null);
+  let authorRole = $state("");
   let formLoading = $state(false);
   let deleteAvatar = $state(false);
   let fileInputEl = $state(null);
+  let currentAvatarId = $state("");
+  let currentAvatarUrl = $state("");
 
   async function loadData() {
     try {
       const [projectsList, testimonialsList] = await Promise.all([
         pb.collection("projects").getFullList({ sort: "title" }),
-        pb.collection("testimonials").getList(1, 50, {
-          sort: "-created",
-          expand: "project",
+        pb.collection("testimonials").getFullList({
+          expand: "project,authorAvatar",
         }),
       ]);
       projects = projectsList;
-      testimonials = testimonialsList.items;
+      testimonials = testimonialsList;
     } catch (err) {
       console.error("Failed to load data:", err);
     }
@@ -46,6 +68,10 @@
         ? t.project.id
         : t?.project || "";
     avatarFile = undefined;
+    authorRole = t?.authorRole || "";
+    currentAvatarId = t?.authorAvatar || "";
+    const attachment = t.expand.authorAvatar;
+    currentAvatarUrl = pb.files.getURL(attachment, attachment.attachment);
   }
 
   function clearAvatarSelection() {
@@ -64,11 +90,13 @@
     formRating = 5;
     formProject = "";
     avatarFile = null;
+    authorRole = "";
+    currentAvatarId = "";
   }
 
   async function saveTestimonial() {
     if (!formName || !formContent) {
-      alert("Name and testimonial text are required");
+      console.error("Name and testimonial text are required");
       return;
     }
 
@@ -79,21 +107,41 @@
     formData.append("content", formContent);
     formData.append("rating", String(formRating));
     formData.append("source", "web");
+    formData.append("authorRole", authorRole);
 
     if (formProject) {
       formData.append("project", formProject);
     }
 
-    // IMPORTANT: append only if a real file exists
-    if (avatarFile instanceof FileList && avatarFile.length === 1) {
-      formData.append("authorAvatar", avatarFile[0], avatarFile[0].name);
-    }
-
-    if (deleteAvatar) {
-      formData.append("authorAvatar", ""); // 🔥 deletes stored file
-    }
-
     try {
+      // Handle Avatar Logic
+
+      // 1. Upload new avatar if selected
+      if (avatarFile && avatarFile.length > 0) {
+        const urls = await uploadAttachment(
+          `Testimonials - ${formName}` || "Testimonial Avatar",
+          Array.from(avatarFile),
+        );
+        if (urls.length > 0) {
+          formData.append("authorAvatar", urls[0]);
+
+          // Cleanup old avatar if it existed (replace logic)
+          if (currentAvatarId) {
+            await deleteAttachment(currentAvatarId);
+          }
+        }
+      }
+      // 2. Clear avatar if requested
+      else if (deleteAvatar) {
+        formData.append("authorAvatar", "");
+
+        // Cleanup old avatar
+        if (currentAvatarId) {
+          await deleteAttachment(currentAvatarId);
+        }
+      }
+      // 3. Otherwise leave authorAvatar as is (don't append anything regarding it)
+
       let record;
       if (selectedId) {
         record = await pb
@@ -119,6 +167,13 @@
   async function deleteTestimonial(id) {
     if (!confirm("Delete this testimonial?")) return;
     try {
+      // Find the testimonial to check for avatar
+      const t = testimonials.find((item) => item.id === id);
+      if (t?.authorAvatar) {
+        const attachId = extractIdFromUrl(t.authorAvatar);
+        if (attachId) await deleteAttachment(attachId);
+      }
+
       await pb.collection("testimonials").delete(id);
       testimonials = testimonials.filter((t) => t.id !== id);
       if (selectedId === id) newTestimonial();
@@ -157,24 +212,16 @@
             }}
           >
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden flex-shrink-0"
-              >
-                {#if t.authorAvatar}
-                  <img
-                    src={pb.files.getURL(t, t.authorAvatar)}
-                    alt={t.authorName}
-                    class="w-full h-full object-cover"
-                  />
-                {/if}
-              </div>
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-slate-900 truncate">
                   {t.authorName}
                 </div>
-                <div class="text-xs text-[#d4af37]">
+                <div class="text-xs text-aspada-gold">
                   {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
                 </div>
+              </div>
+              <div class="text-xs text-aspada-navy/70">
+                {findRoleLabelByValue(t.authorRole)}
               </div>
             </div>
             <button
@@ -197,6 +244,18 @@
         {selectedId ? "Edit Testimonial" : "Create Testimonial"}
       </h3>
 
+      {#if currentAvatarUrl && currentAvatarUrl !== ""}
+        <div
+          class="w-20 h-20 rounded-full bg-slate-100 overflow-hidden flex-shrink-0"
+        >
+          <img
+            src={currentAvatarUrl}
+            alt={formName}
+            class="w-full h-full object-cover"
+          />
+        </div>
+      {/if}
+
       <div class="space-y-4">
         <label class="block">
           <span class="text-sm font-bold text-slate-700">Client Name</span>
@@ -208,13 +267,26 @@
         </label>
 
         <label class="block">
-          <span class="text-sm font-bold text-slate-700">Testimonial Text</span>
-          <textarea
-            bind:value={formContent}
-            rows="5"
-            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
-            placeholder="Enter testimonial text..."
-          ></textarea>
+          <span class="text-sm font-bold text-slate-700">Client Role</span>
+          <select
+            bind:value={authorRole}
+            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none bg-white"
+          >
+            {#each authorRoleOptions as role}
+              <option value={role.value}>{role.label}</option>
+            {/each}
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700">Message</span>
+          {#key selectedId}
+            <MilkdownEditor
+              bind:value={formContent}
+              class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
+              placeholder="Enter message..."
+            />
+          {/key}
         </label>
 
         <div class="grid grid-cols-2 gap-4">
@@ -250,23 +322,32 @@
 
         <label class="block">
           <span class="text-sm font-bold text-slate-700">Avatar Image</span>
-          <input
-            type="file"
-            bind:this={fileInputEl}
-            bind:files={avatarFile}
-            accept="image/*"
-            class="w-full mt-1 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#d4af37]/10 file:text-[#d4af37] file:font-bold"
-          />
+
+          <div class="relative mt-1">
+            <input
+              type="file"
+              bind:this={fileInputEl}
+              bind:files={avatarFile}
+              accept="image/*"
+              class="w-full pr-10 text-sm text-slate-500
+             file:mr-4 file:py-2 file:px-4 file:rounded-full
+             file:border-0 file:bg-[#d4af37]/10
+             file:text-[#d4af37] file:font-bold"
+            />
+
+            {#if avatarFile && avatarFile.length > 0}
+              <button
+                type="button"
+                onclick={clearAvatarSelection}
+                class="absolute right-2 top-1/2 -translate-y-1/2
+               text-red-600 font-bold hover:scale-110"
+                aria-label="Clear selected file"
+              >
+                ✕
+              </button>
+            {/if}
+          </div>
         </label>
-        {#if avatarFile && avatarFile.length > 0}
-          <button
-            type="button"
-            onclick={clearAvatarSelection}
-            class="mt-1 text-xs hover:text-lg text-red-600 hover:underline cursor-pointer"
-          >
-            X
-          </button>
-        {/if}
       </div>
 
       <div class="flex gap-3 mt-6">

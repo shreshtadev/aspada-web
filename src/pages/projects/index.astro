@@ -13,10 +13,11 @@ let projects: string | any[] = [];
 try {
     const records = await pb.collection("projects").getFullList({
         sort: "-created",
+        expand: "coverImage"
     });
 
     projects = records.map((record) => {
-        const coverImageUrl = pb.files.getURL(record, record.coverImage, {
+        const coverImageUrl = pb.files.getURL(record.expand?.coverImage, record.expand?.coverImage?.attachment, {
             thumb: "800x600",
             quality: 80,
         });
@@ -43,7 +44,7 @@ try {
             <div class="mb-20 text-center max-w-3xl mx-auto">
                 <span
                     class="text-[#d4af37] font-bold tracking-[0.3em] uppercase text-xs"
-                    >Portolio</span
+                    >Projects</span
                 >
                 <h1
                     class="text-5xl md:text-7xl font-bold mt-6 text-aspada-steel mb-8"
@@ -53,7 +54,7 @@ try {
                     >
                 </h1>
                 <p class="text-aspada-steel/60 text-xl leading-relaxed">
-                    Explore our portfolio of meticulously crafted residential
+                    Explore our projects of meticulously crafted residential
                     layouts and commercial spaces that redefine modern living.
                 </p>
             </div>

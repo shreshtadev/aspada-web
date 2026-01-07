@@ -8,13 +8,20 @@ interface Project {
   image?: string;
 }
 
-const projectsFromBe = await pb.collection("projects").getList();
-const projects: Project[] = projectsFromBe.items
+const projectsFromBe = await pb.collection("projects").getFullList({
+  limit: 3,
+  expand: "coverImage",
+});
+const projects: Project[] = projectsFromBe
   .map((project) => {
-    const coverImageUrl = pb.files.getURL(project, project.coverImage, {
-      thumb: "1200",
-      quality: 80,
-    });
+    const coverImageUrl = pb.files.getURL(
+      project.expand?.coverImage,
+      project.expand?.coverImage?.attachment,
+      {
+        thumb: "1200",
+        quality: 80,
+      },
+    );
     return {
       id: project.id,
       name: project.title,

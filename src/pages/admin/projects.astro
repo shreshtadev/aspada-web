@@ -1,6 +1,6 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import ProjectList from "../../components/admin/ProjectList.svelte";
+import ProjectManager from "../../components/admin/ProjectManager.svelte";
 ---
 
 <AdminLayout>
@@ -8,13 +8,7 @@ import ProjectList from "../../components/admin/ProjectList.svelte";
     <h1 class="text-3xl font-bold text-aspada-steel uppercase tracking-tight">
       Projects <span class="text-aspada-gold">Inventory</span>
     </h1>
-    <a
-      href="/admin/projects/new"
-      class="bg-aspada-gold text-white px-6 py-2 rounded-full font-bold hover:bg-aspada-navy transition-colors shadow-lg shadow-aspada-gold/20"
-    >
-      + New Project
-    </a>
   </div>
 
-  <ProjectList client:load />
+  <ProjectManager client:load />
 </AdminLayout>

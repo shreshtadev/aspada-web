@@ -1,5 +1,6 @@
 <script lang="ts">
   import pb from "../../lib/pb";
+  import { uploadAttachment, deleteAttachment } from "../../lib/utils";
 
   type Spec = {
     id?: string;
@@ -8,6 +9,7 @@
     attachments?: string[];
     collectionId?: string;
     collectionName?: string;
+    [key: string]: any;
   };
 
   let specs = $state<Spec[]>([]);
@@ -15,20 +17,20 @@
   // Detail form state
   let selectedId = $state<string | null>(null);
   let formTitle = $state("");
-  let formDescription = $state("");
   let formFiles = $state<FileList | null>(null);
   let currentAttachments = $state<string[]>([]);
-  let currentCollectionId = $state("");
+  let currentAttachmentUrls = $state<{ id: string; url: string }[]>([]);
   let formLoading = $state(false);
 
   async function loadData() {
     try {
       formLoading = true;
-      const specsList = await pb.collection("specifications").getList(1, 50, {
-        sort: "-created",
+      const specsList = await pb.collection("metadata").getFullList({
+        filter: "categoryType = 'specification'",
+        expand: "attachments", // No longer expanding since we store URLs strings directly in JSON/text array
       });
 
-      specs = specsList.items as unknown as Spec[];
+      specs = specsList as unknown as Spec[];
     } catch (err) {
       console.error("Failed to load data:", err);
     } finally {
@@ -43,18 +45,22 @@
   function selectSpec(s: Spec) {
     selectedId = s?.id ?? null;
     formTitle = s?.title ?? "";
-    formDescription = s?.details ?? "";
     currentAttachments = s?.attachments ?? [];
-    currentCollectionId = s?.collectionId ?? "";
-    formFiles = null; // Reset file input
+    const attachments = s.expand?.attachments;
+    currentAttachmentUrls =
+      attachments?.map(
+        (attachment: { [key: string]: any; attachment: string }) => ({
+          id: attachment.id,
+          url: pb.files.getURL(attachment, attachment.attachment),
+        }),
+      ) ?? [];
+    formFiles = null;
   }
 
   function newSpec() {
     selectedId = null;
     formTitle = "";
-    formDescription = "";
     currentAttachments = [];
-    currentCollectionId = "";
     formFiles = null;
   }
 
@@ -66,32 +72,54 @@
 
     formLoading = true;
 
-    const formData = new FormData();
-    formData.append("title", formTitle);
-    formData.append("details", formDescription);
+    // 1. Calculate how many we can upload
+    // We want max 3 attachments total (existing + new)
+    const existingCount = currentAttachments.length;
+    const slotsAvailable = 3 - existingCount;
 
-    if (formFiles && formFiles.length > 0) {
-      for (let i = 0; i < formFiles.length; i++) {
-        formData.append("attachments", formFiles[i]);
-      }
-    }
+    let finalAttachments = [...currentAttachments];
 
     try {
+      // 2. Upload new files if any
+      if (formFiles && formFiles.length > 0) {
+        if (formFiles.length > slotsAvailable) {
+          alert(
+            `You can only have up to 3 attachments. You have ${existingCount} already.`,
+          );
+          formLoading = false;
+          return;
+        }
+
+        const uploadedUrls = await uploadAttachment(
+          `Spec - ${formTitle}` || "Specification Attachment",
+          Array.from(formFiles),
+        );
+        finalAttachments = [...finalAttachments, ...uploadedUrls];
+      }
+
+      const formData = new FormData();
+      formData.append("title", formTitle);
+      formData.append("categoryType", "specification");
+
+      // We must serialize the array of URLs effectively.
+      // If PB field 'attachments' is JSON:
+      formData.append("attachments", JSON.stringify(finalAttachments));
+
       if (selectedId) {
         const updated = await pb
-          .collection("specifications")
+          .collection("metadata")
           .update(selectedId, formData);
         specs = specs.map((it) =>
           it.id === selectedId ? (updated as unknown as Spec) : it,
         );
         selectSpec(updated as unknown as Spec);
       } else {
-        const created = await pb.collection("specifications").create(formData);
+        const created = await pb.collection("metadata").create(formData);
         specs = [created as unknown as Spec, ...specs];
         selectSpec(created as unknown as Spec);
       }
     } catch (err) {
-      alert(String(err));
+      alert(String(err)); // likely type mismatch if DB schema is strict file
     } finally {
       formLoading = false;
     }
@@ -102,7 +130,16 @@
     if (!confirm("Remove this specification?")) return;
 
     try {
-      await pb.collection("specifications").delete(id);
+      // 1. Delete all attachments associated
+      const s = specs.find((item) => item.id === id);
+      if (s && s.attachments && Array.isArray(s.attachments)) {
+        for (const attachId of s.attachments) {
+          await deleteAttachment(attachId);
+        }
+      }
+
+      // 2. Delete record
+      await pb.collection("metadata").delete(id);
       specs = specs.filter((s) => s.id !== id);
       if (selectedId === id) newSpec();
     } catch (err) {
@@ -110,17 +147,16 @@
     }
   }
 
-  // Helper to get image URL
-  function getAttachmentUrl(filename: string) {
-    if (!selectedId || !currentCollectionId) return "";
-    return pb.files.getUrl(
-      {
-        collectionId: currentCollectionId,
-        id: selectedId,
-        collectionName: "specifications",
-      },
-      filename,
-    );
+  async function removeAttachment(url: { [key: string]: any }) {
+    if (!confirm("Are you sure you want to delete this attachment?")) return;
+    const success = await deleteAttachment(url.id);
+    if (success) {
+      currentAttachmentUrls = currentAttachmentUrls.filter(
+        (u) => u.id !== url.id,
+      );
+      currentAttachments = currentAttachments.filter((id) => id !== url.id);
+      await loadData();
+    }
   }
 </script>
 
@@ -185,17 +221,6 @@
 
         <label class="block">
           <span class="text-sm font-bold text-slate-700"
-            >Details / Materials</span
-          >
-          <input
-            bind:value={formDescription}
-            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
-            placeholder="e.g., Describe the materials used..."
-          />
-        </label>
-
-        <label class="block">
-          <span class="text-sm font-bold text-slate-700"
             >Attachments (Images/Files)</span
           >
           <input
@@ -214,32 +239,27 @@
         {#if currentAttachments && currentAttachments.length > 0}
           <div class="mt-4">
             <span class="text-sm font-bold text-slate-700 mb-2 block"
-              >Current Attachments</span
+              >Current Attachments (Max 3)</span
             >
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {#each currentAttachments as att}
+              {#each currentAttachmentUrls as url}
                 <div
                   class="relative group border rounded-lg overflow-hidden p-2 bg-slate-50"
                 >
-                  <!-- Basic logic to try showing thumb if image, else link -->
-                  <!-- svelte-ignore a11y_img_redundant_alt -->
-                  <img
-                    src={getAttachmentUrl(att)}
-                    alt="Attachment"
-                    class="w-full h-24 object-cover rounded mb-2 bg-slate-200"
-                    onerror={(e) => {
-                      // Fallback for non-images
-                      (e.currentTarget as HTMLImageElement).style.display =
-                        "none";
-                    }}
-                  />
+                  <button
+                    type="button"
+                    onclick={() => removeAttachment(url)}
+                    class="absolute top-1 right-1 z-10 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    X
+                  </button>
                   <a
-                    href={getAttachmentUrl(att)}
+                    href={url.url}
                     target="_blank"
                     class="text-xs text-blue-600 truncate block hover:underline"
                     rel="noreferrer"
                   >
-                    {att}
+                    View File
                   </a>
                 </div>
               {/each}

@@ -1,0 +1,125 @@
+---
+import pb from '../../lib/pb';
+
+// interface Props {
+//     post: {
+//         id: string;
+//         title: string;
+//         content: string;
+//         created: string;
+//         featuredImage?: string;
+//         expand?: {
+//             featuredImage?: {
+//                 attachment: string;
+//                 collectionId: string;
+//                 collectionName: string;
+//                 created: string;
+//                 updated: string;
+//                 id: string;
+//                 title: string;
+//             },
+//             category?: {
+//                 id: string;
+//                 title: string;
+//             }[];
+//         };
+//     };
+// }
+
+const { post } = Astro.props;
+const fileURL = pb.files.getURL(post.expand?.featuredImage, String(post.expand?.featuredImage?.attachment));
+// Format date
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+};
+
+// Strip HTML/Markdown for excerpt (simple version)
+const getExcerpt = (content: string) => {
+    return content.replace(/<[^>]*>?/gm, "").slice(0, 150) + "...";
+};
+---
+
+<a
+    href={`/blog/${post.id}`}
+    class="block group relative overflow-hidden rounded-3xl bg-white hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full"
+>
+    <!-- Image Section (or Gradient Fallback) -->
+    <div class="aspect-[16/9] overflow-hidden bg-slate-100 relative">
+        {
+            post.featuredImage ? (
+                <img
+                    src={fileURL}
+                    alt={post.title}
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                />
+            ) : (
+                <div class="w-full h-full bg-gradient-to-br from-aspada-navy/5 to-aspada-navy/10 group-hover:from-aspada-navy/10 group-hover:to-aspada-navy/20 transition-colors flex items-center justify-center">
+                    <span class="text-4xl opacity-10">aspada</span>
+                </div>
+            )
+        }
+
+        <!-- Date Badge -->
+        <div
+            class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 shadow-sm"
+        >
+            <span
+                class="text-xs font-bold text-aspada-navy tracking-wide uppercase"
+            >
+                {formatDate(post.created)}
+            </span>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="p-8 flex-1 flex flex-col">
+        <!-- Tags -->
+        {
+            post.expand?.category && post.expand.category.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {post.expand.category.slice(0, 3).map((tag: {title: string}) => (
+                        <span class="text-[#d4af37] text-xs font-bold tracking-[0.1em] uppercase">
+                            #{tag.title}
+                        </span>
+                    ))}
+                </div>
+            )
+        }
+
+        <div class="flex-1">
+            <h3
+                class="text-2xl font-bold text-aspada-navy mb-3 group-hover:text-[#d4af37] transition-colors line-clamp-2"
+            >
+                {post.title}
+            </h3>
+
+            <p class="text-slate-600 mb-6 line-clamp-3 leading-relaxed">
+                {getExcerpt(post.content)}
+            </p>
+        </div>
+
+        <!-- Read More Link -->
+        <div
+            class="flex justify-between items-center pt-6 border-t border-slate-100"
+        >
+            <span
+                class="text-sm font-semibold text-aspada-navy group-hover:text-[#d4af37] transition-colors"
+            >
+                Read Article
+            </span>
+            <div
+                class="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-[#d4af37] group-hover:bg-[#d4af37] transition-all"
+            >
+                <span
+                    class="i-lucide-arrow-right text-slate-400 group-hover:text-white block text-lg"
+                ></span>
+            </div>
+        </div>
+    </div>
+</a>

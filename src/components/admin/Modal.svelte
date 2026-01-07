@@ -4,36 +4,39 @@
 
 {#if show}
     <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all"
+        class="fixed inset-0 z-50 overflow-y-auto"
         role="dialog"
         aria-modal="true"
     >
-        <!-- Backdrop click generic handler -->
+        <!-- Backdrop -->
         <div
-            class="absolute inset-0"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-all"
             onclick={onClose}
-            onkeydown={(e) => e.key === "Escape" && onClose()}
             role="button"
             tabindex="0"
+            onkeydown={(e) => e.key === "Escape" && onClose()}
         ></div>
 
-        <!-- Panel -->
-        <div
-            class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
-        >
+        <!-- Scrollable Wrapper for centering -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <!-- Panel -->
             <div
-                class="px-6 py-4 border-b flex justify-between items-center bg-slate-50"
+                class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-lg md:max-w-5xl lg:max-w-6xl animate-in fade-in zoom-in-95 duration-200"
             >
-                <h3 class="font-bold text-slate-800 text-lg">{title}</h3>
-                <button
-                    onclick={onClose}
-                    class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 transition-colors"
+                <div
+                    class="px-6 py-4 border-b flex justify-between items-center bg-aspada-gold/80 rounded-t-2xl"
                 >
-                    ✕
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto">
-                {@render children()}
+                    <h3 class="font-bold text-aspada-navy text-lg">{title}</h3>
+                    <button
+                        onclick={onClose}
+                        class="text-aspada-navy hover:text-aspada-cream w-8 h-8 flex items-center justify-center rounded-full hover:bg-aspada-steel transition-colors"
+                    >
+                        ✕
+                    </button>
+                </div>
+                <div class="p-6">
+                    {@render children()}
+                </div>
             </div>
         </div>
     </div>
