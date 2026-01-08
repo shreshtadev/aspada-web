@@ -82,7 +82,7 @@
       <h3 class="font-bold">Amenities</h3>
       <button
         onclick={newAmenity}
-        class="text-sm text-[#0f172a] bg-[#f8f6f2] px-3 py-1 rounded"
+        class="text-sm text-aspada-navy bg-aspada-navy/10 px-3 py-1 rounded"
         >+ New</button
       >
     </div>
@@ -142,7 +142,7 @@
         <button
           onclick={saveAmenity}
           disabled={loading}
-          class="bg-[#d4af37] text-white px-6 py-2 rounded font-bold"
+          class="bg-aspada-gold text-white px-6 py-2 rounded font-bold"
           >{loading ? "Saving..." : selectedId ? "Update" : "Create"}</button
         >
         {#if selectedId}

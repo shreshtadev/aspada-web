@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://aspadadevelopers.com/sitemap-index.xml
+Sitemap: https://ornate-parfait-968260.netlify.app/sitemap-index.xml

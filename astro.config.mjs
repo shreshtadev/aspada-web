@@ -27,6 +27,29 @@ export default defineConfig({
         ].filter(Boolean),
     },
     vite: {
+        build: {
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        // ---- Milkdown editor (largest dependency) ----
+                        if (id.includes("node_modules/@milkdown")) {
+                            return "milkdown";
+                        }
+
+                        // ---- PocketBase SDK ----
+                        if (id.includes("node_modules/pocketbase")) {
+                            return "pocketbase";
+                        }
+
+                        // ---- Markdown parsing ----
+                        if (id.includes("node_modules/marked")) {
+                            return "marked";
+                        }
+                        // Default: let Astro/Vite handle everything else
+                    },
+                }
+            }
+        },
         server: {
             watch: {
                 ignored: [

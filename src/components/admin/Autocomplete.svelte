@@ -117,7 +117,7 @@
             {#if allowCreate}
                 <div class="border-t p-1">
                     <button
-                        class="w-full text-left px-4 py-2 text-sm text-[#d4af37] font-bold hover:bg-[#d4af37]/10 rounded-lg flex items-center gap-2"
+                        class="w-full text-left px-4 py-2 text-sm text-aspada-gold font-bold hover:bg-aspada-gold/10 rounded-lg flex items-center gap-2"
                         onclick={handleCreate}
                         type="button"
                     >
