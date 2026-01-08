@@ -34,8 +34,9 @@ const { posterUrl, videoMp4Url, videoWebmUrl } = Astro.props;
       loop
       muted
       playsinline
+      preload="metadata"
       poster={posterUrl}
-      class="w-full h-full object-cover grayscale-10 brightness-40 contrast-110"
+      class="absolute inset-0 w-full h-full object-cover contrast-110 motion-safe:autoplay"
     >
       <source src={videoWebmUrl} type="video/webm" />
       <source src={videoMp4Url} type="video/mp4" />
