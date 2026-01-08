@@ -10,10 +10,7 @@
 
 [build.environment]
   # Specify Node.js version (use a recent LTS version)
-  NODE_VERSION = "20"
-  
-  # Use pnpm as the package manager
-  NPM_FLAGS = "--version" # This is ignored when using pnpm
+  NODE_VERSION = "24"
   
   # Enable pnpm
   ENABLE_PNPM = "true"

@@ -57,6 +57,8 @@ export default defineConfig({
                     "**/.git/**",
                     "**/dist/**",
                     "**/.astro/**",
+                    "**/dist/**",
+                    "**/.netlify/**"
                 ],
             },
         },
