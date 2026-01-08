@@ -1,0 +1,90 @@
+[build]
+  # Build command using pnpm
+  command = "pnpm run build"
+  
+  # Publish directory for Astro with Netlify adapter
+  publish = "dist"
+  
+  # Functions directory (Netlify adapter creates serverless functions here)
+  functions = ".netlify/functions-internal"
+
+[build.environment]
+  # Specify Node.js version (use a recent LTS version)
+  NODE_VERSION = "20"
+  
+  # Use pnpm as the package manager
+  NPM_FLAGS = "--version" # This is ignored when using pnpm
+  
+  # Enable pnpm
+  ENABLE_PNPM = "true"
+  
+  # Specify pnpm version (optional, uses latest if not specified)
+  PNPM_VERSION = "9"
+
+# Development server configuration
+[dev]
+  command = "pnpm run dev"
+  port = 4321
+  targetPort = 4321
+  autoLaunch = false
+
+# Redirects and rewrites (if needed)
+# [[redirects]]
+#   from = "/old-path"
+#   to = "/new-path"
+#   status = 301
+
+# Headers configuration for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Cache control for static assets
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    # Cache static assets for 1 year
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    # Cache Astro build assets for 1 year
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Context-specific configurations
+[context.production]
+  command = "pnpm run build"
+  
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview]
+  command = "pnpm run build"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+
+[context.branch-deploy]
+  command = "pnpm run build"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "production"
+
+# Functions configuration (for Netlify serverless functions)
+[functions]
+  # Directory for custom Netlify functions (if you add any)
+  directory = "netlify/functions"
+  
+  # Node bundler
+  node_bundler = "esbuild"
+  
+  # Include files pattern
+  included_files = ["public/**"]
