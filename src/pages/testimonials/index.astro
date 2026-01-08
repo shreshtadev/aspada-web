@@ -11,7 +11,7 @@ let testimonials: any[] | undefined = [];
 try {
     testimonials = await pb.collection("testimonials").getFullList({
         sort: "-created",
-        expand: "project",
+        expand: "project,authorAvatar",
     });
 } catch (e) {
     console.error("Error fetching testimonials:", e);
@@ -23,7 +23,7 @@ try {
 
     <main class="min-h-screen bg-slate-50">
         <!-- Header Section -->
-        <div class="relative bg-aspada-navy py-24 px-6 overflow-hidden">
+        <div class="relative bg-aspada-navy py-28 px-6 overflow-hidden">
             <div class="absolute inset-0 bg-slate-900/50 z-0"></div>
             <!-- Abstract Background Decoration -->
             <div

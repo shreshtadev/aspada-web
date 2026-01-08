@@ -10,22 +10,24 @@ const { id } = Astro.params;
 
 let testimonial;
 let project;
+let authorAvatar;
 if (id === undefined) {
     return Astro.redirect("/404");
 }
 
 try {
     testimonial = await pb.collection("testimonials").getOne(String(id), {
-        expand: "project",
+        expand: "project,authorAvatar",
     });
     project = testimonial.expand?.project;
+    authorAvatar = testimonial.expand?.authorAvatar;
 } catch (e) {
     console.error("Error fetching testimonial:", e);
     return Astro.redirect("/404");
 }
 
 const avatarUrl = testimonial.authorAvatar
-    ? pb.files.getURL(testimonial, testimonial.authorAvatar)
+    ? pb.files.getURL(authorAvatar, authorAvatar.attachment)
     : "https://i.pravatar.cc/150?u=" + testimonial.id;
 ---
 

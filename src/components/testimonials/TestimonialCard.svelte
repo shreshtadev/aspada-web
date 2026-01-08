@@ -8,10 +8,11 @@
         "https://i.pravatar.cc/150?u=" + (testimonial.id || "default"),
     );
 
+    let authorAvatar = $derived(testimonial.expand?.authorAvatar);
     // Construct image URL if avatar exists
     let avatarUrl = $derived(
-        testimonial.authorAvatar
-            ? pb.files.getURL(testimonial, testimonial.authorAvatar)
+        authorAvatar
+            ? pb.files.getURL(authorAvatar, authorAvatar.attachment)
             : defaultAvatar,
     );
 </script>
