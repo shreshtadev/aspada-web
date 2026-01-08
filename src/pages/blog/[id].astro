@@ -21,7 +21,9 @@ const formatDate = (dateString: string) => {
 
 try {
     if (!id) throw new Error("No ID provided");
-    post = await pb.collection("posts").getOne(id, { expand: "category,featuredImage" });
+    post = await pb
+        .collection("posts")
+        .getOne(id, { expand: "category,featuredImage" });
 
     // Parse markdown content to HTML
     contentHtml = await marked.parse(post.content || "");
@@ -39,7 +41,10 @@ const description = post.content
     ? post.content.replace(/<[^>]*>?/gm, "").slice(0, 160) + "..."
     : "Read this article on Aspada Developers.";
 
-const fileURL = pb.files.getURL(post.expand?.featuredImage, String(post.expand?.featuredImage?.attachment));
+const fileURL = pb.files.getURL(
+    post.expand?.featuredImage,
+    String(post.expand?.featuredImage?.attachment),
+);
 ---
 
 <Layout
@@ -59,7 +64,7 @@ const fileURL = pb.files.getURL(post.expand?.featuredImage, String(post.expand?.
                     post.expand?.tags && (
                         <div class="flex flex-wrap justify-center gap-2 mb-6">
                             {post.expand.tags.map((tag: any) => (
-                                <span class="text-[#d4af37] text-sm font-bold tracking-widest uppercase px-3 py-1 border border-[#d4af37]/20 rounded-full">
+                                <span class="text-aspada-gold text-sm font-bold tracking-widest uppercase px-3 py-1 border border-aspada-gold/20 rounded-full">
                                     {tag.title}
                                 </span>
                             ))}
@@ -68,13 +73,13 @@ const fileURL = pb.files.getURL(post.expand?.featuredImage, String(post.expand?.
                 }
 
                 <h1
-                    class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-aspada-navy mb-6 leading-tight"
+                    class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-aspada-navy/90 mb-6 leading-tight"
                 >
                     {post.title}
                 </h1>
 
                 <div
-                    class="flex items-center justify-center gap-4 text-slate-500 font-medium"
+                    class="flex items-center justify-center gap-4 text-aspada-steel font-medium"
                 >
                     <time datetime={post.created}
                         >{formatDate(post.created)}</time
