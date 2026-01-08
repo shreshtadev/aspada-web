@@ -6,7 +6,7 @@
 </script>
 
 <div
-    class="w-full max-w-xl mx-auto rounded-xl border border-aspada-silver/20 bg-aspada-silver/40 p-4 space-y-3 mb-4"
+    class="w-full max-w-xl mx-auto rounded-xl border border-aspada-silver/20 bg-aspada-silver/10 p-4 space-y-3 mb-4"
 >
     <h3 class="text-base font-semibold text-aspada-steel">
         {title}
