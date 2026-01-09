@@ -7,6 +7,7 @@ import SocialEmbed from "../../components/SocialEmbed.svelte";
 import pb from "../../lib/pb";
 import { getLocationName } from "../../lib/utils";
 import { marked } from "marked";
+import toast from "svelte-french-toast";
 
 const { id } = Astro.params;
 
@@ -90,6 +91,7 @@ try {
     };
 } catch (e) {
     console.error("Error fetching project:", e);
+    toast.error("Error fetching project");
     return Astro.redirect("/404");
 }
 ---

@@ -4,7 +4,7 @@
     import Modal from "./Modal.svelte";
     import MilkdownEditor from "../MilkdownEditor.svelte";
     import Autocomplete from "./Autocomplete.svelte";
-
+    import toast from "svelte-french-toast";
     // Master list state
     let posts = $state([]);
     let currentPage = $state(1);
@@ -59,6 +59,7 @@
             allTags = metadataRes.filter((m) => m.categoryType === "tag");
         } catch (err) {
             console.error("Failed to load data:", err);
+            toast.error("Failed to load data");
         } finally {
             loading = false;
         }
@@ -99,7 +100,7 @@
 
     async function handleQuickAdd() {
         if (!newItemTitle) {
-            alert("Title is required");
+            toast.error("Title is required");
             return;
         }
         modalLoading = true;
@@ -127,7 +128,7 @@
             showModal = false;
         } catch (err) {
             console.error("Error creating metadata:", err);
-            alert(err.message);
+            toast.error(err.message);
         } finally {
             modalLoading = false;
         }
@@ -135,7 +136,7 @@
 
     async function savePost() {
         if (!formTitle) {
-            alert("Title is required");
+            toast.error("Title is required");
             return;
         }
 
@@ -180,7 +181,7 @@
                 selectPost(created);
             }
         } catch (err) {
-            alert(String(err));
+            toast.error(String(err));
             console.error(err);
         } finally {
             formLoading = false;
@@ -199,7 +200,7 @@
             posts = posts.filter((item) => item.id !== id);
             if (selectedId === id) newPost();
         } catch (err) {
-            alert(String(err));
+            toast.error(String(err));
         }
     }
 </script>

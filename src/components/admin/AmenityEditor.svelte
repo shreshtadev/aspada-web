@@ -1,5 +1,6 @@
 <script>
   import pb from "../../lib/pb";
+  import toast from "svelte-french-toast";
 
   // Master-detail state
   let amenities = $state([]);
@@ -15,6 +16,7 @@
       amenities = amenitiesList;
     } catch (err) {
       console.error("Failed to load data:", err);
+      toast.error("Failed to load data:");
     }
   }
 
@@ -34,7 +36,7 @@
 
   async function saveAmenity() {
     if (!formTitle) {
-      alert("Title is required");
+      toast.error("Title is required");
       return;
     }
 
@@ -55,7 +57,7 @@
         selectAmenity(created);
       }
     } catch (err) {
-      alert(String(err));
+      toast.error(String(err));
     } finally {
       loading = false;
     }
@@ -68,7 +70,7 @@
       amenities = amenities.filter((a) => a.id !== id);
       if (selectedId === id) newAmenity();
     } catch (err) {
-      alert(String(err));
+      toast.error(String(err));
     }
   }
 </script>

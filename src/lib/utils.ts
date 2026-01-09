@@ -1,4 +1,5 @@
 // src/lib/utils.ts
+import toast from "svelte-french-toast";
 import pb from "./pb";
 
 // Simple in-memory cache to avoid redundant API calls during a single build/session
@@ -38,6 +39,7 @@ export async function getLocationName(lat: number | string, lon: number | string
 
     } catch (error) {
         console.error("Geocoding Server Error:", error);
+        toast.error("Geocoding Server Error");
         return "Location Details"; // Fallback
     }
 }
@@ -51,6 +53,7 @@ export const markdownAttachmentUploader = async (files: File[], schema: any) => 
         const MAX_SIZE_MB = 2;
         if (file.size > MAX_SIZE_MB * 1024 * 1024) {
             console.error(`File exceeds ${MAX_SIZE_MB}MB`);
+            toast.error(`File exceeds ${MAX_SIZE_MB}MB`);
             continue;
         }
 
@@ -58,6 +61,7 @@ export const markdownAttachmentUploader = async (files: File[], schema: any) => 
         const allowed = ['image/jpeg', 'image/png', 'image/gif'];
         if (!allowed.includes(file.type)) {
             console.error('Only JPEG, PNG, GIF allowed');
+            toast.error('Only JPEG, PNG, GIF allowed');
             continue;
         }
 
@@ -77,6 +81,7 @@ export const markdownAttachmentUploader = async (files: File[], schema: any) => 
             });
         } catch (err) {
             console.error('PocketBase upload failed', err);
+            toast.error('PocketBase upload failed');
             return null;
         }
     }
@@ -91,6 +96,7 @@ export const deleteAttachment = async (id: string) => {
         isDeleted = true;
     } catch (err) {
         console.error('PocketBase delete failed', err);
+        toast.error('PocketBase delete failed');
     }
     return isDeleted;
 };
@@ -107,6 +113,7 @@ export const uploadAttachment = async (title: string, files: File[]) => {
             uploadedFiles.push(record.id);
         } catch (err) {
             console.error('PocketBase upload failed', err);
+            toast.error('PocketBase upload failed');
             return [];
         }
     }

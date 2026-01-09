@@ -1,6 +1,6 @@
 <script>
     import { deleteAttachment } from "../../lib/utils";
-
+    import toast from "svelte-french-toast";
     let {
         label = "Files",
         attachmentIds = $bindable([]),
@@ -25,7 +25,7 @@
 
         // Check limit
         if (filesArray.length > slotsAvailable) {
-            alert(
+            toast.info(
                 `You can only upload ${slotsAvailable} more file(s). Maximum is ${maxFiles}.`,
             );
             if (fileInput) fileInput.value = "";

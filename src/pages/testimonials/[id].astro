@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import pb from "../../lib/pb";
+import toast from "svelte-french-toast";
 
 export const prerender = false;
 
@@ -23,6 +24,7 @@ try {
     authorAvatar = testimonial.expand?.authorAvatar;
 } catch (e) {
     console.error("Error fetching testimonial:", e);
+    toast.error("Error fetching testimonial");
     return Astro.redirect("/404");
 }
 

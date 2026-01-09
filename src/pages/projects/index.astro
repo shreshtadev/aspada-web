@@ -5,6 +5,7 @@ import Footer from "../../components/Footer.astro";
 import ActionDock from "../../components/ActionDock.astro";
 import ProjectList from "../../components/projects/ProjectList.astro";
 import pb from "../../lib/pb";
+import toast from "svelte-french-toast";
 
 // Fetch projects
 // Using fullList to get all projects for the index page.
@@ -13,14 +14,18 @@ let projects: string | any[] = [];
 try {
     const records = await pb.collection("projects").getFullList({
         sort: "-created",
-        expand: "coverImage"
+        expand: "coverImage",
     });
 
     projects = records.map((record) => {
-        const coverImageUrl = pb.files.getURL(record.expand?.coverImage, record.expand?.coverImage?.attachment, {
-            thumb: "800x600",
-            quality: 80,
-        });
+        const coverImageUrl = pb.files.getURL(
+            record.expand?.coverImage,
+            record.expand?.coverImage?.attachment,
+            {
+                thumb: "800x600",
+                quality: 80,
+            },
+        );
 
         return {
             id: record.id,
@@ -32,7 +37,8 @@ try {
         };
     });
 } catch (e) {
-    console.error("Error fetching projects:", e);
+    console.error(e);
+    toast.error("Error fetching projects");
 }
 ---
 

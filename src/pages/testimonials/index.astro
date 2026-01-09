@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import TestimonialList from "../../components/testimonials/TestimonialList.svelte";
 import pb from "../../lib/pb";
+import toast from "svelte-french-toast";
 
 export const prerender = false; // Ensure server-side rendering for fresh data
 
@@ -15,6 +16,7 @@ try {
     });
 } catch (e) {
     console.error("Error fetching testimonials:", e);
+    toast.error("Error fetching testimonials");
 }
 ---
 

@@ -2,6 +2,7 @@
   import pb from "../../lib/pb";
   import { uploadAttachment, deleteAttachment } from "../../lib/utils";
   import MilkdownEditor from "../MilkdownEditor.svelte";
+  import toast from "svelte-french-toast";
 
   const authorRoles = [
     "property-owner",
@@ -51,6 +52,7 @@
       testimonials = testimonialsList;
     } catch (err) {
       console.error("Failed to load data:", err);
+      toast.error("Failed to load data");
     }
   }
 
@@ -69,8 +71,8 @@
         : t?.project || "";
     avatarFile = undefined;
     authorRole = t?.authorRole || "";
-    currentAvatarId = t?.authorAvatar || "";
     const attachment = t.expand.authorAvatar;
+    currentAvatarId = attachment?.id || "";
     currentAvatarUrl = pb.files.getURL(attachment, attachment.attachment);
   }
 
@@ -92,11 +94,13 @@
     avatarFile = null;
     authorRole = "";
     currentAvatarId = "";
+    currentAvatarUrl = "";
   }
 
   async function saveTestimonial() {
     if (!formName || !formContent) {
       console.error("Name and testimonial text are required");
+      toast.error("Name and testimonial text are required");
       return;
     }
 
@@ -157,7 +161,7 @@
       selectTestimonial(record);
     } catch (err) {
       console.error("PocketBase error:", err?.response?.data || err);
-      alert(err?.response?.data?.message ?? "Upload failed");
+      toast.error(err?.message ?? "Upload failed");
     } finally {
       formLoading = false;
       deleteAvatar = false;
@@ -178,7 +182,7 @@
       testimonials = testimonials.filter((t) => t.id !== id);
       if (selectedId === id) newTestimonial();
     } catch (err) {
-      alert(String(err));
+      toast.error(err?.message ?? "Delete failed");
     }
   }
 </script>

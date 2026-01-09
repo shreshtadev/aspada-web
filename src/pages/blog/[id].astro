@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import pb from "../../lib/pb";
 import { marked } from "marked";
+import toast from "svelte-french-toast";
 
 const { id } = Astro.params;
 
@@ -29,6 +30,7 @@ try {
     contentHtml = await marked.parse(post.content || "");
 } catch (e) {
     console.error("Error fetching post:", e);
+    toast.error("Error fetching post");
     return Astro.redirect("/404");
 }
 

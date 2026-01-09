@@ -1,6 +1,7 @@
 <script lang="ts">
   import pb from "../../lib/pb";
   import { uploadAttachment, deleteAttachment } from "../../lib/utils";
+  import toast from "svelte-french-toast";
 
   type Spec = {
     id?: string;
@@ -33,6 +34,7 @@
       specs = specsList as unknown as Spec[];
     } catch (err) {
       console.error("Failed to load data:", err);
+      toast.error("Failed to load data");
     } finally {
       formLoading = false;
     }
@@ -66,7 +68,7 @@
 
   async function saveSpec() {
     if (!formTitle) {
-      alert("Title is required");
+      toast.error("Title is required");
       return;
     }
 
@@ -83,7 +85,7 @@
       // 2. Upload new files if any
       if (formFiles && formFiles.length > 0) {
         if (formFiles.length > slotsAvailable) {
-          alert(
+          toast.success(
             `You can only have up to 3 attachments. You have ${existingCount} already.`,
           );
           formLoading = false;
@@ -119,7 +121,7 @@
         selectSpec(created as unknown as Spec);
       }
     } catch (err) {
-      alert(String(err)); // likely type mismatch if DB schema is strict file
+      toast.error(err?.message);
     } finally {
       formLoading = false;
     }
@@ -143,7 +145,7 @@
       specs = specs.filter((s) => s.id !== id);
       if (selectedId === id) newSpec();
     } catch (err) {
-      alert(String(err));
+      toast.error(err?.message);
     }
   }
 

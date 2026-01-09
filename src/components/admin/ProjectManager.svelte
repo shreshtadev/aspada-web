@@ -5,7 +5,7 @@
   import MilkdownEditor from "../MilkdownEditor.svelte";
   import Autocomplete from "./Autocomplete.svelte";
   import FileUploadTracker from "./FileUploadTracker.svelte";
-
+  import toast from "svelte-french-toast";
   // Master list state
   let projects = $state([]);
   let currentPage = $state(1);
@@ -70,6 +70,7 @@
       allSpecs = metadataRes.filter((m) => m.categoryType === "specification");
     } catch (err) {
       console.error("Failed to load data:", err);
+      toast.error("Failed to load data");
     } finally {
       loading = false;
     }
@@ -127,7 +128,7 @@
 
   async function handleQuickAdd() {
     if (!newItemTitle) {
-      alert("Title is required");
+      toast.error("Title is required");
       return;
     }
     modalLoading = true;
@@ -193,7 +194,7 @@
 
       showModal = false;
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       modalLoading = false;
     }
@@ -201,7 +202,7 @@
 
   async function saveProject() {
     if (!formTitle) {
-      alert("Title is required");
+      toast.error("Title is required");
       return;
     }
 
@@ -264,7 +265,7 @@
         selectProject(created);
       }
     } catch (err) {
-      alert(String(err));
+      toast.error(String(err));
       console.error(err);
     } finally {
       formLoading = false;
@@ -284,7 +285,7 @@
       projects = projects.filter((item) => item.id !== id);
       if (selectedId === id) newProject();
     } catch (err) {
-      alert(String(err));
+      toast.error(String(err));
     }
   }
 </script>
