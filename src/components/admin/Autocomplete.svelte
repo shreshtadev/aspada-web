@@ -65,7 +65,7 @@
       <span
         class="bg-slate-100 text-slate-800 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-slate-200"
       >
-        {item.title} - {item.summary.slice(0, 50) + "..."}
+        {item.title} - {item.summary ? item.summary.slice(0, 50) + "..." : ""}
         <button
           onclick={(e) => {
             e.stopPropagation();

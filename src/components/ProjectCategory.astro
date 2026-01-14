@@ -9,28 +9,22 @@ type Category = {
 
 const categories: Category[] = [
   {
-    title: "Plots",
+    title: "Layouts",
     description: "Residential layouts & plotted developments",
     href: "/projects/plots",
     icon: "map",
-    image:
-      "https://placehold.co/1839x611/purple/white?text=Plots&font=Montserrat",
   },
   {
     title: "Residential",
     description: "Apartments, villas & gated communities",
     href: "/projects/residential",
     icon: "home",
-    image:
-      "https://placehold.co/1839x611/teal/white?text=Residential&font=Oswald",
   },
   {
     title: "Commercial",
     description: "Retail, office & mixed-use projects",
     href: "/projects/commercial",
     icon: "building-2",
-    image:
-      "https://placehold.co/1839x611/blue/white?text=Commercial&font=Poppins",
   },
 ];
 ---
@@ -47,17 +41,6 @@ const categories: Category[] = [
                  transition-all duration-500
                  hover:shadow-2xl hover:-translate-y-2"
           >
-            {item.image && (
-              <img
-                src={item.image}
-                alt={item.title}
-                class="absolute inset-0 h-full w-full object-cover
-                     scale-105 transition-transform duration-[1500ms]
-                     group-hover:scale-110 grayscale-[20%] group-hover:grayscale-0"
-                loading="lazy"
-              />
-            )}
-
             <div
               class="absolute inset-0 bg-gradient-to-t
                    from-aspada-navy via-aspada-navy/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity"
@@ -67,13 +50,15 @@ const categories: Category[] = [
               class="relative z-10 flex h-full w-full flex-col
                    justify-between p-10 text-white"
             >
-              <div
-                class="inline-flex h-24 w-24 items-center justify-center
-                     rounded-[2rem] bg-white/10 backdrop-blur-xl
-                     border border-white/20 transition-all duration-700
-                     group-hover:bg-transparent group-hover:border-aspada-silver/20 group-hover:rotate-[10deg] text-3xl"
-              >
-                <span class={`i-lucide-${item.icon}`} />
+              <div class="flex flex-1 items-center justify-center">
+                <div
+                  class="inline-flex h-48 w-48 items-center justify-center
+                       rounded-[2rem] bg-white/10 backdrop-blur-xl
+                       border border-white/20 transition-all duration-700
+                       group-hover:bg-transparent group-hover:border-aspada-silver/20 group-hover:rotate-[10deg] text-3xl"
+                >
+                  <span class={`i-lucide-${item.icon}`} />
+                </div>
               </div>
 
               <div class="space-y-4">
