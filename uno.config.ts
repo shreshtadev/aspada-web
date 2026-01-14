@@ -31,9 +31,9 @@ export default defineConfig({
 			aspada: {
 				gold: "#D4AF37", // Main Logo Gold
 				navy: "#162A47", // Primary Background (Midnight)
-				cream: "#FFFEEB", // Secondary Text/BG (Vanilla)
+				cream: "#FBFBEB", // Secondary Text/BG (Vanilla)
 				steel: "#2E5A88", // Accent 1
-				silver: "#EEEEE0", // Accent 2 (Champagne)
+				silver: "#e0ebf3ff", // Accent 2 (Champagne)
 			},
 		},
 		breakpoints: {

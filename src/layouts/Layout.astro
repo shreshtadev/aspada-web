@@ -1,4 +1,5 @@
 ---
+import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
@@ -8,7 +9,7 @@ interface Props {
 const {
   title,
   description = "Aspada - Building Legacy, Crafting Dreams. Premium Real Estate Development.",
-  image = "/images/og-image.jpg",
+  image = "../assets/3D.jpg",
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -39,7 +40,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
   </head>
   <body
-    class="bg-aspada-cream text-aspada-navy font-sans selection:bg-aspada-gold selection:text-aspada-steel"
+    class="bg-white text-aspada-navy font-sans selection:bg-aspada-gold selection:text-aspada-steel"
   >
     <slot />
   </body>

@@ -1,0 +1,14 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import MetadataEditor from "../../components/admin/MetadataEditor.svelte";
+---
+
+<AdminLayout>
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tight">
+      Manage <span class="text-aspada-gold">Project Details</span>
+    </h1>
+  </header>
+
+  <MetadataEditor client:load initialCategory="amenity" />
+</AdminLayout>

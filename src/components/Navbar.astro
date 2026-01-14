@@ -2,6 +2,8 @@
 import { Image } from "astro:assets";
 import logo from "../assets/Logo.png";
 import MobileMenu from "./MobileMenu.astro";
+import pb from "../lib/pb";
+const isAuthenticated = pb.authStore.isValid;
 ---
 
 <nav
@@ -42,10 +44,24 @@ import MobileMenu from "./MobileMenu.astro";
       </a>
 
       <a
-        href="/projects"
+        href="/projects/residential"
         class="px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver hover:bg-white/10 transition-all"
       >
-        Projects
+        Residential Projects
+      </a>
+
+      <a
+        href="/projects/commercial"
+        class="px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver hover:bg-white/10 transition-all"
+      >
+        Commercial Projects
+      </a>
+
+      <a
+        href="/projects/plots"
+        class="px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest text-aspada-silver hover:bg-white/10 transition-all"
+      >
+        Plots
       </a>
 
       <a
@@ -69,9 +85,19 @@ import MobileMenu from "./MobileMenu.astro";
         <a
           href="https://youtube.com/@aspadadevelopers/videos"
           class="i-lucide-youtube hover:text-aspada-cream transition"></a>
-        <a
-          href="/admin/login"
-          class="i-lucide-log-in hover:text-aspada-cream transition"></a>
+        {
+          isAuthenticated ? (
+            <a
+              href="/admin"
+              class="i-lucide-user hover:text-aspada-cream transition"
+            />
+          ) : (
+            <a
+              href="/admin/login"
+              class="i-lucide-log-in hover:text-aspada-cream transition"
+            />
+          )
+        }
       </div>
       <button
         id="mobile-menu-toggle"

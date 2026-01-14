@@ -9,53 +9,53 @@ import toast from "svelte-french-toast";
 // Fetch posts
 let posts: string | any[] = [];
 try {
-    posts = await pb.collection("posts").getFullList({
-        sort: "-created",
-        expand: "category,featuredImage",
-    });
+  posts = await pb.collection("posts").getFullList({
+    sort: "-created",
+    expand: "category,featuredImage",
+  });
 } catch (e) {
-    console.error("Error fetching posts:", e);
-    toast.error("Error fetching posts");
+  console.error("Error fetching posts:", e);
+  toast.error("Error fetching posts");
 }
 ---
 
 <Layout
-    title="Blog - Aspada Developers"
-    description="Insights, updates, and stories from the world of luxury real estate development."
+  title="Blog - Aspada Developers"
+  description="Insights, updates, and stories from the world of luxury real estate development."
 >
-    <Navbar />
-    <!-- Simple Hero -->
-    <section class="relative bg-aspada-navy py-24 px-8 overflow-hidden">
-        <div class="max-w-7xl mx-auto relative z-10">
-            <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
-                Latest News
-            </h1>
-            <p class="text-xl text-aspada-steel max-w-2xl">
-                Insights, updates, and stories from the world of luxury real
-                estate development.
-            </p>
-        </div>
+  <Navbar />
+  <!-- Simple Hero -->
+  <section class="relative bg-aspada-navy py-30 px-8 overflow-hidden">
+    <div class="max-w-7xl mx-auto relative z-10">
+      <h1 class="text-4xl md:text-6xl font-bold text-aspada-cream mb-6">
+        Latest News
+      </h1>
+      <p class="text-xl text-aspada-cream max-w-2xl">
+        Insights, updates, and stories from the world of luxury real estate
+        development.
+      </p>
+    </div>
 
-        <!-- Background decoration -->
-        <div
-            class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#d4af37]/10 to-transparent pointer-events-none"
-        >
-        </div>
-    </section>
+    <!-- Background decoration -->
+    <div
+      class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#d4af37]/10 to-transparent pointer-events-none"
+    >
+    </div>
+  </section>
 
-    <!-- Content -->
-    <main class="min-h-screen bg-slate-50 py-16 px-8">
-        <div class="max-w-7xl mx-auto">
-            {
-                posts.length > 0 ? (
-                    <PostList posts={posts} />
-                ) : (
-                    <div class="text-center py-24 text-slate-500">
-                        <p class="text-xl">No stories published yet.</p>
-                    </div>
-                )
-            }
-        </div>
-    </main>
-    <Footer />
+  <!-- Content -->
+  <main class="min-h-screen bg-slate-50 py-16 px-8">
+    <div class="max-w-7xl mx-auto">
+      {
+        posts.length > 0 ? (
+          <PostList posts={posts} />
+        ) : (
+          <div class="text-center py-24 text-slate-500">
+            <p class="text-xl">No stories published yet.</p>
+          </div>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
 </Layout>

@@ -1,20 +1,18 @@
 ---
+import type { ProjectExpand } from "../../types";
+import type { ProjectsResponse } from "../../types/pocketbase-types";
 import ProjectCard from "./ProjectCard.astro";
 
-interface Project {
-    id: string;
-    name: string;
-    type: string;
-    image?: string;
-}
-
 interface Props {
-    projects: Project[];
+  projects: ProjectsResponse<ProjectExpand>[];
 }
 
 const { projects } = Astro.props;
 ---
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {projects.map((project) => <ProjectCard project={project} />)}
-</div>
+<section
+  id="project-grid-container"
+  class="grid grid-cols-1 md:grid-cols-3 gap-8"
+>
+  {projects.map((project) => <ProjectCard project={project} />)}
+</section>

@@ -1,13 +1,15 @@
 ---
+import type { PostInfoExpand } from "../../types";
+import type { PostsResponse } from "../../types/pocketbase-types";
 import PostCard from "./PostCard.astro";
 
 interface Props {
-    posts: any[]; // Using any to be flexible with the PB response structure for now, but strictly matches PostCard props
+  posts: PostsResponse<PostInfoExpand>[];
 }
 
 const { posts } = Astro.props;
 ---
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {posts.map((post) => <PostCard post={post} />)}
+  {posts.map((post) => <PostCard post={post} />)}
 </div>

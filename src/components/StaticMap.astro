@@ -1,0 +1,51 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+  /** Optimized local map image (recommended) */
+  image: ImageMetadata;
+
+  /** Alt text for accessibility & SEO */
+  alt: string;
+
+  /** Google Maps link (opens interactive map) */
+  mapsUrl: string;
+
+  /** Optional height ratio (defaults to 16:9) */
+  aspect?: "16/9" | "4/3" | "1/1";
+
+  /** Show overlay CTA text */
+  ctaText?: string;
+}
+
+const { image, alt, mapsUrl, aspect = "16/9" } = Astro.props;
+
+const aspectClass =
+  aspect === "4/3"
+    ? "aspect-[4/3]"
+    : aspect === "1/1"
+      ? "aspect-square"
+      : "aspect-[16/9]";
+---
+
+<a
+  href={mapsUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={alt}
+  class={`group relative block overflow-hidden rounded-2xl ${aspectClass}`}
+>
+  <Image
+    src={image}
+    alt={alt}
+    class="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+    loading="lazy"
+    decoding="async"
+  />
+
+  <!-- Subtle overlay -->
+  <div
+    class="absolute inset-0 bg-black/15 transition-colors group-hover:bg-black/30"
+  >
+  </div>
+</a>

@@ -17,33 +17,14 @@ html {
 }
 
 body {
-	/* Ensures the Royal Heritage background color is everywhere */
-	background-color: #0a192f;
-	/* Your aspada-navy */
-	color: #f5eedc;
-	/* Your aspada-cream */
 	overflow-x: hidden;
 }
 
-/* 3. Custom Scrollbar (Real Estate sites should look premium) */
-::-webkit-scrollbar {
-	width: 8px;
-}
-
-::-webkit-scrollbar-track {
-	background: #0a192f;
-}
-
-::-webkit-scrollbar-thumb {
-	background: #d4af37;
-	/* Your aspada-gold */
-	border-radius: 10px;
-}
 
 /* 4. Selection Color */
 ::selection {
-	background-color: #d4af37;
-	color: #0a192f;
+	background-color: #fffbed;
+	color: #3f5068;
 }
 
 /* === Milkdown / ProseMirror base === */
@@ -51,9 +32,9 @@ body {
 .milkdown-container .ProseMirror {
 	outline: none;
 	min-height: 180px;
-	color: #e5e7eb;
+	color: #2c2d30;
 	/* text-neutral-200 */
-	caret-color: #e5e7eb;
+	caret-color: #2c2d30;
 	font-size: 15px;
 	line-height: 1.6;
 }
@@ -78,4 +59,48 @@ body {
 .milkdown-container .ProseMirror ul,
 .milkdown-container .ProseMirror ol {
 	padding-left: 1.25rem;
+}
+
+@layer base {
+  /* Global Fruity Text Inputs & Textareas */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  textarea {
+    @apply w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl 
+           outline-none transition-all duration-300 font-bold text-aspada-navy;
+  }
+
+  /* Fruity Interaction: Elevation and Ring on Focus */
+  input:focus, textarea:focus {
+    @apply bg-white border-aspada-gold/30 ring-4 ring-aspada-gold/10 shadow-xl -translate-y-[1px];
+  }
+
+  /* Fruity Dropdowns (Select) */
+  select {
+    @apply w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl 
+           appearance-none outline-none transition-all duration-300 
+           font-bold text-aspada-navy cursor-pointer;
+    /* Custom Fruity Arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230a192f'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+  }
+
+  select:focus {
+    @apply bg-white ring-4 ring-aspada-gold/10 shadow-lg;
+  }
+
+  /* Fruity Buttons */
+  button[type="submit"] {
+    @apply px-8 py-4 bg-aspada-navy text-white rounded-2xl font-black 
+           uppercase tracking-widest transition-all duration-500 
+           ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-95;
+  }
+
+  button[type="submit"]:hover {
+    @apply bg-aspada-gold shadow-2xl -translate-y-1;
+  }
 }

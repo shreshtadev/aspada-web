@@ -17,7 +17,7 @@
 </script>
 
 <div
-  class="max-w-md mx-auto mt-20 p-8 bg-aspada-silver/35 rounded-2xl shadow-xl border border-[#d4af37]/20"
+  class="max-w-md mx-auto mt-20 p-8 rounded-2xl shadow-xl border border-aspada-gold/20"
 >
   <h1 class="text-2xl font-bold mb-6 text-aspada-steel">Admin Login</h1>
 

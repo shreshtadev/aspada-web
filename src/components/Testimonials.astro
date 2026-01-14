@@ -1,29 +1,32 @@
 ---
 import pb from "../lib/pb";
-
+import type { TestimonialsResponse } from "../types/pocketbase-types";
+import type { TestimonialInfoExpand } from "../types";
 interface Testimonial {
   name: string;
   role: string;
   text: string;
   avatar: string;
 }
-const testimonialsFromBe = await pb.collection("testimonials").getFullList({
-  sort: "-created",
-  limit: 3,
-  expand: "authorAvatar",
-});
+const testimonialsFromBe = await pb
+  .collection("testimonials")
+  .getFullList<TestimonialsResponse<TestimonialInfoExpand>>({
+    sort: "-created",
+    limit: 3,
+    expand: "authorAvatar",
+  });
 const testimonials = testimonialsFromBe.map((t) => ({
   name: t.authorName,
   role: t.authorRole,
   text: t.content,
   avatar: pb.files.getURL(
-    t.expand?.authorAvatar,
-    t.expand?.authorAvatar?.attachment,
+    t.expand.authorAvatar,
+    t.expand.authorAvatar?.attachment
   ),
 }));
 ---
 
-<section class="py-32 px-6 overflow-hidden">
+<section class="py-8 px-6 overflow-hidden">
   <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
     <div class="space-y-6">
       <span
@@ -36,8 +39,9 @@ const testimonials = testimonialsFromBe.map((t) => ({
       </h2>
       <p class="text-aspada-steel/60 text-lg max-w-md">
         Our legacy is built on the trust of our clients. Tap to shuffle or wait
-        to see more stories <a class="text-aspada-gold" href="/testimonials"
-          >here</a
+        to see more stories <a
+          class="text-aspada-gold text-2xl hover:text-aspada-steel hover:underline transition-all duration-300"
+          href="/testimonials">here</a
         >.
       </p>
     </div>
@@ -55,7 +59,7 @@ const testimonials = testimonialsFromBe.map((t) => ({
             <div class="flex items-center gap-4 mb-8">
               <img
                 src={t.avatar}
-                class="w-14 h-14 rounded-full border-2 border-aspada-gold/50 p-1"
+                class="w-24 h-24 rounded-full border-2 border-aspada-gold/50 p-1"
                 alt={t.name}
               />
               <div>
@@ -127,20 +131,22 @@ const testimonials = testimonialsFromBe.map((t) => ({
       }
     }
 
-    // Manual Interaction
-    stack?.addEventListener("click", () => {
-      stopAutoPlay();
-      rotate();
-      startAutoPlay(); // Restart timer after click
-    });
+    if (cards.length !== 0 && stack !== null) {
+      // Manual Interaction
+      stack?.addEventListener("click", () => {
+        stopAutoPlay();
+        rotate();
+        startAutoPlay(); // Restart timer after click
+      });
 
-    // Pause on hover
-    stack?.addEventListener("mouseenter", stopAutoPlay);
-    stack?.addEventListener("mouseleave", startAutoPlay);
+      // Pause on hover
+      stack?.addEventListener("mouseenter", stopAutoPlay);
+      stack?.addEventListener("mouseleave", startAutoPlay);
 
-    // Initial setup
-    updateStack();
-    startAutoPlay();
+      // Initial setup
+      updateStack();
+      startAutoPlay();
+    }
   }
 
   // Handle Astro page loads & View Transitions

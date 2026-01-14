@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import pb from "../../lib/pb";
   import { uploadAttachment, deleteAttachment } from "../../lib/utils";
   import Modal from "./Modal.svelte";
@@ -6,6 +6,14 @@
   import Autocomplete from "./Autocomplete.svelte";
   import FileUploadTracker from "./FileUploadTracker.svelte";
   import toast from "svelte-french-toast";
+  import {
+    Collections,
+    MetadataCategoryTypeOptions,
+    ProjectsCategoryOptions,
+    ProjectsStatusOptions,
+  } from "../../types/pocketbase-types";
+  import { type ProjectInfoExpand } from "../../types";
+  import { type ProjectsResponse } from "../../types/pocketbase-types";
   // Master list state
   let projects = $state([]);
   let currentPage = $state(1);
@@ -23,21 +31,29 @@
   let selectedId = $state(null);
   let formTitle = $state("");
   let formSlug = $state("");
-  let formCategory = $state("residential");
-  let formStatus = $state("upcoming");
+  let formCategory = $state(ProjectsCategoryOptions.residential);
+  let formStatus = $state(ProjectsStatusOptions.ongoing);
   let formDescription = $state("");
+  let formAddressLine1 = $state("");
+  let formCity = $state("");
+  let formState = $state("");
+  let formPinCode = $state("");
+  let formDistrict = $state("");
   let formSocials = $state([]); // IDs
   let formAmenities = $state([]); // IDs
   let formSpecs = $state([]); // IDs
-  let currentCoverId = $state(""); // ID of current cover attachment record
-  let currentBrochureId = $state(""); // ID of current brochure attachment record
+  let currentCoverIds = $state([]); // Array of current cover attachment record ID
+  let currentCoverVideoIds = $state([]); // Array of current cover video attachment record ID
+  let currentBrochureIds = $state([]); // Array of current brochure attachment record ID
 
   let specificationAttachmentIds = $state([]);
   let fileUploadTracker = $state(null);
 
   let coverFile = $state(null);
+  let coverVideoFile = $state(null);
   let brochureFile = $state(null);
   let coverFileInput = $state(null);
+  let coverVideoFileInput = $state(null);
   let brochureFileInput = $state(null);
 
   let formLoading = $state(false);
@@ -55,9 +71,9 @@
     loading = true;
     try {
       const [projectsRes, socialsRes, metadataRes] = await Promise.all([
-        pb.collection("projects").getList(page, perPage),
-        pb.collection("socials").getFullList({ sort: "title" }),
-        pb.collection("metadata").getFullList({ sort: "title" }),
+        pb.collection(Collections.Projects).getList(page, perPage),
+        pb.collection(Collections.Socials).getFullList({ sort: "title" }),
+        pb.collection(Collections.Metadata).getFullList({ sort: "title" }),
       ]);
 
       projects = projectsRes.items;
@@ -66,8 +82,12 @@
       totalItems = projectsRes.totalItems;
 
       allSocials = socialsRes;
-      allAmenities = metadataRes.filter((m) => m.categoryType === "amenity");
-      allSpecs = metadataRes.filter((m) => m.categoryType === "specification");
+      allAmenities = metadataRes.filter(
+        (m) => m.categoryType === MetadataCategoryTypeOptions.amenity
+      );
+      allSpecs = metadataRes.filter(
+        (m) => m.categoryType === MetadataCategoryTypeOptions.specification
+      );
     } catch (err) {
       console.error("Failed to load data:", err);
       toast.error("Failed to load data");
@@ -80,22 +100,28 @@
     loadData(currentPage);
   });
 
-  function selectProject(p) {
-    selectedId = p?.id ?? null;
-    formTitle = p?.title ?? "";
-    formSlug = p?.slug ?? "";
-    formCategory = p?.category ?? "residential";
-    formStatus = p?.status ?? "upcoming";
-    formDescription = p?.description ?? "";
-    formSocials = p?.socials ?? [];
-    formAmenities = p?.amenities ?? [];
-    formSpecs = p?.specifications ?? [];
-
+  function selectProject(p: ProjectsResponse) {
+    selectedId = p.id;
+    formTitle = p.title;
+    formSlug = p.slug;
+    formCategory = p.category;
+    formStatus = p.status;
+    formDescription = p.description ?? "";
+    formSocials = p.socials ?? [];
+    formAmenities = p.projectDetails;
+    formSpecs = p.projectDetails;
+    formAddressLine1 = p.addressLine1;
+    formCity = p.city;
+    formState = p.state;
+    formPinCode = p.pinCode;
+    formDistrict = p.district;
     // Relation IDs are strings in the 'projects' record (if not expanded)
-    currentCoverId = p?.coverImage ?? "";
-    currentBrochureId = p?.brochure ?? "";
+    currentCoverIds = p?.coverImage ? [p.coverImage] : [];
+    currentCoverVideoIds = p?.coverVideo ? [p.coverVideo] : [];
+    currentBrochureIds = p?.brochure ? [p.brochure] : [];
 
     coverFile = null;
+    coverVideoFile = null;
     brochureFile = null;
     specificationAttachmentIds = [];
   }
@@ -104,15 +130,22 @@
     selectedId = null;
     formTitle = "";
     formSlug = "";
-    formCategory = "residential";
-    formStatus = "upcoming";
+    formCategory = ProjectsCategoryOptions.residential;
+    formStatus = ProjectsStatusOptions.upcoming;
     formDescription = "";
+    formAddressLine1 = "";
+    formCity = "";
+    formState = "";
+    formPinCode = "";
+    formDistrict = "";
     formSocials = [];
     formAmenities = [];
     formSpecs = [];
-    currentCoverId = "";
-    currentBrochureId = "";
+    currentCoverIds = [];
+    currentCoverVideoIds = [];
+    currentBrochureIds = [];
     coverFile = null;
+    coverVideoFile = null;
     brochureFile = null;
     specificationAttachmentIds = [];
   }
@@ -134,7 +167,7 @@
     modalLoading = true;
     try {
       let collection = "";
-      let payload = { title: newItemTitle };
+      let payload = { title: newItemTitle, summary: newItemExtra };
 
       if (modalType === "amenity") {
         collection = "metadata";
@@ -160,7 +193,7 @@
           if (selectedFiles.length > 0) {
             const uploadedIds = await uploadAttachment(
               `Spec - ${newItemTitle}`,
-              selectedFiles,
+              selectedFiles
             );
             payload.attachments = uploadedIds;
           }
@@ -172,17 +205,17 @@
       // Refresh list and select
       if (modalType === "amenity") {
         allAmenities = [...allAmenities, record].sort((a, b) =>
-          a.title.localeCompare(b.title),
+          a.title.localeCompare(b.title)
         );
         formAmenities = [...formAmenities, record.id];
       } else if (modalType === "social") {
         allSocials = [...allSocials, record].sort((a, b) =>
-          a.title.localeCompare(b.title),
+          a.title.localeCompare(b.title)
         );
         formSocials = [...formSocials, record.id];
       } else if (modalType === "specification") {
         allSpecs = [...allSpecs, record].sort((a, b) =>
-          a.title.localeCompare(b.title),
+          a.title.localeCompare(b.title)
         );
         formSpecs = [...formSpecs, record.id];
 
@@ -212,11 +245,16 @@
     formData.append("category", formCategory);
     formData.append("status", formStatus);
     formData.append("description", formDescription);
+    formData.append("addressLine1", formAddressLine1);
+    formData.append("city", formCity);
+    formData.append("district", formDistrict);
+    formData.append("state", formState);
+    formData.append("pincode", formPinCode);
 
     // Append relations
     for (const id of formSocials) formData.append("socials", id);
-    for (const id of formAmenities) formData.append("amenities", id);
-    for (const id of formSpecs) formData.append("specifications", id);
+    for (const id of formAmenities) formData.append("projectDetails", id);
+    for (const id of formSpecs) formData.append("projectDetails", id);
 
     try {
       // 1. Handle Cover Image
@@ -229,8 +267,9 @@
           if (newId) {
             formData.append("coverImage", newId);
             // Clean up old
-            if (currentCoverId) {
-              await deleteAttachment(currentCoverId);
+            const oldId = currentCoverIds[0];
+            if (oldId) {
+              await deleteAttachment(oldId);
             }
           }
         }
@@ -246,8 +285,27 @@
           if (newId) {
             formData.append("brochure", newId);
             // Clean up old
-            if (currentBrochureId) {
-              await deleteAttachment(currentBrochureId);
+            const oldId = currentBrochureIds[0];
+            if (oldId) {
+              await deleteAttachment(oldId);
+            }
+          }
+        }
+      }
+
+      // 3. Handle CoverVideo
+      if (coverVideoFile) {
+        const urls = await uploadAttachment(`CoverVideo - ${formTitle}`, [
+          coverVideoFile,
+        ]);
+        if (urls.length > 0) {
+          const newId = urls[0];
+          if (newId) {
+            formData.append("coverVideo", newId);
+            // Clean up old
+            const oldId = currentCoverVideoIds[0];
+            if (oldId) {
+              await deleteAttachment(oldId);
             }
           }
         }
@@ -255,12 +313,14 @@
 
       if (selectedId) {
         const updated = await pb
-          .collection("projects")
+          .collection(Collections.Projects)
           .update(selectedId, formData);
         projects = projects.map((it) => (it.id === selectedId ? updated : it));
         selectProject(updated);
       } else {
-        const created = await pb.collection("projects").create(formData);
+        const created = await pb
+          .collection(Collections.Projects)
+          .create(formData);
         projects = [created, ...projects];
         selectProject(created);
       }
@@ -279,9 +339,10 @@
 
       // Cleanup relations if they exist
       if (p.coverImage) await deleteAttachment(p.coverImage);
+      if (p.coverVideo) await deleteAttachment(p.coverVideo);
       if (p.brochure) await deleteAttachment(p.brochure);
 
-      await pb.collection("projects").delete(id);
+      await pb.collection(Collections.Projects).delete(id);
       projects = projects.filter((item) => item.id !== id);
       if (selectedId === id) newProject();
     } catch (err) {
@@ -314,10 +375,10 @@
       {:else}
         {#each projects as p}
           <div
-            class="group p-4 rounded-2xl cursor-pointer border border-transparent hover:border-[#d4af37]/30 hover:bg-slate-50 transition-all relative"
+            class="group p-4 rounded-2xl cursor-pointer border border-transparent hover:border-aspada-gold/30 hover:bg-slate-50 transition-all relative"
             class:bg-slate-100={selectedId === p.id}
             class:border-l-4={selectedId === p.id}
-            class:border-l-[#d4af37]={selectedId === p.id}
+            class:border-l-aspada-gold={selectedId === p.id}
             role="button"
             tabindex="0"
             onclick={() => selectProject(p)}
@@ -326,7 +387,7 @@
             <div class="flex justify-between items-start">
               <div>
                 <div
-                  class="font-bold text-slate-900 group-hover:text-[#d4af37] transition-colors"
+                  class="font-bold text-slate-900 group-hover:text-aspada-gold transition-colors"
                 >
                   {p.title}
                 </div>
@@ -379,7 +440,7 @@
 
   <!-- Detail: form -->
   <div
-    class="md:col-span-2 h-full overflow-y-auto bg-white rounded-3xl border border-[#d4af37]/20 shadow-xl p-8"
+    class="md:col-span-2 h-full overflow-y-auto bg-white rounded-3xl border border-aspada-gold/20 shadow-xl p-8"
   >
     <div class="flex items-center justify-between mb-8">
       <h3 class="font-bold text-slate-900 text-2xl">
@@ -402,7 +463,7 @@
           >
           <input
             bind:value={formTitle}
-            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:bg-white outline-none transition-all"
+            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold focus:bg-white outline-none transition-all"
             placeholder="e.g. The Grand Residence"
           />
         </label>
@@ -419,6 +480,56 @@
           />
         </label>
       </div>
+      <div class="grid grid-cols-1 gap-8">
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700 mb-1 block"
+            >Address Line 1</span
+          >
+          <input
+            bind:value={formAddressLine1}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. 123 Main St"
+          />
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-6">
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700 mb-1 block">City</span>
+          <input
+            bind:value={formCity}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. Shivamogga"
+          />
+        </label>
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700 mb-1 block"
+            >District</span
+          >
+          <input
+            bind:value={formDistrict}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. Shivamogga"
+          />
+        </label>
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700 mb-1 block">State</span>
+          <input
+            bind:value={formState}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. Karnataka"
+          />
+        </label>
+        <label class="block">
+          <span class="text-sm font-bold text-slate-700 mb-1 block"
+            >Pin Code</span
+          >
+          <input
+            bind:value={formPinCode}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. 577201"
+          />
+        </label>
+      </div>
 
       <div class="grid grid-cols-2 gap-6">
         <label class="block">
@@ -427,7 +538,7 @@
           >
           <select
             bind:value={formCategory}
-            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] outline-none"
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
           >
             <option value="residential">Residential</option>
             <option value="commercial">Commercial</option>
@@ -440,7 +551,7 @@
           >
           <select
             bind:value={formStatus}
-            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] outline-none"
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
           >
             <option value="upcoming">Upcoming</option>
             <option value="ongoing">Ongoing</option>
@@ -457,7 +568,7 @@
           {#key selectedId}
             <MilkdownEditor
               bind:value={formDescription}
-              class="w-full min-h-[150px] p-4 bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-[#d4af37] focus-within:bg-white transition-all"
+              class="w-full min-h-[150px] p-4 bg-slate-50 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-aspada-gold focus-within:bg-white transition-all"
               placeholder="Describe the project..."
             />
           {/key}
@@ -497,103 +608,37 @@
         />
       </div>
 
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100"
-      >
-        <div class="block">
-          <span class="text-sm font-bold text-slate-700 mb-2 block"
-            >Cover Image</span
-          >
-          <div
-            class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors relative"
-          >
-            {#if currentCoverId && !coverFile}
-              <div class="text-xs text-green-600 font-bold mb-2">
-                ✓ Current Image Set
-              </div>
-            {/if}
-            <input
-              type="file"
-              bind:this={coverFileInput}
-              onchange={(e) => {
-                const files = e.target.files;
-                if (files && files.length > 0) {
-                  coverFile = files[0];
-                }
-              }}
-              accept="image/*"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <div class="pointer-events-none">
-              {#if coverFile}
-                <span class="text-slate-900 font-bold">{coverFile.name}</span>
-              {:else}
-                <span class="text-slate-500 text-sm">Click to upload image</span
-                >
-              {/if}
-            </div>
-          </div>
-          {#if coverFile}
-            <button
-              type="button"
-              onclick={() => {
-                coverFile = null;
-                if (coverFileInput) coverFileInput.value = "";
-              }}
-              class="mt-2 text-xs text-red-600 hover:underline"
-            >
-              Clear selection
-            </button>
-          {/if}
-        </div>
+      {#key selectedId}
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100"
+        >
+          <FileUploadTracker
+            label="Cover Image"
+            accept="image/*"
+            maxFiles={1}
+            onFileSelect={(files) => (coverFile = files[0])}
+            bind:attachmentIds={currentCoverIds}
+          />
 
-        <div class="block">
-          <span class="text-sm font-bold text-slate-700 mb-2 block"
-            >Brochure (PDF)</span
-          >
-          <div
-            class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors relative"
-          >
-            {#if currentBrochureId && !brochureFile}
-              <div class="text-xs text-green-600 font-bold mb-2">
-                ✓ Current Brochure Set
-              </div>
-            {/if}
-            <input
-              type="file"
-              bind:this={brochureFileInput}
-              onchange={(e) => {
-                const files = e.target.files;
-                if (files && files.length > 0) {
-                  brochureFile = files[0];
-                }
-              }}
+          <FileUploadTracker
+            label="Cover Video"
+            accept="video/*"
+            maxFiles={1}
+            onFileSelect={(files) => (coverVideoFile = files[0])}
+            bind:attachmentIds={currentCoverVideoIds}
+          />
+
+          <div class="md:col-span-2">
+            <FileUploadTracker
+              label="Brochure (PDF)"
               accept=".pdf"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              maxFiles={1}
+              onFileSelect={(files) => (brochureFile = files[0])}
+              bind:attachmentIds={currentBrochureIds}
             />
-            <div class="pointer-events-none">
-              {#if brochureFile}
-                <span class="text-slate-900 font-bold">{brochureFile.name}</span
-                >
-              {:else}
-                <span class="text-slate-500 text-sm">Click to upload PDF</span>
-              {/if}
-            </div>
           </div>
-          {#if brochureFile}
-            <button
-              type="button"
-              onclick={() => {
-                brochureFile = null;
-                if (brochureFileInput) brochureFileInput.value = "";
-              }}
-              class="mt-2 text-xs text-red-600 hover:underline"
-            >
-              Clear selection
-            </button>
-          {/if}
         </div>
-      </div>
+      {/key}
     </div>
 
     <div class="flex gap-4 mt-8 pt-6 border-t border-slate-100">
@@ -646,7 +691,7 @@
       >
       <input
         bind:value={newItemTitle}
-        class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
+        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
         placeholder="Enter title"
         autofocus
       />
@@ -658,10 +703,33 @@
         <input
           type="url"
           bind:value={shareUrl}
-          class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
+          class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-aspada-gold/50 outline-none"
           placeholder="Enter share URL"
         />
       </label>
+    {/if}
+    {#if modalType !== "social"}
+      <label class="block">
+        <span
+          class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block ml-1"
+          >Summary / Details</span
+        >
+        <input
+          bind:value={newItemExtra}
+          class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
+          placeholder="Enter summary or details..."
+        />
+      </label>
+    {/if}
+
+    {#if modalType === "amenity"}
+      <FileUploadTracker
+        bind:this={fileUploadTracker}
+        label="Icon (Optional)"
+        bind:attachmentIds={specificationAttachmentIds}
+        maxFiles={1}
+        accept="image/*"
+      />
     {/if}
 
     {#if modalType === "specification"}
@@ -669,8 +737,8 @@
         bind:this={fileUploadTracker}
         label="Attachments (Optional)"
         bind:attachmentIds={specificationAttachmentIds}
-        maxFiles={5}
-        accept="image/*,.pdf"
+        maxFiles={3}
+        accept="image/*"
       />
     {/if}
 
@@ -684,7 +752,7 @@
       <button
         onclick={handleQuickAdd}
         disabled={modalLoading}
-        class="px-6 py-2 bg-[#d4af37] text-white rounded-lg font-bold hover:brightness-110 disabled:opacity-50"
+        class="px-6 py-2 bg-aspada-gold text-white rounded-lg font-bold hover:brightness-110 disabled:opacity-50"
       >
         {modalLoading ? "Creating..." : "Create"}
       </button>

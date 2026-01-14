@@ -124,7 +124,7 @@
       if (avatarFile && avatarFile.length > 0) {
         const urls = await uploadAttachment(
           `Testimonials - ${formName}` || "Testimonial Avatar",
-          Array.from(avatarFile),
+          Array.from(avatarFile)
         );
         if (urls.length > 0) {
           formData.append("authorAvatar", urls[0]);
@@ -152,7 +152,7 @@
           .collection("testimonials")
           .update(selectedId, formData);
         testimonials = testimonials.map((t) =>
-          t.id === record.id ? record : t,
+          t.id === record.id ? record : t
         );
       } else {
         record = await pb.collection("testimonials").create(formData);

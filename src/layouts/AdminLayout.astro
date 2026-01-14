@@ -1,6 +1,7 @@
 ---
 import { actions } from "astro:actions";
 import { Toaster } from "svelte-french-toast";
+import "../styles/global.css";
 const result = Astro.getActionResult(actions.logout);
 ---
 
@@ -17,11 +18,11 @@ const result = Astro.getActionResult(actions.logout);
         <a href="/admin/projects" class="block hover:text-aspada-steel"
           >Projects</a
         >
-        <a href="/admin/amenities" class="block hover:text-aspada-steel"
-          >Amenities</a
+        <a href="/admin/metadata" class="block hover:text-aspada-steel"
+          >Project Details</a
         >
-        <a href="/admin/specifications" class="block hover:text-aspada-steel"
-          >Specifications</a
+        <a href="/admin/socials" class="block hover:text-aspada-steel"
+          >Social Details</a
         >
         <a href="/admin/testimonials" class="block hover:text-aspada-steel"
           >Testimonials</a

@@ -23,6 +23,10 @@ export default defineConfig({
         domains: [
             "images.unsplash.com",
             "i.pravatar.cc",
+            "placehold.co",
+            "instagram.com",
+            "www.instagram.com",
+            "m.instagram.com",
             PUBLIC_PB_URL,
         ].filter(Boolean),
     },

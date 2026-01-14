@@ -1,88 +1,145 @@
 ---
+import pb from "../lib/pb";
+import type { ProjectExpand } from "../types";
+import {
+  Collections,
+  MetadataCategoryTypeOptions,
+  type MetadataResponse,
+  type ProjectsResponse,
+} from "../types/pocketbase-types";
+
 interface HeroProps {
-  posterUrl: string;
-  videoMp4Url?: string;
-  videoWebmUrl?: string;
+  projects: ProjectsResponse<ProjectExpand>[];
+  index: number;
 }
-const { posterUrl, videoMp4Url, videoWebmUrl } = Astro.props;
+
+const { projects: projectsFromBe } = Astro.props as HeroProps;
+const count = projectsFromBe.length;
+const durationPerImage = 5;
+const totalDuration = count * durationPerImage;
+const projects = projectsFromBe.map((project) => {
+  const coverImageUrl = pb.files.getURL(
+    project.expand?.coverImage,
+    project.expand?.coverImage?.attachment,
+    { thumb: "1200", quality: 80 }
+  );
+  project.coverImage = coverImageUrl;
+  return project;
+});
+const metadatas = await pb
+  .collection(Collections.Metadata)
+  .getFullList<MetadataResponse>();
+const stats = metadatas.filter(
+  (metadata) =>
+    metadata.categoryType === MetadataCategoryTypeOptions.statsSettings
+);
 ---
 
 <style>
-  @keyframes fadeOut {
-    from {
-      opacity: 0.35;
-      transform: translateY(0);
-    }
+  .slideshow-slide {
+    opacity: 0;
+    animation: fade var(--total-duration) ease-in-out infinite;
+    will-change: opacity, transform;
+  }
 
-    to {
+  .ken-burns {
+    animation: kenburns var(--total-duration) linear infinite;
+  }
+
+  @keyframes fade {
+    0% {
       opacity: 0;
-      transform: translateY(-12px);
+    }
+    10% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 
-  .animate-fade-out {
-    animation: fadeOut 1.2s ease-in forwards;
-    animation-delay: 0.5s;
+  @keyframes kenburns {
+    0% {
+      transform: scale(1.08) translate3d(0%, 0%, 0);
+    }
+    100% {
+      transform: scale(1.18) translate3d(-4%, -2%, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slideshow-slide,
+    .ken-burns {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* SBR-style outline text effect */
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
+    color: transparent;
   }
 </style>
+
 <section
-  class="relative h-[110vh] w-full flex items-center justify-center overflow-hidden"
+  class="relative h-[110vh] w-full flex items-center overflow-hidden bg-aspada-navy/10"
 >
-  <div class="absolute inset-0 z-0">
-    <video
-      autoplay
-      loop
-      muted
-      playsinline
-      preload="metadata"
-      poster={posterUrl}
-      class="absolute inset-0 w-full h-full object-cover contrast-110 motion-safe:autoplay"
-    >
-      <source src={videoWebmUrl} type="video/webm" />
-      <source src={videoMp4Url} type="video/mp4" />
-    </video>
-    <div
-      class="absolute inset-0 bg-gradient-to-b from-aspada-navy/80 via-transparent to-aspada-navy/20"
-    >
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0" style={`--total-duration: ${totalDuration}s`}>
+      {
+        projects.map((project, index) => (
+          <div
+            class="absolute inset-0 slideshow-slide"
+            style={{ animationDelay: `${index * durationPerImage}s` }}
+          >
+            {projects.length === 1 ? (
+              <img
+                src={projects[0].coverImage}
+                alt={projects[0].slug}
+                class="absolute inset-0 w-full h-full object-cover ken-burns transform-gpu"
+              />
+            ) : (
+              <img
+                src={project.coverImage}
+                alt={project.slug}
+                class="w-full h-full object-cover ken-burns transform-gpu"
+                style={{ animationDelay: `${index * durationPerImage}s` }}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+            )}
+          </div>
+        ))
+      }
     </div>
   </div>
 
-  <div class="relative z-10 w-full max-w-5xl mx-4 text-center animate-fade-out">
-    <div class="flex justify-center mb-8">
-      <span
-        class="px-5 py-1.5 border border-aspada-gold/30 rounded-full text-aspada-gold text-[10px] uppercase tracking-[0.5em] bg-black/20 backdrop-blur-md"
-      >
-        Established 2010
-      </span>
+  <div class="absolute right-12 bottom-24 hidden lg:block z-20">
+    <div class="flex flex-col gap-10">
+      {
+        stats.map((stat) => (
+          <div class="text-right border-r-4 border-aspada-gold/20 pr-6">
+            <p class="text-white font-black text-2xl uppercase tracking-tighter">
+              {stat.summary}
+            </p>
+            <p class="text-aspada-cream uppercase text-[10px] font-bold tracking-widest">
+              {stat.title}
+            </p>
+          </div>
+        ))
+      }
     </div>
+  </div>
 
-    <h1
-      class="text-6xl md:text-9xl font-bold leading-[0.85] mb-8 text-aspada-cream tracking-tighter"
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+    <div
+      class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1"
     >
-      SHAPING <br />
-      <span
-        class="bg-gradient-to-b from-aspada-gold via-aspada-gold/80 to-aspada-gold bg-clip-text text-transparent"
-      >
-        SILHOUETTES
-      </span>
-    </h1>
-
-    <p
-      class="text-aspada-silver text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
-    >
-      Experience the harmony of modern engineering and royal aesthetics in the
-      heart of <span class="text-aspada-cream font-medium">Shivamogga</span>.
-    </p>
-
-    <div class="flex items-center justify-center gap-6">
-      <div class="w-16 h-px bg-aspada-gold/40"></div>
-      <div class="hover:animate-tada">
-        <div
-          class="i-lucide-mouse-pointer-2 text-aspada-gold text-2xl rotate-220"
-        >
-        </div>
-      </div>
-      <div class="w-16 h-px bg-aspada-gold/40"></div>
+      <div class="w-1 h-2 bg-aspada-gold rounded-full animate-bounce"></div>
     </div>
   </div>
 </section>

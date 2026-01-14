@@ -1,4 +1,5 @@
 import PocketBase from 'pocketbase';
+import type { TypedPocketBase } from '../types/pocketbase-types';
 
 // 1. Helper to get the URL regardless of environment
 const getPbUrl = () => {
@@ -17,6 +18,6 @@ const getPbUrl = () => {
 };
 
 // 2. Initialize the Singleton
-const pb = new PocketBase(getPbUrl());
+const pb = new PocketBase(getPbUrl()) as TypedPocketBase;
 
 export default pb;

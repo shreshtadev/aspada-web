@@ -1,0 +1,74 @@
+---
+import ProjectSkeleton from "./Skeleton.astro";
+
+interface Props {
+  sectionId: string;
+  skeletonCount?: number;
+  minHeight?: string;
+  class?: string;
+}
+
+const {
+  sectionId,
+  skeletonCount = 3,
+  minHeight = "200px",
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  id={`loading-${sectionId}`}
+  class={className}
+  style={`min-height: ${minHeight}`}
+>
+  <div class="max-w-7xl mx-auto">
+    <div class="flex gap-6 overflow-hidden">
+      {
+        Array.from({ length: skeletonCount }).map(() => (
+          <div class="flex-none w-[85vw] md:w-[45vw] lg:w-[30vw]">
+            <ProjectSkeleton />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<div
+  id={`content-${sectionId}`}
+  class="opacity-0 transition-opacity duration-1000"
+  style="display: none;"
+>
+  <slot />
+</div>
+
+<script is:inline define:vars={{ sectionId }}>
+  function initLoadingSection() {
+    const loadingEl = document.getElementById(`loading-${sectionId}`);
+    const contentEl = document.getElementById(`content-${sectionId}`);
+
+    if (!loadingEl || !contentEl) return;
+
+    // Small delay to ensure client-side components are ready to hydrate
+    setTimeout(() => {
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";
+
+      // Trigger fade-in
+      requestAnimationFrame(() => {
+        contentEl.classList.remove("opacity-0");
+        contentEl.classList.add("opacity-100");
+      });
+    }, 400);
+  }
+
+  // Run on page load
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLoadingSection);
+  } else {
+    initLoadingSection();
+  }
+
+  // Handle Astro view transitions
+  document.addEventListener("astro:page-load", initLoadingSection);
+</script>

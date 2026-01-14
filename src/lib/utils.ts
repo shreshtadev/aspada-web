@@ -1,11 +1,13 @@
 // src/lib/utils.ts
 import toast from "svelte-french-toast";
 import pb from "./pb";
+import type { Address } from "../types";
 
 // Simple in-memory cache to avoid redundant API calls during a single build/session
 const geoCache = new Map<string, string>();
 
-export async function getLocationName(lat: number | string, lon: number | string): Promise<string> {
+export async function getLocationName(lat: string, lon: string): Promise<Address> {
+    if(parseInt(lat) === 0 || parseInt(lon) === 0) return {name: "Location Details"};
     const precision = 3;
     const roundedLat = Number(lat).toFixed(precision);
     const roundedLon = Number(lon).toFixed(precision);
@@ -13,34 +15,33 @@ export async function getLocationName(lat: number | string, lon: number | string
 
     // 1. Check Memory Cache
     if (geoCache.has(cacheKey)) {
-        return geoCache.get(cacheKey)!;
+        return JSON.parse(geoCache.get(cacheKey)!) as Address;
     }
 
     try {
         // 2. Fetch from API (Server-side fetch)
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-            {
-                headers: {
-                    // Nominatim requires a User-Agent for server-side calls
-                    'User-Agent': 'AspadaDevelopers/1.0 (contact: aspadadevelopers@gmail.com)'
-                }
-            }
+            `https://nominatim.openstreetmap.org/reverse?lat=${roundedLat}&lon=${roundedLon}&format=json`
         );
 
         if (!response.ok) throw new Error('Geocoding failed');
 
         const data = await response.json();
         const name = data.display_name;
-
+        const state = data.address.state;
+        const suburb = data.address.suburb;
+        const postcode = data.address.postcode;
+        const county = data.address.county;
+        const district = data.address.state_district;   
+        const address = {name, state, suburb, postcode,county,district}
         // 3. Save to Cache
-        geoCache.set(cacheKey, name);
-        return name;
+        geoCache.set(cacheKey, JSON.stringify(address));
+        return address;
 
     } catch (error) {
         console.error("Geocoding Server Error:", error);
         toast.error("Geocoding Server Error");
-        return "Location Details"; // Fallback
+        return {name: "Location Details"};
     }
 }
 
@@ -119,4 +120,8 @@ export const uploadAttachment = async (title: string, files: File[]) => {
     }
 
     return uploadedFiles;
+};
+
+export const encodeForQuery = (str: string): string => {
+  return encodeURIComponent(str).replace(/%20/g, '+');
 };

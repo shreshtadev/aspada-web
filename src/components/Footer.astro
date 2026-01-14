@@ -1,97 +1,190 @@
 ---
+import { Image } from "astro:assets";
+import FooterLogo from "../assets/Logo.png";
+
 const currYear = new Date().getFullYear();
+
+const links = {
+  company: [
+    { name: "Residential Layouts", href: "/projects" },
+    { name: "Commercial Projects", href: "/projects" },
+    { name: "Ongoing Projects", href: "/projects" },
+    { name: "Completed Projects", href: "/projects" },
+  ],
+  support: [
+    { name: "Official Disclaimer", href: "/disclaimer" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms & Conditions", href: "/terms" },
+    { name: "Contact Us", href: "/contactus" },
+  ],
+};
 ---
 
-<footer
-  class="pt-20 pb-10 px-6 border-t border-aspada-silver/5 bg-aspada-silver/10"
->
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-    <div class="md:col-span-2">
-      <h3 class="font-display font-black text-3xl text-aspada-navy mb-6">
-        ASPADA <span class="text-aspada-gold">DEVELOPERS</span>
-      </h3>
-      <p class="text-aspada-steel max-w-sm leading-relaxed mb-8">
-        Established in 2010, we have been the cornerstone of trust in
-        Shivamogga's real estate, delivering 1700+ homes with 100% legal
-        clarity.
-      </p>
-      <div class="flex gap-4">
-        {
-          ["facebook", "instagram", "youtube"].map((social) => (
-            <a
-              href={`https://${social}.com/${social == "youtube" ? "@" : ""}aspadadevelopers${social == "youtube" ? "/videos" : social == "instagram" ? "/" : ""}`}
-              class={`i-lucide-${social} text-aspada-steel hover:text-aspada-gold transition-colors text-xl`}
-            />
-          ))
-        }
+<footer class="bg-aspada-navy text-white px-6">
+  <div class="mx-auto max-w-7xl pt-24 pb-14">
+    <!-- Main grid -->
+    <div class="grid gap-14 md:grid-cols-12">
+      <!-- Brand -->
+      <div class="md:col-span-4">
+        <Image
+          src={FooterLogo}
+          alt="Aspada Developers"
+          class="mb-8 w-36 brightness-0 invert"
+        />
+
+        <p class="max-w-md text-sm leading-relaxed text-white/55">
+          Aspada Developers is a premier real estate firm in Shivamogga,
+          committed to architectural excellence and legal transparency.
+          Transforming dreams into addresses since 2010.
+        </p>
+
+        <div class="mt-8 flex items-center gap-4">
+          {
+            ["facebook", "instagram", "youtube"].map((social) => (
+              <a
+                href={`https://${social}.com/aspadadevelopers`}
+                aria-label={social}
+                class="inline-flex h-10 w-10 items-center justify-center
+                     rounded-full border border-white/10
+                     text-white/60 transition-colors
+                     hover:bg-aspada-gold hover:text-aspada-navy"
+              >
+                <div class={`i-lucide-${social} text-lg`} />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="md:col-span-5 md:grid md:grid-cols-2 md:gap-10">
+        <div>
+          <h4
+            class="mb-6 text-xs font-semibold uppercase
+                   tracking-[0.28em] text-aspada-gold"
+          >
+            Our Projects
+          </h4>
+          <ul class="space-y-3 text-sm text-white/65">
+            {
+              links.company.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="transition-colors hover:text-white"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div>
+          <h4
+            class="mb-6 text-xs font-semibold uppercase
+                   tracking-[0.28em] text-aspada-gold"
+          >
+            Useful Links
+          </h4>
+          <ul class="space-y-3 text-sm text-white/65">
+            {
+              links.support.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="transition-colors hover:text-white"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <!-- Office -->
+      <div class="md:col-span-3">
+        <h4
+          class="mb-6 text-xs font-semibold uppercase
+                 tracking-[0.28em] text-aspada-gold"
+        >
+          Registered Office
+        </h4>
+
+        <div class="space-y-6 text-sm text-white/65">
+          <div class="flex gap-4">
+            <div class="i-lucide-map-pin text-xl text-aspada-gold shrink-0">
+            </div>
+            <p class="leading-relaxed">
+              #123, Aspada Plaza,<br />
+              100ft Road, Shivamogga,<br />
+              Karnataka – 577201
+            </p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="i-lucide-phone text-xl text-aspada-gold"></div>
+            <a href="tel:+919876543210" class="hover:text-white">
+              +91 98765 43210
+            </a>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="i-lucide-mail text-xl text-aspada-gold"></div>
+            <a href="mailto:info@aspada.com" class="hover:text-white">
+              info@aspada.com
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div>
-      <h4
-        class="text-aspada-navy font-bold mb-6 uppercase text-xs tracking-[0.2em]"
-      >
-        Quick Links
-      </h4>
-      <ul class="space-y-4 text-aspada-steel text-sm font-medium">
-        <li>
-          <a
-            href="/projects"
-            class="hover:text-aspada-steel/60 text-aspada-steel transition-colors"
-            >Residential Layouts</a
-          >
-        </li>
-        <li>
-          <a
-            href="/projects"
-            class="hover:text-aspada-steel/60 text-aspada-steel transition-colors"
-            >Commercial Projects</a
-          >
-        </li>
-      </ul>
-    </div>
+    <!-- Divider -->
+    <div class="my-12 h-px bg-white/5"></div>
 
-    <div>
-      <h4
-        class="text-aspada-navy font-bold mb-6 uppercase text-xs tracking-[0.2em]"
-      >
-        Contact Support
-      </h4>
-      <p class="text-aspada-steel text-sm mb-2">General Enquiries:</p>
-      <a
-        href="mailto:info@aspadadevelopers.com"
-        class="text-aspada-navy/70 font-bold hover:text-aspada-steel/60 transition-colors"
-        >info@aspada.com</a
-      >
-      <p class="text-aspada-steel text-sm mt-4 mb-2">Sales Support:</p>
-      <a
-        href="tel:+918123444622"
-        class="text-aspada-navy/70 font-bold hover:text-aspada-steel/60 transition-colors"
-        >+91 81234 44622</a
-      >
-    </div>
-  </div>
-
-  <div
-    class="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6"
-  >
-    <p
-      class="text-aspada-navy/60 text-[10px] font-bold uppercase tracking-widest"
-    >
-      © {currYear} Aspada Developers. Designed by <a href="https://shreshtasmg.in" target="_blank" class="text-aspada-navy/60 hover:text-aspada-steel transition-colors">Shreshta SMG</a>.
-    </p>
+    <!-- Bottom bar -->
     <div
-      class="flex gap-6 text-[10px] uppercase tracking-widest text-aspada-navy/60"
+      class="flex flex-col items-center justify-between
+             gap-6 md:flex-row"
     >
-      <a href="/disclaimer" class="hover:text-aspada-steel font-semibold"
-        >Official Disclaimer</a
+      <p
+        class="text-[10px] font-semibold uppercase
+               tracking-[0.2em] text-white/40"
       >
-      <a href="/privacy" class="hover:text-aspada-steel font-semibold"
-        >Privacy Policy</a
+        © {currYear} Aspada Developers. All rights reserved.
+      </p>
+
+      <p
+        class="text-[10px] font-semibold uppercase
+               tracking-[0.2em] text-white/40"
       >
-      <a href="/terms" class="hover:text-aspada-steel font-semibold"
-        >Terms of Service</a
+        Handcrafted by{" "}
+        <a
+          href="https://shreshtasmg.in"
+          target="_blank"
+          class="text-aspada-gold hover:underline underline-offset-4"
+        >
+          Shreshta SMG
+        </a>
+      </p>
+
+      <button
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        class="group flex items-center gap-2
+               text-[10px] font-semibold uppercase
+               tracking-[0.2em] text-white/40
+               transition-colors hover:text-aspada-gold"
       >
+        Back to top
+        <div
+          class="i-lucide-arrow-up text-sm
+                 transition-transform group-hover:-translate-y-0.5"
+        >
+        </div>
+      </button>
     </div>
   </div>
 </footer>
