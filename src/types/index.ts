@@ -1,4 +1,4 @@
-import type { AttachmentsResponse, MetadataResponse, SocialsResponse } from "./pocketbase-types";
+import type { AttachmentsResponse, MetadataResponse, ProjectsResponse, SocialsResponse } from "./pocketbase-types";
 
 export type ProjectExpand = {
     coverImage: AttachmentsResponse;
@@ -29,5 +29,6 @@ export type PostInfoExpand = {
 }
 
 export type TestimonialInfoExpand = {
+    project: ProjectsResponse;
     authorAvatar: AttachmentsResponse;
 }
