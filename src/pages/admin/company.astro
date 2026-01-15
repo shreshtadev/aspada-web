@@ -1,0 +1,14 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import CompanyProfileManager from "../../components/admin/CompanyProfileManager.svelte";
+---
+
+<AdminLayout>
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tight">
+      Manage <span class="text-aspada-gold">Company Profile</span>
+    </h1>
+  </header>
+
+  <CompanyProfileManager client:load />
+</AdminLayout>

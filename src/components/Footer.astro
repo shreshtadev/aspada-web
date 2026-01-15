@@ -2,14 +2,14 @@
 import { Image } from "astro:assets";
 import FooterLogo from "../assets/Logo.png";
 
+const { companyProfile } = Astro.props;
 const currYear = new Date().getFullYear();
 
 const links = {
   company: [
-    { name: "Residential Layouts", href: "/projects" },
-    { name: "Commercial Projects", href: "/projects" },
-    { name: "Ongoing Projects", href: "/projects" },
-    { name: "Completed Projects", href: "/projects" },
+    { name: "Residential Layouts", href: "/projects/residential" },
+    { name: "Commercial Projects", href: "/projects/commercial" },
+    { name: "Layouts", href: "/projects/plots" },
   ],
   support: [
     { name: "Official Disclaimer", href: "/disclaimer" },
@@ -42,7 +42,13 @@ const links = {
           {
             ["facebook", "instagram", "youtube"].map((social) => (
               <a
-                href={`https://${social}.com/aspadadevelopers`}
+                href={
+                  social === "facebook"
+                    ? companyProfile.companyFacebook
+                    : social === "instagram"
+                      ? companyProfile.companyInsta
+                      : companyProfile.companyYoutube
+                }
                 aria-label={social}
                 class="inline-flex h-10 w-10 items-center justify-center
                      rounded-full border border-white/10
@@ -119,23 +125,30 @@ const links = {
             <div class="i-lucide-map-pin text-xl text-aspada-gold shrink-0">
             </div>
             <p class="leading-relaxed">
-              #123, Aspada Plaza,<br />
-              100ft Road, Shivamogga,<br />
-              Karnataka – 577201
+              {companyProfile.addressLine1}<br />
+              {companyProfile.city}, {companyProfile.state} &hyphen; {
+                companyProfile.pincode
+              }
             </p>
           </div>
 
           <div class="flex items-center gap-4">
             <div class="i-lucide-phone text-xl text-aspada-gold"></div>
-            <a href="tel:+919876543210" class="hover:text-white">
-              +91 98765 43210
+            <a
+              href={`tel:+91${companyProfile.companyMainPhone}`}
+              class="hover:text-white"
+            >
+              +91 {companyProfile.companyMainPhone}
             </a>
           </div>
 
           <div class="flex items-center gap-4">
             <div class="i-lucide-mail text-xl text-aspada-gold"></div>
-            <a href="mailto:info@aspada.com" class="hover:text-white">
-              info@aspada.com
+            <a
+              href={`mailto:${companyProfile.companyMainEmail}`}
+              class="hover:text-white"
+            >
+              {companyProfile.companyMainEmail}
             </a>
           </div>
         </div>

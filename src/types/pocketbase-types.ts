@@ -12,6 +12,7 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Attachments = "attachments",
+	Companies = "companies",
 	Metadata = "metadata",
 	Posts = "posts",
 	Projects = "projects",
@@ -108,6 +109,24 @@ export type AttachmentsRecord = {
 	created: IsoAutoDateString
 	id: string
 	title: string
+	updated: IsoAutoDateString
+}
+
+export type CompaniesRecord = {
+	addressLine1?: string
+	city?: string
+	companyAlternatePhone1?: string
+	companyAlternatePhone2?: string
+	companyFacebook?: string
+	companyInsta?: string
+	companyMainEmail?: string
+	companyMainPhone?: string
+	companyName: string
+	companyYoutube?: string
+	created: IsoAutoDateString
+	id: string
+	pincode?: string
+	state?: string
 	updated: IsoAutoDateString
 }
 
@@ -236,6 +255,7 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type AttachmentsResponse<Texpand = unknown> = Required<AttachmentsRecord> & BaseSystemFields<Texpand>
+export type CompaniesResponse<Texpand = unknown> = Required<CompaniesRecord> & BaseSystemFields<Texpand>
 export type MetadataResponse<Texpand = unknown> = Required<MetadataRecord> & BaseSystemFields<Texpand>
 export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
@@ -252,6 +272,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	attachments: AttachmentsRecord
+	companies: CompaniesRecord
 	metadata: MetadataRecord
 	posts: PostsRecord
 	projects: ProjectsRecord
@@ -267,6 +288,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	attachments: AttachmentsResponse
+	companies: CompaniesResponse
 	metadata: MetadataResponse
 	posts: PostsResponse
 	projects: ProjectsResponse

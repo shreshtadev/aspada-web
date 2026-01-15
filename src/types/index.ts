@@ -25,6 +25,7 @@ export interface Address {
 export type PostInfoExpand = {
     featuredImage: AttachmentsResponse;
     category: MetadataResponse[];
+    tags: MetadataResponse[];
 }
 
 export type TestimonialInfoExpand = {

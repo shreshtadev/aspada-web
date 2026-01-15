@@ -28,6 +28,12 @@ const projects = await pb
 const ongoingProjects = projects.filter(
   (project) => project.status === ProjectsStatusOptions.ongoing
 );
+
+const companyProfile = await pb
+  .collection(Collections.Companies)
+  .getFirstListItem(
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+  );
 ---
 
 <Layout title="Aspada Developers | Shivamogga's Finest">
@@ -55,6 +61,6 @@ const ongoingProjects = projects.filter(
     </LoadingSection>
     <Address />
   </main>
-  <Footer />
-  <ActionDock />
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
 </Layout>

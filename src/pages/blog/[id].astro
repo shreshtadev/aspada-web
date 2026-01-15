@@ -5,129 +5,127 @@ import Footer from "../../components/Footer.astro";
 import pb from "../../lib/pb";
 import { marked } from "marked";
 import toast from "svelte-french-toast";
+import type { PostInfoExpand } from "../../types";
+import type { PostsResponse } from "../../types/pocketbase-types";
 
 const { id } = Astro.params;
 
-let post;
+let post: PostsResponse<PostInfoExpand>;
 let contentHtml = "";
 
 // Format date helper
 const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
 try {
-    if (!id) throw new Error("No ID provided");
-    post = await pb
-        .collection("posts")
-        .getOne(id, { expand: "category,featuredImage" });
+  if (!id) throw new Error("No ID provided");
+  post = await pb
+    .collection("posts")
+    .getOne(id, { expand: "category,featuredImage" });
 
-    // Parse markdown content to HTML
-    contentHtml = await marked.parse(post.content || "");
+  // Parse markdown content to HTML
+  contentHtml = await marked.parse(post.content || "");
 } catch (e) {
-    console.error("Error fetching post:", e);
-    toast.error("Error fetching post");
-    return Astro.redirect("/404");
+  console.error("Error fetching post:", e);
+  toast.error("Error fetching post");
+  return Astro.redirect("/404");
 }
 
 if (!post) {
-    return Astro.redirect("/404");
+  return Astro.redirect("/404");
 }
 
 // Generate simpler description for meta tags from content
 const description = post.content
-    ? post.content.replace(/<[^>]*>?/gm, "").slice(0, 160) + "..."
-    : "Read this article on Aspada Developers.";
+  ? post.content.replace(/<[^>]*>?/gm, "").slice(0, 160) + "..."
+  : "Read this article on Aspada Developers.";
 
 const fileURL = pb.files.getURL(
-    post.expand?.featuredImage,
-    String(post.expand?.featuredImage?.attachment),
+  post.expand?.featuredImage,
+  String(post.expand?.featuredImage?.attachment)
 );
 ---
 
 <Layout
-    title={`${post.title} - Aspada Blog`}
-    description={description}
-    image={fileURL}
+  title={`${post.title} - Aspada Blog`}
+  description={description}
+  image={fileURL}
 >
-    <Navbar />
+  <Navbar />
 
-    <main class="min-h-screen bg-slate-50 pt-32 pb-16">
-        <!-- Hero Image (if exists) or Title Section -->
-        <article class="max-w-4xl mx-auto px-6">
-            <!-- Header -->
-            <header class="mb-12 text-center">
-                <!-- Tags -->
-                {
-                    post.expand?.tags && (
-                        <div class="flex flex-wrap justify-center gap-2 mb-6">
-                            {post.expand.tags.map((tag: any) => (
-                                <span class="text-aspada-gold text-sm font-bold tracking-widest uppercase px-3 py-1 border border-aspada-gold/20 rounded-full">
-                                    {tag.title}
-                                </span>
-                            ))}
-                        </div>
-                    )
-                }
+  <main class="min-h-screen bg-slate-50 pt-32 pb-16">
+    <!-- Hero Image (if exists) or Title Section -->
+    <article class="max-w-4xl mx-auto px-6">
+      <!-- Header -->
+      <header class="mb-12 text-center">
+        <!-- Tags -->
+        {
+          post.expand?.tags && (
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+              {post.expand.tags.map((tag: any) => (
+                <span class="text-aspada-gold text-sm font-bold tracking-widest uppercase px-3 py-1 border border-aspada-gold/20 rounded-full">
+                  {tag.title}
+                </span>
+              ))}
+            </div>
+          )
+        }
 
-                <h1
-                    class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-aspada-navy/90 mb-6 leading-tight"
-                >
-                    {post.title}
-                </h1>
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-aspada-navy/90 mb-6 leading-tight"
+        >
+          {post.title}
+        </h1>
 
-                <div
-                    class="flex items-center justify-center gap-4 text-aspada-steel font-medium"
-                >
-                    <time datetime={post.created}
-                        >{formatDate(post.created)}</time
-                    >
-                    <span>•</span>
-                    <span>Aspada Team</span>
-                </div>
-            </header>
+        <div
+          class="flex items-center justify-center gap-4 text-aspada-steel font-medium"
+        >
+          <time datetime={post.created}>{formatDate(post.created)}</time>
+          <span>•</span>
+          <span>Aspada Team</span>
+        </div>
+      </header>
 
-            <!-- Featured Image -->
-            {
-                post.featuredImage && (
-                    <div class="mb-16 rounded-3xl overflow-hidden shadow-2xl aspect-video relative">
-                        <img
-                            src={fileURL}
-                            alt={post.title}
-                            class="w-full h-full object-cover"
-                        />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                    </div>
-                )
-            }
+      <!-- Featured Image -->
+      {
+        post.featuredImage && (
+          <div class="mb-16 rounded-3xl overflow-hidden shadow-2xl aspect-video relative">
+            <img
+              src={fileURL}
+              alt={post.title}
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+          </div>
+        )
+      }
 
-            <!-- Content -->
-            <div
-                class="prose prose-lg prose-slate max-w-none
+      <!-- Content -->
+      <div
+        class="prose prose-lg prose-slate max-w-none
                prose-headings:font-display prose-headings:text-aspada-navy
                prose-a:text-[#d4af37] prose-a:no-underline hover:prose-a:underline
                prose-blockquote:border-l-[#d4af37] prose-blockquote:bg-white/50 prose-blockquote:py-2 prose-blockquote:pr-4"
-                set:html={contentHtml}
-            />
-        </article>
+        set:html={contentHtml}
+      />
+    </article>
 
-        <!-- Navigation / Back -->
-        <div
-            class="max-w-4xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200"
-        >
-            <a
-                href="/blog"
-                class="inline-flex items-center gap-2 text-aspada-navy font-bold hover:text-[#d4af37] transition-colors"
-            >
-                <span class="i-lucide-arrow-left text-xl"></span>
-                Back to Blog
-            </a>
-        </div>
-    </main>
+    <!-- Navigation / Back -->
+    <div class="max-w-4xl mx-auto px-6 mt-16 pt-8 border-t border-slate-200">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 text-aspada-navy font-bold hover:text-[#d4af37] transition-colors"
+      >
+        <span class="i-lucide-arrow-left text-xl"></span>
+        Back to Blog
+      </a>
+    </div>
+  </main>
 
-    <Footer />
+  <Footer />
 </Layout>
