@@ -12,7 +12,10 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Attachments = "attachments",
+	ChatCache = "chat_cache",
+	ChatLogs = "chat_logs",
 	Companies = "companies",
+	Leads = "leads",
 	Metadata = "metadata",
 	Posts = "posts",
 	Projects = "projects",
@@ -112,6 +115,33 @@ export type AttachmentsRecord = {
 	updated: IsoAutoDateString
 }
 
+export type ChatCacheRecord<Tembedding = unknown> = {
+	answer?: string
+	created: IsoAutoDateString
+	embedding?: null | Tembedding
+	helpful_count?: number
+	hitCount?: number
+	id: string
+	isSemantic?: boolean
+	question?: string
+	unhelpful_count?: number
+	updated: IsoAutoDateString
+}
+
+export enum ChatLogsRoleOptions {
+	"user" = "user",
+	"model" = "model",
+}
+export type ChatLogsRecord<Tmetadata = unknown> = {
+	content?: string
+	created: IsoAutoDateString
+	id: string
+	metadata?: null | Tmetadata
+	role?: ChatLogsRoleOptions
+	sessionId?: string
+	updated: IsoAutoDateString
+}
+
 export type CompaniesRecord = {
 	addressLine1?: string
 	city?: string
@@ -127,6 +157,21 @@ export type CompaniesRecord = {
 	id: string
 	pincode?: string
 	state?: string
+	updated: IsoAutoDateString
+}
+
+export enum LeadsStatusOptions {
+	"new" = "new",
+	"contacted" = "contacted",
+	"closed" = "closed",
+}
+export type LeadsRecord = {
+	contactNo?: string
+	created: IsoAutoDateString
+	fullName?: string
+	id: string
+	interest?: string
+	status?: LeadsStatusOptions
 	updated: IsoAutoDateString
 }
 
@@ -255,7 +300,10 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type AttachmentsResponse<Texpand = unknown> = Required<AttachmentsRecord> & BaseSystemFields<Texpand>
+export type ChatCacheResponse<Tembedding = unknown, Texpand = unknown> = Required<ChatCacheRecord<Tembedding>> & BaseSystemFields<Texpand>
+export type ChatLogsResponse<Tmetadata = unknown, Texpand = unknown> = Required<ChatLogsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type CompaniesResponse<Texpand = unknown> = Required<CompaniesRecord> & BaseSystemFields<Texpand>
+export type LeadsResponse<Texpand = unknown> = Required<LeadsRecord> & BaseSystemFields<Texpand>
 export type MetadataResponse<Texpand = unknown> = Required<MetadataRecord> & BaseSystemFields<Texpand>
 export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
@@ -272,7 +320,10 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	attachments: AttachmentsRecord
+	chat_cache: ChatCacheRecord
+	chat_logs: ChatLogsRecord
 	companies: CompaniesRecord
+	leads: LeadsRecord
 	metadata: MetadataRecord
 	posts: PostsRecord
 	projects: ProjectsRecord
@@ -288,7 +339,10 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	attachments: AttachmentsResponse
+	chat_cache: ChatCacheResponse
+	chat_logs: ChatLogsResponse
 	companies: CompaniesResponse
+	leads: LeadsResponse
 	metadata: MetadataResponse
 	posts: PostsResponse
 	projects: ProjectsResponse

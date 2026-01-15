@@ -1,26 +1,91 @@
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
-  import { tick } from "svelte";
+  import { onMount } from "svelte";
+  import pb from "../lib/pb";
 
-  // Svelte 5 States
   let isOpen = $state(false);
   let isTyping = $state(false);
   let userInput = $state("");
   let chatElement = $state(null);
+  let isConnected = $state(false);
 
-  // Initialize with a warm welcome
-  let messages = $state([
-    {
-      role: "model",
-      parts: [
-        {
-          text: "Namaste! I am your Aspada Assistant. I can help you with project details, locations, or scheduling a site visit in Shivamogga. What is on your mind?",
-        },
-      ],
-    },
-  ]);
+  let sessionId = $state(
+    (typeof window !== "undefined" && localStorage.getItem("chat_session")) ||
+      crypto.randomUUID()
+  );
 
-  // Auto-scroll to bottom whenever messages change
+  if (typeof window !== "undefined") {
+    localStorage.setItem("chat_session", sessionId);
+  }
+
+  const welcomeMessage = {
+    role: "model",
+    parts: [
+      {
+        text: "Namaste! I am your Aspada Assistant. I can help you with project details, locations, or scheduling a site visit in Shivamogga. What is on your mind?",
+      },
+    ],
+    // Welcome message doesn't need feedback
+    cacheId: null,
+    isSemantic: false,
+  };
+
+  let dbMessages = $state([]);
+  let messages = $derived([welcomeMessage, ...dbMessages]);
+
+  onMount(() => {
+    pb.realtime.addListener("connection", (e) => {
+      isConnected = e === "connected";
+    });
+    if (pb.realtime.isConnected) isConnected = true;
+
+    // 1. Fetch History
+    pb.collection("chat_logs")
+      .getList(1, 50, {
+        filter: `sessionId = "${sessionId}"`,
+        sort: "created",
+        query: { sessionId: sessionId },
+      })
+      .then((result) => {
+        dbMessages = result.items.map((record) => ({
+          role: record.role,
+          parts: [{ text: record.content }],
+          // metadata could be stored in record if you want history to show badges
+          cacheId: record.cacheId || null,
+          isSemantic: record.isSemantic || false,
+        }));
+      });
+
+    // 2. Realtime Subscribe
+    const unsubscribe = pb.collection("chat_logs").subscribe(
+      "*",
+      (e) => {
+        if (e.action === "create" && e.record.sessionId === sessionId) {
+          const isDuplicate = dbMessages.some(
+            (m) => m.parts[0].text === e.record.content
+          );
+          if (!isDuplicate) {
+            dbMessages = [
+              ...dbMessages,
+              {
+                role: e.record.role,
+                parts: [{ text: e.record.content }],
+                cacheId: e.record.cacheId || null,
+                isSemantic: e.record.isSemantic || false,
+              },
+            ];
+          }
+        }
+      },
+      { query: { sessionId: sessionId } }
+    );
+
+    return () => {
+      unsubscribe();
+      pb.realtime.removeListener("connection");
+    };
+  });
+
   $effect(() => {
     if (messages.length && chatElement) {
       chatElement.scrollTo({
@@ -30,37 +95,51 @@
     }
   });
 
+  // NEW: Feedback Handler
+  async function submitFeedback(cacheId: string, isHelpful: boolean) {
+    if (!cacheId) return;
+    const { error } = await actions.submitFeedback({ cacheId, isHelpful });
+    if (!error) {
+      // Optional: Visual toast or disable buttons
+      console.log("Feedback submitted");
+    }
+  }
+
   async function sendMessage() {
     if (!userInput.trim() || isTyping) return;
 
     const userText = userInput;
-    messages = [...messages, { role: "user", parts: [{ text: userText }] }];
+    dbMessages = [...dbMessages, { role: "user", parts: [{ text: userText }] }];
     userInput = "";
     isTyping = true;
 
     try {
-      // Calling the Gemini 2.0 Flash Action
       const { data, error } = await actions.chatWithAI({
         message: userText,
-        history:
-          messages[0].role === "model"
-            ? messages.slice(1, -1)
-            : messages.slice(0, -1),
+        // Map history back to plain text format Gemini expects
+        history: dbMessages
+          .map((m) => ({ role: m.role, parts: m.parts }))
+          .slice(0, -1),
+        sessionId: sessionId,
       });
 
       if (data) {
-        messages = [...messages, { role: "model", parts: [{ text: data }] }];
+        // 'data' is now an object: { text, cacheId, isSemantic }
+        if (!dbMessages.some((m) => m.parts[0].text === data.text)) {
+          dbMessages = [
+            ...dbMessages,
+            {
+              role: "model",
+              parts: [{ text: data.text }],
+              cacheId: data.cacheId, // STORED FOR FEEDBACK
+              isSemantic: data.isSemantic, // STORED FOR UI BADGE
+            },
+          ];
+        }
       } else if (error) {
-        messages = [
-          ...messages,
-          {
-            role: "model",
-            parts: [
-              {
-                text: "I'm having trouble connecting right now. Please try again in a moment.",
-              },
-            ],
-          },
+        dbMessages = [
+          ...dbMessages,
+          { role: "model", parts: [{ text: "Error connecting..." }] },
         ];
       }
     } catch (err) {
@@ -98,7 +177,7 @@
         <p
           class="text-[10px] uppercase tracking-widest text-aspada-gold/80 font-black"
         >
-          Online • Gemini 2.0 Flash
+          Online •
         </p>
       </div>
     </div>
@@ -107,7 +186,7 @@
       bind:this={chatElement}
       class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar bg-gradient-to-b from-slate-50 to-white"
     >
-      {#each messages as msg}
+      <!-- {#each messages as msg}
         <div
           class="flex {msg.role === 'model' ? 'justify-start' : 'justify-end'}"
         >
@@ -118,6 +197,56 @@
               : 'bg-aspada-navy text-white rounded-tr-none font-medium'}"
           >
             {msg.parts[0].text}
+          </div>
+        </div>
+      {/each} -->
+
+      {#each messages as msg}
+        <div
+          class="flex {msg.role === 'model'
+            ? 'justify-start'
+            : 'justify-end'} group"
+        >
+          <div
+            class="max-w-[85%] p-4 rounded-[1.5rem] relative
+      {msg.role === 'model' ? 'bg-white border' : 'bg-aspada-navy text-white'}"
+          >
+            {msg.parts[0].text}
+
+            {#if msg.role === "model" && msg.cacheId}
+              <div
+                class="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <button
+                  onclick={() =>
+                    actions.submitFeedback({
+                      cacheId: msg.cacheId,
+                      isHelpful: true,
+                    })}
+                  class="text-[10px] flex items-center gap-1 text-slate-400 hover:text-emerald-500"
+                >
+                  <span class="i-lucide-thumbs-up w-3 h-3"></span> Helpful
+                </button>
+                <button
+                  onclick={() =>
+                    actions.submitFeedback({
+                      cacheId: msg.cacheId,
+                      isHelpful: false,
+                    })}
+                  class="text-[10px] flex items-center gap-1 text-slate-400 hover:text-rose-500"
+                >
+                  <span class="i-lucide-thumbs-down w-3 h-3"></span> Unhelpful
+                </button>
+              </div>
+            {/if}
+
+            {#if msg.isSemantic}
+              <span
+                class="absolute -top-2 -right-2 bg-emerald-100 text-emerald-700 text-[8px] px-2 py-0.5 rounded-full border border-emerald-200"
+              >
+                Smart Match
+              </span>
+            {/if}
           </div>
         </div>
       {/each}

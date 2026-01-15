@@ -4,6 +4,14 @@ import pb from "../lib/pb";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Collections } from "../types/pocketbase-types";
 const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY);
+
+const cosineSimilarity = (vecA: number[], vecB: number[]) => {
+    const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
+    const magA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
+    const magB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
+    return dotProduct / (magA * magB);
+}
+
 export const server = {
     logout: defineAction({
         accept: "form",
@@ -31,21 +39,53 @@ export const server = {
     input: z.object({
       message: z.string(),
       history: z.array(z.any()).optional(),
+      sessionId: z.string(),
     }),
-    handler: async ({ message, history }) => {
+    handler: async ({ message, history, sessionId }) => {
+      const cleanMsg = message.trim().toLowerCase();
+      const exactMatch = await pb.collection(Collections.ChatCache).getFirstListItem(`question = "${cleanMsg}"`).catch(() => null);
+      if (exactMatch) {
+        return { text: exactMatch.answer, cacheId: exactMatch.id, isSemantic: false };
+      }
+      const embedVecModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+      const embedVecUser = await embedVecModel.embedContent(cleanMsg);
+      const currentVector = embedVecUser.embedding.values;
+      
       let validHistory = history || [];
       if (validHistory.length > 0 && validHistory[0].role === 'model') {
         validHistory = validHistory.slice(1);
       }
+
+      const cachedEntries = await pb.collection(Collections.ChatCache).getFullList({
+        // filter: `sessionId = "${sessionId}"`,
+        // sort: "-created",
+        // query: { sessionId: sessionId }, // For API Rules
+      });
+      let bestMatch = null;
+      let highestScore = 0;
+      for (const entry of cachedEntries) {
+        if (!entry.embedding) continue;
+        const score = cosineSimilarity(currentVector, entry.embedding as number[]);
+        if (score > highestScore) {
+          highestScore = score;
+          bestMatch = entry;
+        }
+      }
+
+      // Threshold: 0.85 to 0.90 is usually a "safe" semantic match
+      if (highestScore > 0.90) {
+        return { text: bestMatch?.answer, cacheId: bestMatch?.id, isSemantic: true };
+      }
+
+      
       // 1. Fetch live data from PocketBase to feed the AI context
       const projects = await pb.collection(Collections.Projects).getFullList({
-        filter: "status = 'ongoing'",
         fields: "title,category,status,addressLine1,city,district,state,pincode,description"
       });
 
       // 2. Format project data into a readable string for the AI
       const projectContext = projects.map(p => 
-        `- ${p.title}: A ${p.category} project located in ${p.addressLine1}, ${p.city}, ${p.district}, ${p.state}, ${p.pincode}. ${p.description}`
+        `- ${p.title}: A ${p.category} project located at ${p.addressLine1}, ${p.city} ${p.district} ${p.state} ${p.pincode ?? ""}.${p.description}`
       ).join("\n");
 
       // 3. Initialize Gemini 2.0 Flash
@@ -65,7 +105,50 @@ export const server = {
 
       const chat = model.startChat({ history: validHistory || [] });
       const result = await chat.sendMessage(message);
-      return result.response.text();
+      const aiResponse = result.response.text();
+      // 5. ASYNC BACKGROUND TASKS (Don't 'await' these to keep chat fast)
+      
+      // Save to Server Cache
+      const newCache = await pb.collection(Collections.ChatCache).create({ question: cleanMsg, answer: aiResponse, embedding: embedVecUser.embedding.values, isSemantic: false });
+
+      // Save to Conversation Logs (Realtime trigger)
+      pb.collection(Collections.ChatLogs).create({
+        session_id: sessionId,
+        role: 'user',
+        content: message
+      }).then(() => {
+        pb.collection('chat_logs').create({
+          session_id: sessionId,
+          role: 'model',
+          content: aiResponse
+        });
+      });
+
+      // LEAD EXTRACTION: Check if user shared a 10-digit Indian phone number
+      const phoneMatch = message.match(/[6-9]\d{9}/);
+      if (phoneMatch) {
+        pb.collection('leads').create({
+          contactNo: phoneMatch[0],
+          status: 'new',
+          interest: `Inquiry during session ${sessionId}`
+        }).catch(() => null);
+      }
+
+      return { text: aiResponse, cacheId: newCache.id, isSemantic: false };
+    }
+  }),
+
+  submitFeedback: defineAction({
+    input: z.object({
+      cacheId: z.string(),
+      isHelpful: z.boolean()
+    }),
+    handler: async ({ cacheId, isHelpful }) => {
+      const field = isHelpful ? 'helpful_count+' : 'unhelpful_count+';
+      // Atomic increment in PocketBase
+      return await pb.collection(Collections.ChatCache).update(cacheId, {
+        [isHelpful ? 'helpful_count+' : 'unhelpful_count+']: 1
+      });
     }
   })
 };
