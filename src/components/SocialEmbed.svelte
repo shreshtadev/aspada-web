@@ -1,15 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  let { title, shareUrl, shareUrlType } = $props<{
+  let { title, shareUrl, shareUrlType, index } = $props<{
     title: string;
     shareUrl: string;
     shareUrlType: "instagram" | "youtube" | "facebook";
+    index: number;
   }>();
 
   onMount(() => {
     // Only load Instagram embed if we actually render it
-    if (shareUrl && shareUrlType === "instagram") {
+    if (shareUrl && shareUrlType === "instagram" && index === 0) {
       if (!(window as any).instgrm) {
         const script = document.createElement("script");
         script.src = "https://www.instagram.com/embed.js";
@@ -41,7 +42,7 @@
   <!-- Content -->
   <div class="p-4 space-y-6">
     <!-- Instagram (latest post embed) -->
-    {#if shareUrlType === "instagram"}
+    {#if shareUrlType === "instagram" && index === 0}
       <div>
         <p
           class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500"
@@ -57,6 +58,18 @@
           <a href={shareUrl}>View on Instagram</a>
         </blockquote>
       </div>
+    {:else}
+      <a
+        href={shareUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center justify-between
+                 rounded-xl border border-slate-200
+                 px-4 py-3 text-sm
+                 hover:bg-aspada-steel/10 hover:underline transition"
+      >
+        <span class="font-medium text-slate-800">{title}</span>
+      </a>
     {/if}
 
     <!-- Other platforms (links only) -->
@@ -69,7 +82,7 @@
           class="flex items-center justify-between
                  rounded-xl border border-slate-200
                  px-4 py-3 text-sm
-                 hover:bg-slate-50 transition"
+                 hover:bg-aspada-steel/10 hover:underline transition"
         >
           <span class="font-medium text-slate-800">YouTube</span>
           <span class="text-slate-500">Visit channel →</span>
@@ -84,10 +97,9 @@
           class="flex items-center justify-between
                  rounded-xl border border-slate-200
                  px-4 py-3 text-sm
-                 hover:bg-slate-50 transition"
+                 hover:bg-aspada-steel/30 hover:underline transition"
         >
-          <span class="font-medium text-slate-800">Facebook</span>
-          <span class="text-slate-500">Visit page →</span>
+          <span class="font-medium text-slate-800">{title}</span>
         </a>
       {/if}
     </div>

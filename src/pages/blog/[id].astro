@@ -6,13 +6,18 @@ import pb from "../../lib/pb";
 import { marked } from "marked";
 import toast from "svelte-french-toast";
 import type { PostInfoExpand } from "../../types";
-import type { PostsResponse } from "../../types/pocketbase-types";
+import {
+  Collections,
+  type CompaniesResponse,
+  type PostsResponse,
+} from "../../types/pocketbase-types";
+import ActionDock from "../../components/ActionDock.astro";
 
 const { id } = Astro.params;
 
 let post: PostsResponse<PostInfoExpand>;
 let contentHtml = "";
-
+let companyProfile: CompaniesResponse;
 // Format date helper
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -49,6 +54,12 @@ const fileURL = pb.files.getURL(
   post.expand?.featuredImage,
   String(post.expand?.featuredImage?.attachment)
 );
+
+companyProfile = await pb
+  .collection(Collections.Companies)
+  .getFirstListItem(
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+  );
 ---
 
 <Layout
@@ -56,7 +67,7 @@ const fileURL = pb.files.getURL(
   description={description}
   image={fileURL}
 >
-  <Navbar />
+  <Navbar companyProfile={companyProfile} />
 
   <main class="min-h-screen bg-slate-50 pt-32 pb-16">
     <!-- Hero Image (if exists) or Title Section -->
@@ -127,5 +138,6 @@ const fileURL = pb.files.getURL(
     </div>
   </main>
 
-  <Footer />
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
 </Layout>

@@ -40,12 +40,12 @@ export const server = {
       // 1. Fetch live data from PocketBase to feed the AI context
       const projects = await pb.collection(Collections.Projects).getFullList({
         filter: "status = 'ongoing'",
-        fields: "title,category,location,description"
+        fields: "title,category,status,addressLine1,city,district,state,pincode,description"
       });
 
       // 2. Format project data into a readable string for the AI
       const projectContext = projects.map(p => 
-        `- ${p.title}: A ${p.category} project located in ${p.location}. ${p.description}`
+        `- ${p.title}: A ${p.category} project located in ${p.addressLine1}, ${p.city}, ${p.district}, ${p.state}, ${p.pincode}. ${p.description}`
       ).join("\n");
 
       // 3. Initialize Gemini 2.0 Flash

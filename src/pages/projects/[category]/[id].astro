@@ -12,6 +12,7 @@ import {
   Collections,
   MetadataCategoryTypeOptions,
   type AttachmentsResponse,
+  type CompaniesResponse,
   type MetadataResponse,
   type ProjectsResponse,
 } from "../../../types/pocketbase-types";
@@ -29,6 +30,7 @@ let specifications: any[] = [];
 let socials: any[] = [];
 let projectGallery: any[] = [];
 let brochureUrl = "";
+let companyProfile: CompaniesResponse;
 // let fullAddress: Address;
 try {
   const record = await pb
@@ -158,10 +160,16 @@ try {
   toast.error("Error fetching project");
   return Astro.redirect("/404");
 }
+
+companyProfile = await pb
+  .collection(Collections.Companies)
+  .getFirstListItem(
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+  );
 ---
 
 <Layout title={`${project.title} | Aspada Developers`}>
-  <Navbar />
+  <Navbar companyProfile={companyProfile} />
 
   <main class="min-h-screen bg-aspada-cream/10">
     {/* Hero Section */}
@@ -463,14 +471,17 @@ try {
             socials.length > 0 && (
               <div class="space-y-6">
                 <h3 class="font-bold text-aspada-steel px-2">Social Updates</h3>
-                {socials.map((social) => (
-                  <SocialEmbed
-                    client:visible
-                    title={social.title}
-                    shareUrl={social.shareUrl}
-                    shareUrlType={social.shareUrlType}
-                  />
-                ))}
+                {socials
+                  .sort((a, b) => b.updated - a.updated)
+                  .map((social, index) => (
+                    <SocialEmbed
+                      client:visible
+                      index={index}
+                      title={social.title}
+                      shareUrl={social.shareUrl}
+                      shareUrlType={social.shareUrlType}
+                    />
+                  ))}
               </div>
             )
           }
@@ -479,6 +490,6 @@ try {
     </div>
   </main>
 
-  <Footer />
-  <ActionDock />
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
 </Layout>

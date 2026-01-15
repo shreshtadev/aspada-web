@@ -5,9 +5,19 @@ import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import pb from "../../lib/pb";
 import toast from "svelte-french-toast";
+import {
+  type CompaniesResponse,
+  Collections,
+} from "../../types/pocketbase-types";
+import ActionDock from "../../components/ActionDock.astro";
 
 // Fetch posts
 let posts: string | any[] = [];
+const companyProfile: CompaniesResponse = await pb
+  .collection(Collections.Companies)
+  .getFirstListItem(
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+  );
 try {
   posts = await pb.collection("posts").getFullList({
     sort: "-created",
@@ -23,7 +33,7 @@ try {
   title="Blog - Aspada Developers"
   description="Insights, updates, and stories from the world of luxury real estate development."
 >
-  <Navbar />
+  <Navbar companyProfile={companyProfile} />
   <!-- Simple Hero -->
   <section class="relative bg-aspada-navy py-30 px-8 overflow-hidden">
     <div class="max-w-7xl mx-auto relative z-10">
@@ -57,5 +67,6 @@ try {
       }
     </div>
   </main>
-  <Footer />
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
 </Layout>
