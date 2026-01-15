@@ -112,7 +112,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
       }
 
       {
-        completedProjects.length > 0 ? (
+        completedProjects.length > 0 && (
                 <div class="mb-20 text-center max-w-3xl mx-auto">
         <h1
           class="text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8"
@@ -123,19 +123,10 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
         </h1>
       </div>
           <ProjectList projects={completedProjects} />
-        ) : (
-          <div class="text-center py-20 bg-aspada-silver/5 rounded-3xl border border-white/10">
-            <p class="text-aspada-steel/50 text-xl">
-              No projects found at the moment.
-            </p>
-            <p class="text-sm mt-2 text-aspada-steel/40">
-              Please check back soon.
-            </p>
-          </div>
         )
       }
       {
-        upcomingProjects.length > 0 ? (
+        upcomingProjects.length > 0 && (
                 <div class="mb-20 text-center max-w-3xl mx-auto">
         <h1
           class="text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8"
@@ -146,15 +137,6 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
         </h1>
       </div>
           <ProjectList projects={upcomingProjects} />
-        ) : (
-          <div class="text-center py-20 bg-aspada-silver/5 rounded-3xl border border-white/10">
-            <p class="text-aspada-steel/50 text-xl">
-              No projects found at the moment.
-            </p>
-            <p class="text-sm mt-2 text-aspada-steel/40">
-              Please check back soon.
-            </p>
-          </div>
         )
       }
     </div>
