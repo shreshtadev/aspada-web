@@ -165,12 +165,19 @@ export enum LeadsStatusOptions {
 	"contacted" = "contacted",
 	"closed" = "closed",
 }
+
+export enum LeadsSourceOptions {
+	"aspadaChat" = "aspadaChat",
+	"aspadaForms" = "aspadaForms",
+}
 export type LeadsRecord = {
+	contactEmail?: string
 	contactNo?: string
 	created: IsoAutoDateString
 	fullName?: string
 	id: string
 	interest?: string
+	source?: LeadsSourceOptions
 	status?: LeadsStatusOptions
 	updated: IsoAutoDateString
 }

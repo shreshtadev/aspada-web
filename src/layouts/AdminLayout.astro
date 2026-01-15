@@ -45,6 +45,6 @@ const result = Astro.getActionResult(actions.logout);
   </aside>
   <main class="flex-1 p-10">
     <slot />
-    <Toaster />
+    <Toaster client:load />
   </main>
 </div>

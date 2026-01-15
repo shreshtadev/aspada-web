@@ -35,6 +35,7 @@ const companyProfile = await pb
   .getFirstListItem(
     "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
   );
+const mapsUrl = "https://maps.app.goo.gl/ByMKK3ayuos1PQQt8";
 ---
 
 <Layout title="Aspada Developers | Shivamogga's Finest">
@@ -60,7 +61,7 @@ const companyProfile = await pb
     >
       <Testimonials />
     </LoadingSection>
-    <Address />
+    <Address mapsUrl={mapsUrl} />
   </main>
   <Footer companyProfile={companyProfile} />
   <ActionDock companyProfile={companyProfile} />

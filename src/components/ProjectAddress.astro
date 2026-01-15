@@ -1,9 +1,8 @@
 ---
-import StaticMap from "./StaticMap.astro";
-import AspadaMap from "../assets/headquarters.webp";
 import AspadaForm from "./AspadaForm.svelte";
+import LeafMap from "./LeafMap.svelte";
 
-const { mapsUrl } = Astro.props;
+const { latitude, longitude } = Astro.props;
 ---
 
 <section id="contact" class="py-24 px-6 relative overflow-y">
@@ -39,12 +38,7 @@ const { mapsUrl } = Astro.props;
             <span class="i-lucide-map-pin text-3xl text-aspada-gold"></span>
           </div>
 
-          <StaticMap
-            image={AspadaMap}
-            alt="Aspada Developers office location in Shivamogga"
-            mapsUrl={mapsUrl}
-            aspect="1/1"
-          />
+          <LeafMap client:load latitude={latitude} longitude={longitude} />
         </div>
 
         <div

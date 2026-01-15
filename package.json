@@ -18,6 +18,7 @@
     "@milkdown/kit": "^7.18.0",
     "@milkdown/plugin-upload": "^7.18.0",
     "astro": "^5.16.6",
+    "leaflet": "^1.9.4",
     "marked": "^17.0.1",
     "pocketbase": "^0.26.5",
     "svelte": "^5.46.1",
