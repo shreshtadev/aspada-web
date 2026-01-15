@@ -4,6 +4,7 @@ import logo from "../assets/Logo.png";
 import MobileMenu from "./MobileMenu.astro";
 import pb from "../lib/pb";
 const isAuthenticated = pb.authStore.isValid;
+const { companyProfile } = Astro.props;
 ---
 
 <nav
@@ -25,10 +26,10 @@ const isAuthenticated = pb.authStore.isValid;
       <div class="hidden sm:flex flex-col">
         <span
           class="font-bold text-aspada-silver tracking-tighter leading-none text-lg uppercase"
-          >Aspada</span
+          >{companyProfile?.companyName.split(" ")[0]}</span
         >
         <span class="text-[9px] text-aspada-gold tracking-[0.3em] uppercase"
-          >Developers</span
+          >{companyProfile?.companyName.split(" ")[1]}</span
         >
       </div>
     </a>
@@ -77,13 +78,13 @@ const isAuthenticated = pb.authStore.isValid;
         class="hidden lg:flex gap-3 mr-4 border-r border-white/10 pr-4 text-aspada-silver/40"
       >
         <a
-          href="https://instagram.com/aspadadevelopers/"
+          href={companyProfile?.companyInsta}
           class="i-lucide-instagram hover:text-aspada-cream transition"></a>
         <a
-          href="https://facebook.com/aspadadevelopers"
+          href={companyProfile?.companyFacebook}
           class="i-lucide-facebook hover:text-aspada-cream transition"></a>
         <a
-          href="https://youtube.com/@aspadadevelopers/videos"
+          href={companyProfile?.companyYoutube}
           class="i-lucide-youtube hover:text-aspada-cream transition"></a>
         {
           isAuthenticated ? (
@@ -109,7 +110,7 @@ const isAuthenticated = pb.authStore.isValid;
     </div>
   </div>
 
-  <MobileMenu />
+  <MobileMenu companyProfile={companyProfile} />
 </nav>
 
 <script>
