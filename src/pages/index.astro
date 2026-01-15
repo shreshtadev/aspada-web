@@ -17,6 +17,7 @@ import {
   type ProjectsResponse,
 } from "../types/pocketbase-types";
 import type { ProjectExpand } from "../types";
+import AspadaChat from "../components/AspadaChat.svelte";
 
 const projects = await pb
   .collection(Collections.Projects)
@@ -63,4 +64,5 @@ const companyProfile = await pb
   </main>
   <Footer companyProfile={companyProfile} />
   <ActionDock companyProfile={companyProfile} />
+  <AspadaChat client:idle />
 </Layout>

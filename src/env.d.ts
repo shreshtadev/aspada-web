@@ -6,6 +6,7 @@ interface ImportMetaEnv {
     readonly PUBLIC_PB_URL: string;
     readonly PUBLIC_COMPANY_NAME: string;
     readonly PUBLIC_SITE_URL: string;
+    readonly GEMINI_API_KEY: string;
 }
 
 interface ImportMeta {
