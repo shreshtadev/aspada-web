@@ -81,8 +81,8 @@ export const markdownAttachmentUploader = async (files: File[], schema: any) => 
                 alt: file.name,
             });
         } catch (err) {
-            console.error('PocketBase upload failed', err);
-            toast.error('PocketBase upload failed');
+            console.error('upload failed', err);
+            toast.error('upload failed');
             return null;
         }
     }
@@ -96,15 +96,21 @@ export const deleteAttachment = async (id: string) => {
         await pb.collection('attachments').delete(id);
         isDeleted = true;
     } catch (err) {
-        console.error('PocketBase delete failed', err);
-        toast.error('PocketBase delete failed');
+        console.error('delete failed', err);
+        toast.error('delete failed');
     }
     return isDeleted;
 };
 
 export const uploadAttachment = async (title: string, files: File[]) => {
     const uploadedFiles: string[] = [];
+    const MAX_SIZE_MB = 5;
+
     for (const file of files) {
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+            toast.error(`File exceeds ${MAX_SIZE_MB}MB`);
+            return [];
+        }
         try {
             const record = await pb.collection('attachments').create({
                 attachment: file,
@@ -113,8 +119,8 @@ export const uploadAttachment = async (title: string, files: File[]) => {
 
             uploadedFiles.push(record.id);
         } catch (err) {
-            console.error('PocketBase upload failed', err);
-            toast.error('PocketBase upload failed');
+            console.error('upload failed', err);
+            toast.error('upload failed');
             return [];
         }
     }

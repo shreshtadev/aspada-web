@@ -191,10 +191,11 @@ export enum MetadataCategoryTypeOptions {
 	"contactSettings" = "contactSettings",
 	"gallery" = "gallery",
 }
-export type MetadataRecord = {
+export type MetadataRecord<TprojectSlugs = unknown> = {
 	attachments?: RecordIdString[]
 	categoryType?: MetadataCategoryTypeOptions
 	id: string
+	projectSlugs?: null | TprojectSlugs
 	showInTiles?: boolean
 	summary?: string
 	title: string
@@ -311,7 +312,7 @@ export type ChatCacheResponse<Tembedding = unknown, Texpand = unknown> = Require
 export type ChatLogsResponse<Tmetadata = unknown, Texpand = unknown> = Required<ChatLogsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type CompaniesResponse<Texpand = unknown> = Required<CompaniesRecord> & BaseSystemFields<Texpand>
 export type LeadsResponse<Texpand = unknown> = Required<LeadsRecord> & BaseSystemFields<Texpand>
-export type MetadataResponse<Texpand = unknown> = Required<MetadataRecord> & BaseSystemFields<Texpand>
+export type MetadataResponse<TprojectSlugs = unknown, Texpand = unknown> = Required<MetadataRecord<TprojectSlugs>> & BaseSystemFields<Texpand>
 export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type SocialsResponse<Texpand = unknown> = Required<SocialsRecord> & BaseSystemFields<Texpand>

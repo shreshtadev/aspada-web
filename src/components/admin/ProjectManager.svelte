@@ -83,10 +83,10 @@
 
       allSocials = socialsRes;
       allAmenities = metadataRes.filter(
-        (m) => m.categoryType === MetadataCategoryTypeOptions.amenity
+        (m) => m.categoryType === MetadataCategoryTypeOptions.amenity,
       );
       allSpecs = metadataRes.filter(
-        (m) => m.categoryType === MetadataCategoryTypeOptions.specification
+        (m) => m.categoryType === MetadataCategoryTypeOptions.specification,
       );
     } catch (err) {
       console.error("Failed to load data:", err);
@@ -193,7 +193,7 @@
           if (selectedFiles.length > 0) {
             const uploadedIds = await uploadAttachment(
               `Spec - ${newItemTitle}`,
-              selectedFiles
+              selectedFiles,
             );
             payload.attachments = uploadedIds;
           }
@@ -205,17 +205,17 @@
       // Refresh list and select
       if (modalType === "amenity") {
         allAmenities = [...allAmenities, record].sort((a, b) =>
-          a.title.localeCompare(b.title)
+          a.title.localeCompare(b.title),
         );
         formAmenities = [...formAmenities, record.id];
       } else if (modalType === "social") {
         allSocials = [...allSocials, record].sort((a, b) =>
-          a.title.localeCompare(b.title)
+          a.title.localeCompare(b.title),
         );
         formSocials = [...formSocials, record.id];
       } else if (modalType === "specification") {
         allSpecs = [...allSpecs, record].sort((a, b) =>
-          a.title.localeCompare(b.title)
+          a.title.localeCompare(b.title),
         );
         formSpecs = [...formSpecs, record.id];
 
@@ -315,12 +315,34 @@
         const updated = await pb
           .collection(Collections.Projects)
           .update(selectedId, formData);
+
+        for (const id of [...formAmenities, ...formSpecs]) {
+          const metadataRes = [...allAmenities, ...allSpecs];
+          const foundMetadata = metadataRes.find((it) => it.id === id);
+          const projectSlugs = foundMetadata.projectSlugs || [];
+          const updateRefs = await pb
+            .collection(Collections.Metadata)
+            .update(id, {
+              projectSlugs: [...projectSlugs, updated.id],
+            });
+        }
         projects = projects.map((it) => (it.id === selectedId ? updated : it));
         selectProject(updated);
       } else {
         const created = await pb
           .collection(Collections.Projects)
           .create(formData);
+        for (const id of [...formAmenities, ...formSpecs]) {
+          const metadataRes = [...allAmenities, ...allSpecs];
+          const foundMetadata = metadataRes.find((it) => it.id === id);
+          const projectSlugs = foundMetadata.projectSlugs || [];
+          const updateRefs = await pb
+            .collection(Collections.Metadata)
+            .update(id, {
+              projectSlugs: [...projectSlugs, created.id],
+            });
+        }
+        toast.success("Project Saved.");
         projects = [created, ...projects];
         selectProject(created);
       }
@@ -345,6 +367,7 @@
       await pb.collection(Collections.Projects).delete(id);
       projects = projects.filter((item) => item.id !== id);
       if (selectedId === id) newProject();
+      toast.success("Project Deleted.");
     } catch (err) {
       toast.error(String(err));
     }

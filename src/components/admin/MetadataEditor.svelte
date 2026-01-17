@@ -6,6 +6,7 @@
     Collections,
     MetadataCategoryTypeOptions,
   } from "../../types/pocketbase-types";
+  import Autocomplete from "./Autocomplete.svelte";
 
   type Metadata = {
     id?: string;
@@ -14,6 +15,7 @@
     summary: string;
     showInTiles: boolean;
     attachments: string[];
+    projectSlugs: string[];
     expand?: {
       attachments?: any[];
     };
@@ -25,7 +27,7 @@
     { value: "amenity", label: "Amenity" },
     { value: "postCategory", label: "Post Category" },
     { value: "tag", label: "Tag" },
-    { value: "specification", label: "Specification" },
+    { value: "specification", label: "Gallery" },
     { value: "statsSettings", label: "Stats Settings" },
     { value: "contactSettings", label: "Contact Settings" },
     { value: "gallery", label: "Gallery Images" },
@@ -40,6 +42,7 @@
   let selectedCategory = $state(initialCategory);
   let loading = $state(false);
   let formLoading = $state(false);
+  let projects = $state<any[]>([]);
 
   // Sync selectedCategory with initialCategory prop if it changes externally
   $effect(() => {
@@ -55,11 +58,12 @@
   let formFiles = $state<FileList | null>(null);
   let currentAttachments = $state<string[]>([]);
   let currentAttachmentUrls = $state<{ id: string; url: string }[]>([]);
+  let formProjectSlugs = $state<string[]>([]);
 
   async function loadData() {
     try {
       loading = true;
-      console.log(selectedCategory);
+      projects = await pb.collection(Collections.Projects).getFullList();
       const list = await pb.collection(Collections.Metadata).getFullList({
         filter: `categoryType = '${selectedCategory}'`,
         expand: "attachments",
@@ -84,6 +88,7 @@
     formShowInTiles = item.showInTiles ?? false;
     formCategory = item.categoryType ?? MetadataCategoryTypeOptions.amenity;
     currentAttachments = item.attachments ?? [];
+    formProjectSlugs = item.projectSlugs ?? [];
 
     const attachments = item.expand?.attachments;
     currentAttachmentUrls =
@@ -103,6 +108,7 @@
     formShowInTiles = false;
     currentAttachments = [];
     currentAttachmentUrls = [];
+    formProjectSlugs = [];
     formFiles = null;
   }
 
@@ -120,7 +126,7 @@
       if (formFiles && formFiles.length > 0) {
         const uploadedIds = await uploadAttachment(
           `${formCategory} - ${formTitle}`,
-          Array.from(formFiles)
+          Array.from(formFiles),
         );
         finalAttachments = [...finalAttachments, ...uploadedIds];
       }
@@ -131,6 +137,7 @@
         showInTiles: formShowInTiles,
         categoryType: formCategory,
         attachments: finalAttachments,
+        projectSlugs: formProjectSlugs,
       };
 
       if (selectedId) {
@@ -140,7 +147,7 @@
             expand: "attachments",
           });
         items = items.map((it) =>
-          it.id === selectedId ? (updated as unknown as Metadata) : it
+          it.id === selectedId ? (updated as unknown as Metadata) : it,
         );
         selectItem(updated as unknown as Metadata);
         toast.success("Updated successfully");
@@ -189,10 +196,10 @@
       const success = await deleteAttachment(attach.id);
       if (success) {
         currentAttachments = currentAttachments.filter(
-          (id) => id !== attach.id
+          (id) => id !== attach.id,
         );
         currentAttachmentUrls = currentAttachmentUrls.filter(
-          (u) => u.id !== attach.id
+          (u) => u.id !== attach.id,
         );
 
         // Update the record immediately
@@ -204,7 +211,7 @@
           items = items.map((it) =>
             it.id === selectedId
               ? { ...it, attachments: currentAttachments }
-              : it
+              : it,
           );
         }
         toast.success("Attachment removed");
@@ -336,7 +343,11 @@
             <p
               class="text-slate-400 text-sm font-medium uppercase tracking-widest"
             >
-              Managing in <span class="text-aspada-gold">{formCategory}</span>
+              Managing in <span class="text-aspada-gold"
+                >{formCategory === "specification"
+                  ? "Gallery (Add project specifics)"
+                  : formCategory}</span
+              >
             </p>
           </div>
         </div>
@@ -353,6 +364,21 @@
               placeholder="Enter title..."
             />
           </label>
+
+          <div class="block">
+            <Autocomplete
+              label="Projects"
+              options={projects.map((p) => ({
+                id: p.id,
+                title: p.title,
+                summary: p.slug,
+              }))}
+              bind:selected={formProjectSlugs}
+              multiple={true}
+              placeholder="Select projects..."
+            />
+          </div>
+
           {#if selectedCategory === "specification"}
             <label class="block cursor-pointer group">
               <span

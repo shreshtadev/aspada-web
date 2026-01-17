@@ -15,13 +15,13 @@
   // Derived filtered options
   let filteredOptions = $derived(
     options.filter((opt) =>
-      opt.title.toLowerCase().includes(search.toLowerCase())
-    )
+      opt.title.toLowerCase().includes(search.toLowerCase()),
+    ),
   );
 
   // Derived selected items for display
   let selectedItems = $derived(
-    selected.map((id) => options.find((o) => o.id === id)).filter(Boolean)
+    selected.map((id) => options.find((o) => o.id === id)).filter(Boolean),
   );
 
   function select(opt) {
@@ -55,7 +55,7 @@
   {/if}
 
   <div
-    class="bg-white border focus-within:ring-2 focus-within:ring-[#d4af37]/50 focus-within:border-[#d4af37] border-slate-300 rounded-xl p-2 min-h-[46px] flex flex-wrap gap-2 items-center cursor-text transition-all"
+    class="bg-white border focus-within:ring-2 focus-within:ring-aspada-gold/50 focus-within:border-aspada-gold border-slate-300 rounded-xl p-2 min-h-[46px] flex flex-wrap gap-2 items-center cursor-text transition-all"
     role="button"
     tabindex="0"
     onclick={() => (isOpen = true)}
@@ -63,7 +63,7 @@
   >
     {#each selectedItems as item}
       <span
-        class="bg-slate-100 text-slate-800 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-slate-200"
+        class="bg-aspada-silver/30 text-aspada-navy text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-aspada-steel/90"
       >
         {item.title} - {item.summary ? item.summary.slice(0, 50) + "..." : ""}
         <button
@@ -79,6 +79,7 @@
     {/each}
 
     <input
+      name="multiSelector"
       type="text"
       bind:value={search}
       {placeholder}
@@ -95,7 +96,7 @@
         {#each filteredOptions as opt}
           <button
             class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between group {selected.includes(
-              opt.id
+              opt.id,
             )
               ? 'bg-slate-50 text-[#d4af37] font-bold'
               : 'text-slate-700'}"
