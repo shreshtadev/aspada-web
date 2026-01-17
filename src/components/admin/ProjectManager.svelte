@@ -319,7 +319,7 @@
         for (const id of [...formAmenities, ...formSpecs]) {
           const metadataRes = [...allAmenities, ...allSpecs];
           const foundMetadata = metadataRes.find((it) => it.id === id);
-          const projectSlugs = foundMetadata.projectSlugs || [];
+          const projectSlugs = foundMetadata.projectSlugs ?? [];
           const updateRefs = await pb
             .collection(Collections.Metadata)
             .update(id, {
@@ -335,7 +335,7 @@
         for (const id of [...formAmenities, ...formSpecs]) {
           const metadataRes = [...allAmenities, ...allSpecs];
           const foundMetadata = metadataRes.find((it) => it.id === id);
-          const projectSlugs = foundMetadata.projectSlugs || [];
+          const projectSlugs = foundMetadata.projectSlugs ?? [];
           const updateRefs = await pb
             .collection(Collections.Metadata)
             .update(id, {
