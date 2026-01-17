@@ -17,7 +17,7 @@ const { id } = Astro.params;
 const companyProfile = await pb
   .collection(Collections.Companies)
   .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
   );
 
 let testimonial: TestimonialsResponse<TestimonialInfoExpand>;
@@ -51,7 +51,7 @@ const testimonialContent = await marked.parse(testimonial.content);
 
   <main class="min-h-screen bg-slate-50 flex flex-col">
     <!-- Breadcrumb / Header -->
-    <div class="bg-aspada-navy py-12 px-6">
+    <div class="bg-aspada-navy py-6 px-4 sm:py-12 sm:px-6">
       <div class="max-w-4xl mx-auto">
         <a
           href="/testimonials"
@@ -62,7 +62,9 @@ const testimonialContent = await marked.parse(testimonial.content);
       </div>
     </div>
 
-    <div class="flex-1 flex items-center justify-center py-12 px-6">
+    <div
+      class="flex-1 flex items-center justify-center py-6 px-4 sm:py-12 sm:px-6"
+    >
       <div class="max-w-4xl w-full">
         <div
           class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-[#d4af37]/20 relative"
@@ -84,10 +86,10 @@ const testimonialContent = await marked.parse(testimonial.content);
             </svg>
           </div>
 
-          <div class="grid md:grid-cols-[1fr,2fr] min-h-[400px]">
+          <div class="grid grid-cols-1 md:grid-cols-[1fr,2fr] min-h-[400px]">
             <!-- Sidebar / Author Info -->
             <div
-              class="bg-slate-900 p-10 flex flex-col items-center text-center justify-center relative overflow-hidden"
+              class="bg-slate-900 p-6 sm:p-10 flex flex-col items-center text-center justify-center relative overflow-hidden"
             >
               <div class="absolute inset-0 bg-[#d4af37]/10"></div>
 
@@ -132,10 +134,10 @@ const testimonialContent = await marked.parse(testimonial.content);
             </div>
 
             <!-- Content -->
-            <div class="p-10 md:p-14 flex items-center bg-white">
+            <div class="p-6 md:p-14 flex items-center bg-white">
               <div>
                 <p
-                  class="text-xl md:text-2xl text-slate-700 italic leading-relaxed font-light"
+                  class="text-lg sm:text-xl md:text-2xl text-slate-700 italic leading-relaxed font-light"
                 >
                   <blockquote
                     class="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-slate-800 prose-p:text-slate-600 prose-li:text-slate-600"

@@ -47,7 +47,7 @@ try {
     record.expand?.coverImage?.attachment,
     {
       quality: 90,
-    }
+    },
   );
 
   const coverVideoUrl = pb.files.getURL(
@@ -55,14 +55,14 @@ try {
     record.expand?.coverVideo?.attachment,
     {
       quality: 90,
-    }
+    },
   );
 
   // Process Brochure
   if (record.expand?.brochure) {
     brochureUrl = pb.files.getURL(
       record.expand?.brochure,
-      record.expand?.brochure?.attachment
+      record.expand?.brochure?.attachment,
     );
   }
 
@@ -72,7 +72,7 @@ try {
       (await Promise.all(
         record.expand.projectDetails
           ?.filter(
-            (y) => y.categoryType === MetadataCategoryTypeOptions.amenity
+            (y) => y.categoryType === MetadataCategoryTypeOptions.amenity,
           )
           .map(async (md: MetadataResponse) => {
             const iconAttachmentID = md.attachments[0] || "";
@@ -82,29 +82,29 @@ try {
                 .getOne(iconAttachmentID);
               const iconAttachmentUrl = pb.files.getURL(
                 iconAttachment,
-                iconAttachment.attachment
+                iconAttachment.attachment,
               );
               md.attachments = [iconAttachmentUrl];
             }
             return md;
-          })
+          }),
       )) || [];
     specifications =
       record.expand.projectDetails?.filter(
-        (y) => y.categoryType === MetadataCategoryTypeOptions.specification
+        (y) => y.categoryType === MetadataCategoryTypeOptions.specification,
       ) || [];
     projectGallery =
       record.expand.projectDetails?.filter(
-        (y) => y.categoryType === MetadataCategoryTypeOptions.gallery
+        (y) => y.categoryType === MetadataCategoryTypeOptions.gallery,
       ) || [];
     socials = record.expand.socials || [];
     // Process Gallery Images (if any)
     const specAttachments = specifications.flatMap(
-      (spec) => spec.attachments || []
+      (spec) => spec.attachments || [],
     );
 
     const projectGalleryAttachments = projectGallery.flatMap(
-      (pj) => pj.attachments || []
+      (pj) => pj.attachments || [],
     );
     specAttachments.push(...projectGalleryAttachments);
 
@@ -166,7 +166,7 @@ try {
 companyProfile = await pb
   .collection(Collections.Companies)
   .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
   );
 ---
 
@@ -175,7 +175,7 @@ companyProfile = await pb
 
   <main class="min-h-screen bg-aspada-cream/10">
     {/* Hero Section */}
-    <div class="relative h-[70vh] w-full overflow-hidden">
+    <div class="relative h-[60vh] sm:h-[70vh] w-full overflow-hidden">
       <div
         class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/90 z-10"
       >
@@ -200,7 +200,7 @@ companyProfile = await pb
         )
       }
       <div
-        class="absolute inset-0 z-20 flex flex-col justify-end pb-20 px-6 sm:px-12 max-w-7xl mx-auto w-full"
+        class="absolute inset-0 z-20 flex flex-col justify-end pb-12 px-4 sm:pb-20 sm:px-12 max-w-7xl mx-auto w-full"
       >
         <div
           class="space-y-4 animate-in slide-in-from-bottom-10 fade-in duration-700"
@@ -223,7 +223,7 @@ companyProfile = await pb
           </div>
 
           <h1
-            class="text-5xl md:text-7xl font-bold text-white tracking-tight drop-shadow-2xl"
+            class="text-3xl sm:text-5xl md:text-7xl font-bold text-white tracking-tight drop-shadow-2xl"
           >
             {project.title}
           </h1>
@@ -248,9 +248,11 @@ companyProfile = await pb
       class="sticky top-24 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200"
     >
       <div
-        class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4"
+        class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-4"
       >
-        <div class="flex gap-6 text-sm font-semibold text-aspada-navy">
+        <div
+          class="flex gap-4 sm:gap-6 text-sm font-semibold text-aspada-navy overflow-x-auto no-scrollbar whitespace-nowrap mask-linear-fade pb-1 sm:pb-0 w-full sm:w-auto"
+        >
           <a href="#overview" class="hover:text-aspada-gold transition-colors"
             >Overview</a
           >
@@ -303,8 +305,8 @@ companyProfile = await pb
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 py-20">
-      <div class="grid lg:grid-cols-3 gap-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-16">
         {/* Main Content */}
         <div class="col-span-2 space-y-24">
           {/* Specifications */}
@@ -357,7 +359,7 @@ companyProfile = await pb
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {amenities.map((item) => (
-                    <div class="group p-6 rounded-2xl">
+                    <div class="group p-4 sm:p-6 rounded-2xl">
                       <div class="w-24 h-24 rounded-full flex items-center justify-center text-aspada-steel mb-4">
                         {item.attachments[0] ? (
                           <img

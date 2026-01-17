@@ -43,15 +43,15 @@
 
 <form
   onsubmit={handleSubmit}
-  class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 max-w-md"
+  class="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2rem] shadow-xl border border-slate-100 max-w-md w-full mx-auto"
 >
-  <h3 class="text-2xl font-bold text-aspada-navy mb-6">Enquire Now</h3>
+  <h3 class="text-xl sm:text-2xl font-bold text-aspada-navy mb-5 sm:mb-6">Enquire Now</h3>
 
   <div class="space-y-4">
     <div class="space-y-1 w-full">
       <label
         for="name"
-        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
       >
         Full Name
       </label>
@@ -60,30 +60,31 @@
         bind:value={fullName}
         placeholder="Full Name"
         required
-        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
+        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
       />
     </div>
 
     <div class="space-y-1 w-full">
       <label
         for="email"
-        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
       >
         Email Address
       </label>
       <input
         id="email"
+        type="email"
         bind:value={contactEmail}
         placeholder="Contact Email"
         required
-        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
+        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
       />
     </div>
 
     <div class="space-y-1 w-full">
       <label
         for="phone"
-        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
       >
         Phone Number
       </label>
@@ -102,7 +103,7 @@
           inputmode="numeric"
           placeholder="98765 43210"
           required
-          class="w-full p-4 pl-16 bg-slate-50 border rounded-xl outline-none transition-all duration-300
+          class="w-full p-3 sm:p-4 pl-16 text-base bg-slate-50 border rounded-xl outline-none transition-all duration-300
              {contactNo.length > 0 && !isValid
             ? 'border-rose-300 focus:ring-4 focus:ring-rose-500/10'
             : 'border-aspada-gold/60 focus:border-aspada-gold focus:ring-4 focus:ring-aspada-gold/10'}"
@@ -124,7 +125,7 @@
 
       {#if contactNo.length > 0 && !isValid}
         <p
-          class="text-[10px] text-rose-500 font-medium ml-1 animate-in slide-in-from-top-1"
+          class="text-xs text-rose-500 font-medium ml-1 animate-in slide-in-from-top-1"
         >
           Please enter a valid 10-digit mobile number
         </p>
@@ -134,7 +135,7 @@
     <div class="space-y-1 w-full">
       <label
         for="message"
-        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
       >
         Message
       </label>
@@ -143,14 +144,14 @@
         bind:value={message}
         placeholder="How can we help you?"
         rows="3"
-        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
+        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
       ></textarea>
     </div>
 
     <button
       type="submit"
       disabled={status === "sending"}
-      class="w-full bg-aspada-navy text-white font-bold py-4 rounded-xl transition-all hover:bg-opacity-90 active:scale-95 disabled:opacity-50"
+      class="w-full bg-aspada-navy text-white font-bold py-3 sm:py-4 rounded-xl transition-all hover:bg-opacity-90 active:scale-95 disabled:opacity-50"
     >
       {status === "sending" ? "Submitting..." : "Send Message"}
     </button>

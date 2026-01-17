@@ -16,7 +16,7 @@ let posts: string | any[] = [];
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
   .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
   );
 try {
   posts = await pb.collection("posts").getFullList({
@@ -35,12 +35,16 @@ try {
 >
   <Navbar companyProfile={companyProfile} />
   <!-- Simple Hero -->
-  <section class="relative bg-aspada-navy py-30 px-8 overflow-hidden">
+  <section
+    class="relative bg-aspada-navy py-24 px-4 sm:py-30 sm:px-8 overflow-hidden"
+  >
     <div class="max-w-7xl mx-auto relative z-10">
-      <h1 class="text-4xl md:text-6xl font-bold text-aspada-cream mb-6">
+      <h1
+        class="text-3xl sm:text-4xl md:text-6xl font-bold text-aspada-cream mb-6"
+      >
         Latest News
       </h1>
-      <p class="text-xl text-aspada-cream max-w-2xl">
+      <p class="text-lg sm:text-xl text-aspada-cream max-w-2xl">
         Insights, updates, and stories from the world of luxury real estate
         development.
       </p>
@@ -54,7 +58,7 @@ try {
   </section>
 
   <!-- Content -->
-  <main class="min-h-screen bg-slate-50 py-16 px-8">
+  <main class="min-h-screen bg-slate-50 py-12 px-4 sm:py-16 sm:px-8">
     <div class="max-w-7xl mx-auto">
       {
         posts.length > 0 ? (

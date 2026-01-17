@@ -6,7 +6,7 @@ import { Collections, type CompaniesResponse } from "../types/pocketbase-types";
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
   .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
+    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
   );
 ---
 
@@ -14,17 +14,21 @@ const companyProfile: CompaniesResponse = await pb
   <Navbar companyProfile={companyProfile} />
 
   <main>
-    <section class="bg-aspada-cream/50 min-h-screen py-20 px-6 sm:px-10">
+    <section
+      class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10"
+    >
       <div
         class="max-w-4xl mx-auto bg-white border border-aspada-gold/20 rounded-3xl shadow-xl overflow-hidden"
       >
-        <div class="bg-aspada-steel p-10 text-center relative overflow-hidden">
+        <div
+          class="bg-aspada-steel p-6 sm:p-10 text-center relative overflow-hidden"
+        >
           <div
             class="absolute -top-10 -right-10 w-40 h-40 bg-[#d4af37]/10 blur-3xl rounded-full"
           >
           </div>
           <h1
-            class="text-4xl font-bold text-white relative z-10 uppercase tracking-widest"
+            class="text-3xl sm:text-4xl font-bold text-white relative z-10 uppercase tracking-widest"
           >
             Terms <span class="italic text-aspada-gold font-light">&amp;</span> Conditions
           </h1>
@@ -33,7 +37,7 @@ const companyProfile: CompaniesResponse = await pb
           </p>
         </div>
 
-        <div class="p-8 md:p-12 text-slate-700 leading-relaxed space-y-8">
+        <div class="p-6 md:p-12 text-slate-700 leading-relaxed space-y-8">
           <p class="text-lg">
             Welcome to <span class="font-bold text-aspada-silver uppercase"
               >{companyProfile.companyName}</span
