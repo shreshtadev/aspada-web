@@ -58,7 +58,6 @@
   let formFiles = $state<FileList | null>(null);
   let currentAttachments = $state<string[]>([]);
   let currentAttachmentUrls = $state<{ id: string; url: string }[]>([]);
-  let formProjectSlugs = $state<string[]>([]);
 
   async function loadData() {
     try {
@@ -88,7 +87,6 @@
     formShowInTiles = item.showInTiles ?? false;
     formCategory = item.categoryType ?? MetadataCategoryTypeOptions.amenity;
     currentAttachments = item.attachments ?? [];
-    formProjectSlugs = item.projectSlugs ?? [];
 
     const attachments = item.expand?.attachments;
     currentAttachmentUrls =
@@ -108,7 +106,6 @@
     formShowInTiles = false;
     currentAttachments = [];
     currentAttachmentUrls = [];
-    formProjectSlugs = [];
     formFiles = null;
   }
 
@@ -137,7 +134,6 @@
         showInTiles: formShowInTiles,
         categoryType: formCategory,
         attachments: finalAttachments,
-        projectSlugs: formProjectSlugs,
       };
 
       if (selectedId) {
@@ -364,20 +360,6 @@
               placeholder="Enter title..."
             />
           </label>
-
-          <div class="block">
-            <Autocomplete
-              label="Projects"
-              options={projects.map((p) => ({
-                id: p.id,
-                title: p.title,
-                summary: p.slug,
-              }))}
-              bind:selected={formProjectSlugs}
-              multiple={true}
-              placeholder="Select projects..."
-            />
-          </div>
 
           {#if selectedCategory === "specification"}
             <label class="block cursor-pointer group">

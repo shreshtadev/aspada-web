@@ -6,6 +6,7 @@
     placeholder = "Select...",
     allowCreate = false,
     oncreate = () => {},
+    onedit = (id) => {},
   } = $props();
 
   let isOpen = $state(false);
@@ -63,9 +64,19 @@
   >
     {#each selectedItems as item}
       <span
-        class="bg-aspada-silver/30 text-aspada-navy text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-aspada-steel/90"
+        class="bg-aspada-silver/30 text-aspada-navy text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-aspada-steel/90 group"
       >
         {item.title} - {item.summary ? item.summary.slice(0, 50) + "..." : ""}
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            onedit(item.id);
+          }}
+          class="hover:text-aspada-gold rounded-full w-4 h-4 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Edit"
+        >
+          ✎
+        </button>
         <button
           onclick={(e) => {
             e.stopPropagation();
