@@ -6,9 +6,14 @@
     title?: string
   }
 
-  let { images = [], projectTitle = '' } = $props<{
+  let {
+    images = [],
+    projectTitle = '',
+    layout = 'grid',
+  } = $props<{
     images: Image[]
     projectTitle: string
+    layout?: 'grid' | 'scroll'
   }>()
 
   let selectedIndex = $state(-1)
@@ -46,36 +51,93 @@
     if (e.key === 'ArrowRight') next()
     if (e.key === 'ArrowLeft') prev()
   }
+  let scrollerEl = $state<HTMLElement | null>(null)
+  let canScrollLeft = $state(false)
+  let canScrollRight = $state(false)
+
+  function updateScrollButtons() {
+    if (!scrollerEl) return
+    canScrollLeft = scrollerEl.scrollLeft > 5
+    canScrollRight = scrollerEl.scrollLeft + scrollerEl.clientWidth < scrollerEl.scrollWidth - 5
+  }
+
+  function scrollScroller(direction: 'left' | 'right') {
+    if (!scrollerEl) return
+    const amount = scrollerEl.clientWidth * 0.7
+    scrollerEl.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' })
+  }
+
+  $effect(() => {
+    if (layout === 'scroll' && scrollerEl) {
+      updateScrollButtons()
+      scrollerEl.addEventListener('scroll', updateScrollButtons)
+      window.addEventListener('resize', updateScrollButtons)
+      return () => {
+        scrollerEl?.removeEventListener('scroll', updateScrollButtons)
+        window.removeEventListener('resize', updateScrollButtons)
+      }
+    }
+  })
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {#each images as img, i}
+<div class="relative group/scroller">
+  {#if layout === 'scroll'}
     <button
-      onclick={() => openLightbox(i)}
-      class="rounded-2xl overflow-hidden aspect-video group cursor-zoom-in relative text-left"
+      onclick={() => scrollScroller('left')}
+      class="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 shadow-lg border border-slate-200 flex items-center justify-center text-aspada-navy md:opacity-0 md:group-hover/scroller:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 md:hover:scale-110 disabled:pointer-events-none disabled:opacity-0 cursor-pointer"
+      disabled={!canScrollLeft}
+      aria-label="Previous"
     >
-      <div
-        class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"
-      ></div>
-      <img
-        src={img.url}
-        alt={`${projectTitle} view ${i + 1}`}
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        loading="lazy"
-      />
-      {#if img.title}
-        <div
-          class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/60 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        >
-          <p class="text-white text-lg sm:text-2xl font-medium">
-            {(img.title as string).indexOf('-') ? (img.title as string).split('-')[1] : img.title}
-          </p>
-        </div>
-      {/if}
+      <span class="i-lucide-chevron-left text-xl md:text-2xl"></span>
     </button>
-  {/each}
+
+    <button
+      onclick={() => scrollScroller('right')}
+      class="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 shadow-lg border border-slate-200 flex items-center justify-center text-aspada-navy md:opacity-0 md:group-hover/scroller:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 md:hover:scale-110 disabled:pointer-events-none disabled:opacity-0 cursor-pointer"
+      disabled={!canScrollRight}
+      aria-label="Next"
+    >
+      <span class="i-lucide-chevron-right text-xl md:text-2xl"></span>
+    </button>
+  {/if}
+
+  <div
+    bind:this={scrollerEl}
+    class={layout === 'grid'
+      ? 'grid grid-cols-1 md:grid-cols-2 gap-6'
+      : 'flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-6 pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth'}
+  >
+    {#each images as img, i}
+      <button
+        onclick={() => openLightbox(i)}
+        class="rounded-2xl overflow-hidden aspect-video group cursor-zoom-in relative text-left shrink-0 snap-start {layout ===
+        'scroll'
+          ? 'w-[85vw] md:w-[600px]'
+          : ''}"
+      >
+        <div
+          class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10"
+        ></div>
+        <img
+          src={img.url}
+          alt={`${projectTitle} view ${i + 1}`}
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          loading="lazy"
+        />
+        {#if img.title}
+          <div
+            class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/60 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <p class="text-white text-lg sm:text-2xl font-medium">
+              {(img.title as string).indexOf('-') ? (img.title as string).split('-')[1] : img.title}
+            </p>
+          </div>
+        {/if}
+      </button>
+    {/each}
+  </div>
 </div>
 
 {#if isOpen}
@@ -152,5 +214,12 @@
 <style>
   :global(body.overflow-hidden) {
     overflow: hidden;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 </style>

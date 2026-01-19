@@ -107,14 +107,14 @@
             class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between group {selected.includes(
               opt.id
             )
-              ? 'bg-slate-50 text-[#d4af37] font-bold'
-              : 'text-slate-700'}"
+              ? 'bg-slate-50 text-aspada-gold font-bold'
+              : 'text-aspada-navy'}"
             onclick={() => select(opt)}
             type="button"
           >
             <span>{opt.title}</span>
             {#if selected.includes(opt.id)}
-              <span class="text-[#d4af37]">✓</span>
+              <span class="text-aspada-gold">✓</span>
             {/if}
           </button>
         {/each}

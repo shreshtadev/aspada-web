@@ -43,6 +43,8 @@
   let formSocials = $state<string[]>([]) // IDs
   let formAmenities = $state<string[]>([]) // IDs
   let formSpecs = $state<string[]>([]) // IDs
+  let formOtherDetails = $state<string[]>([]) // IDs for items like gallery that aren't managed here
+
   let currentCoverIds = $state([]) // Array of current cover attachment record ID
   let currentCoverVideoIds = $state([]) // Array of current cover video attachment record ID
   let currentBrochureIds = $state([]) // Array of current brochure attachment record ID
@@ -130,12 +132,18 @@
     formStatus = p.status
     formDescription = p.description ?? ''
     formSocials = p.socials ?? []
-    formAmenities = p.projectDetails
-    formSpecs = p.projectDetails
+    const projectDetails = p.projectDetails || []
+    const amenityIds = new Set(allAmenities.map((a) => a.id))
+    const specIds = new Set(allSpecs.map((s) => s.id))
+
+    formAmenities = projectDetails.filter((id) => amenityIds.has(id))
+    formSpecs = projectDetails.filter((id) => specIds.has(id))
+    formOtherDetails = projectDetails.filter((id) => !amenityIds.has(id) && !specIds.has(id))
+
     formAddressLine1 = p.addressLine1
     formCity = p.city
     formState = p.state
-    formPinCode = p.pincode
+    formPinCode = p.pincode ?? ''
     formDistrict = p.district
     // Relation IDs are strings in the 'projects' record (if not expanded)
     currentCoverIds = p?.coverImage ? [p.coverImage] : []
@@ -163,6 +171,8 @@
     formSocials = []
     formAmenities = []
     formSpecs = []
+    formOtherDetails = []
+
     currentCoverIds = []
     currentCoverVideoIds = []
     currentBrochureIds = []
@@ -231,7 +241,6 @@
       } else if (modalType === 'specification') {
         allSpecs = [...allSpecs, record].sort((a, b) => a.title.localeCompare(b.title))
         formSpecs = [...formSpecs, record.id]
-
         // Clear file tracker
         if (fileUploadTracker) {
           fileUploadTracker.clearFiles()
@@ -266,8 +275,8 @@
 
     // Append relations
     for (const id of formSocials) formData.append('socials', id)
-    for (const id of formAmenities) formData.append('projectDetails', id)
-    for (const id of formSpecs) formData.append('projectDetails', id)
+    for (const id of [...formAmenities, ...formSpecs, ...formOtherDetails])
+      formData.append('projectDetails', id)
 
     try {
       // 1. Handle Cover Image
@@ -321,30 +330,10 @@
       if (selectedId) {
         const updated = await pb.collection(Collections.Projects).update(selectedId, formData)
 
-        // for (const id of [...formAmenities, ...formSpecs]) {
-        //   const metadataRes = [...allAmenities, ...allSpecs];
-        //   const foundMetadata = metadataRes.find((it) => it.id === id);
-        //   const projectSlugs = foundMetadata.projectSlugs ?? [];
-        //   const updateRefs = await pb
-        //     .collection(Collections.Metadata)
-        //     .update(id, {
-        //       projectSlugs: [...projectSlugs, updated.id],
-        //     });
-        // }
         projects = projects.map((it) => (it.id === selectedId ? updated : it))
         selectProject(updated)
       } else {
         const created = await pb.collection(Collections.Projects).create(formData)
-        // for (const id of [...formAmenities, ...formSpecs]) {
-        //   const metadataRes = [...allAmenities, ...allSpecs];
-        //   const foundMetadata = metadataRes.find((it) => it.id === id);
-        //   const projectSlugs = foundMetadata.projectSlugs ?? [];
-        //   const updateRefs = await pb
-        //     .collection(Collections.Metadata)
-        //     .update(id, {
-        //       projectSlugs: [...projectSlugs, created.id],
-        //     });
-        // }
         projects = [created, ...projects]
         selectProject(created)
       }

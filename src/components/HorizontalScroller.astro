@@ -1,0 +1,100 @@
+---
+interface Props {
+  class?: string
+  id?: string
+}
+
+const { class: className = '', id } = Astro.props
+---
+
+<div class="relative group/scroller horizontal-scroller-container">
+  <!-- Navigation Buttons -->
+  <button
+    class="prev-btn absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 shadow-xl border border-slate-200 flex items-center justify-center text-aspada-navy md:opacity-0 md:group-hover/scroller:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 md:hover:scale-110 cursor-pointer"
+    aria-label="Previous"
+  >
+    <span class="i-lucide-chevron-left text-xl md:text-2xl"></span>
+  </button>
+
+  <button
+    class="next-btn absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 shadow-xl border border-slate-200 flex items-center justify-center text-aspada-navy md:opacity-0 md:group-hover/scroller:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 md:hover:scale-110 cursor-pointer"
+    aria-label="Next"
+  >
+    <span class="i-lucide-chevron-right text-xl md:text-2xl"></span>
+  </button>
+
+  <!-- Scroller Content -->
+  <div
+    id={id}
+    class:list={[
+      'scroller-content flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-6 pb-6 scroll-smooth',
+      '-mx-4 px-4 sm:mx-0 sm:px-0',
+      className,
+    ]}
+  >
+    <slot />
+  </div>
+</div>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script>
+  function setupScrollers() {
+    const containers = document.querySelectorAll('.horizontal-scroller-container')
+
+    containers.forEach((container) => {
+      const scroller = container.querySelector('.scroller-content') as HTMLElement
+      const prevBtn = container.querySelector('.prev-btn') as HTMLButtonElement
+      const nextBtn = container.querySelector('.next-btn') as HTMLButtonElement
+
+      if (!scroller || !prevBtn || !nextBtn) return
+
+      const updateButtons = () => {
+        const { scrollLeft, scrollWidth, clientWidth } = scroller
+
+        // Hide/Show prev button if at the start
+        if (scrollLeft <= 5) {
+          prevBtn.classList.add('opacity-0', 'pointer-events-none')
+        } else {
+          prevBtn.classList.remove('opacity-0', 'pointer-events-none')
+        }
+
+        // Hide/Show next button if at the end
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          nextBtn.classList.add('opacity-0', 'pointer-events-none')
+        } else {
+          nextBtn.classList.remove('opacity-0', 'pointer-events-none')
+        }
+      }
+
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        scroller.scrollBy({ left: -scroller.clientWidth * 0.75, behavior: 'smooth' })
+      })
+
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        scroller.scrollBy({ left: scroller.clientWidth * 0.75, behavior: 'smooth' })
+      })
+
+      scroller.addEventListener('scroll', updateButtons, { passive: true })
+      window.addEventListener('resize', updateButtons)
+
+      // Initial check
+      setTimeout(updateButtons, 100)
+    })
+  }
+
+  // Run on page load
+  setupScrollers()
+  // Support view transitions
+  document.addEventListener('astro:page-load', setupScrollers)
+</script>

@@ -2,6 +2,7 @@
 module.exports = {
   root: true,
 
+
   env: {
     browser: true,
     es2022: true,
@@ -13,7 +14,7 @@ module.exports = {
     sourceType: 'module',
   },
 
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', "prettier"],
 
   plugins: ['@typescript-eslint'],
 

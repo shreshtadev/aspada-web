@@ -20,6 +20,7 @@ import type { ProjectInfoExpand } from '../../../types'
 import ProjectAddress from '../../../components/ProjectAddress.astro'
 import ProjectEnquiryModal from '../../../components/ProjectEnquiryModal.svelte'
 import GalleryLightbox from '../../../components/projects/GalleryLightbox.svelte'
+import HorizontalScroller from '../../../components/HorizontalScroller.astro'
 
 const { category, id } = Astro.params
 if (!id || !category) {
@@ -29,7 +30,7 @@ if (!id || !category) {
 let project: ProjectsResponse<ProjectInfoExpand>
 let galleryImages: any[] = []
 let amenities: MetadataResponse[] = []
-let specifications: any[] = []
+let specifications: MetadataResponse[] = []
 let socials: any[] = []
 let projectGallery: any[] = []
 let brochureUrl = ''
@@ -287,16 +288,20 @@ companyProfile = await pb
                   Specifications
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2 border-2 border-aspada-navy rounded-2xl p-4">
-                  {specifications.map((item) => (
-                    <div class="p-4 rounded-2xl flex flex-col">
-                      <div class="flex-1">
-                        <p class="text-aspada-navy font-semibold text-md leading-6 mb-4">
-                          {item.title}
-                        </p>
-                        <span class="text-aspada-steel text-xs leading-6 mb-4">{item.summary}</span>
+                  {specifications
+                    .filter((item) => item.showInTiles)
+                    .map((item) => (
+                      <div class="p-4 rounded-2xl flex flex-col">
+                        <div class="flex-1">
+                          <p class="text-aspada-navy font-semibold text-md leading-6 mb-4">
+                            {item.title}
+                          </p>
+                          <span class="text-aspada-steel text-xs leading-6 mb-4">
+                            {item.summary}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </section>
             )
@@ -322,26 +327,26 @@ companyProfile = await pb
                   <span class="w-8 h-1 bg-aspada-steel" />
                   Premium Amenities
                 </h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <HorizontalScroller>
                   {amenities.map((item) => (
-                    <div class="group p-4 sm:p-6 rounded-2xl">
-                      <div class="w-24 h-24 rounded-full flex items-center justify-center text-aspada-steel mb-4">
+                    <div class="group p-6 rounded-3xl bg-white transition-all shrink-0 w-[200px] snap-start flex flex-col items-center text-center">
+                      <div class="w-24 h-24 rounded-2xl bg-aspada-cream/30 flex items-center justify-center text-aspada-steel mb-4 group-hover:scale-110 transition-transform">
                         {item.attachments[0] ? (
                           <img
                             src={item.attachments[0]}
                             alt={item.title}
-                            class="w-24 h-24 object-contain"
+                            class="w-20 h-20 object-contain"
                           />
                         ) : (
-                          <span class="i-lucide-check text-xl" />
+                          <span class="i-lucide-check text-2xl" />
                         )}
                       </div>
-                      <h3 class="font-bold text-aspada-steel/80 group-hover:text-aspada-steel transition-colors">
+                      <h3 class="font-bold text-aspada-navy group-hover:text-aspada-gold transition-colors text-sm">
                         {item.title}
                       </h3>
                     </div>
                   ))}
-                </div>
+                </HorizontalScroller>
               </section>
             )
           }
@@ -354,7 +359,12 @@ companyProfile = await pb
                   <span class="w-8 h-1 bg-aspada-steel" />
                   Gallery
                 </h2>
-                <GalleryLightbox client:load images={galleryImages} projectTitle={project.title} />
+                <GalleryLightbox
+                  client:load
+                  images={galleryImages}
+                  projectTitle={project.title}
+                  layout="scroll"
+                />
               </section>
             )
           }
@@ -363,7 +373,7 @@ companyProfile = await pb
         {/* Sidebar */}
         <div class="space-y-8">
           {/* Quick Info Card */}
-          <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-32">
+          <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 top-32">
             <div class="pb-6 mb-6 border-b border-slate-100">
               <h3 class="text-xl font-bold text-slate-800">At a Glance</h3>
             </div>
@@ -408,7 +418,7 @@ companyProfile = await pb
           {/* Socials Media Embeds */}
           {
             socials.length > 0 && (
-              <div class="space-y-6">
+              <div class="sticky top-32 space-y-6">
                 <h3 class="font-bold text-aspada-steel px-2">Social Updates</h3>
                 <div class="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar space-y-4">
                   {socials
