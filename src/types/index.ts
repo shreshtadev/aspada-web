@@ -1,34 +1,44 @@
-import type { AttachmentsResponse, MetadataResponse, ProjectsResponse, SocialsResponse } from "./pocketbase-types";
+import type {
+  AgentsResponse,
+  AttachmentsResponse,
+  MetadataResponse,
+  ProjectsResponse,
+  SocialsResponse,
+} from './pocketbase-types'
 
 export type ProjectExpand = {
-    coverImage: AttachmentsResponse;
-    projectDetails: MetadataResponse[];
-};
+  coverImage: AttachmentsResponse
+  projectDetails: MetadataResponse[]
+}
 
 export type ProjectInfoExpand = {
-    coverImage: AttachmentsResponse;
-    coverVideo: AttachmentsResponse;
-    brochure: AttachmentsResponse;
-    socials: SocialsResponse[];
-    projectDetails: MetadataResponse[];
+  coverImage: AttachmentsResponse
+  coverVideo: AttachmentsResponse
+  brochure: AttachmentsResponse
+  socials: SocialsResponse[]
+  projectDetails: MetadataResponse[]
 }
 
 export interface Address {
-    name: string;
-    state?: string;
-    suburb?: string;
-    postcode?: string;
-    county?: string;
-    district?: string;
+  name: string
+  state?: string
+  suburb?: string
+  postcode?: string
+  county?: string
+  district?: string
 }
 
 export type PostInfoExpand = {
-    featuredImage: AttachmentsResponse;
-    category: MetadataResponse[];
-    tags: MetadataResponse[];
+  featuredImage: AttachmentsResponse
+  category: MetadataResponse[]
+  tags: MetadataResponse[]
 }
 
 export type TestimonialInfoExpand = {
-    project: ProjectsResponse;
-    authorAvatar: AttachmentsResponse;
+  project: ProjectsResponse
+  authorAvatar: AttachmentsResponse
+}
+
+export type LeadsInfoExpand = {
+  assignedAgent: AgentsResponse
 }

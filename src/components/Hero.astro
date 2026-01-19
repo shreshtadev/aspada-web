@@ -1,38 +1,35 @@
 ---
-import pb from "../lib/pb";
-import type { ProjectExpand } from "../types";
+import pb from '../lib/pb'
+import type { ProjectExpand } from '../types'
 import {
   Collections,
   MetadataCategoryTypeOptions,
   type MetadataResponse,
   type ProjectsResponse,
-} from "../types/pocketbase-types";
+} from '../types/pocketbase-types'
 
 interface HeroProps {
-  projects: ProjectsResponse<ProjectExpand>[];
-  index: number;
+  projects: ProjectsResponse<ProjectExpand>[]
+  index: number
 }
 
-const { projects: projectsFromBe } = Astro.props as HeroProps;
-const count = projectsFromBe.length;
-const durationPerImage = 5;
-const totalDuration = count * durationPerImage;
+const { projects: projectsFromBe } = Astro.props as HeroProps
+const count = projectsFromBe.length
+const durationPerImage = 5
+const totalDuration = count * durationPerImage
 const projects = projectsFromBe.map((project) => {
   const coverImageUrl = pb.files.getURL(
     project.expand?.coverImage,
     project.expand?.coverImage?.attachment,
-    { thumb: "1200", quality: 80 }
-  );
-  project.coverImage = coverImageUrl;
-  return project;
-});
-const metadatas = await pb
-  .collection(Collections.Metadata)
-  .getFullList<MetadataResponse>();
+    { thumb: '1200', quality: 80 }
+  )
+  project.coverImage = coverImageUrl
+  return project
+})
+const metadatas = await pb.collection(Collections.Metadata).getFullList<MetadataResponse>()
 const stats = metadatas.filter(
-  (metadata) =>
-    metadata.categoryType === MetadataCategoryTypeOptions.statsSettings
-);
+  (metadata) => metadata.categoryType === MetadataCategoryTypeOptions.statsSettings
+)
 ---
 
 <style>
@@ -86,9 +83,7 @@ const stats = metadatas.filter(
   }
 </style>
 
-<section
-  class="relative h-[110vh] w-full flex items-center overflow-hidden bg-aspada-navy/10"
->
+<section class="relative h-[110vh] w-full flex items-center overflow-hidden bg-aspada-navy/10">
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute inset-0" style={`--total-duration: ${totalDuration}s`}>
       {
@@ -109,7 +104,7 @@ const stats = metadatas.filter(
                 alt={project.slug}
                 class="w-full h-full object-cover ken-burns transform-gpu"
                 style={{ animationDelay: `${index * durationPerImage}s` }}
-                loading={index === 0 ? "eager" : "lazy"}
+                loading={index === 0 ? 'eager' : 'lazy'}
               />
             )}
           </div>
@@ -123,9 +118,7 @@ const stats = metadatas.filter(
       {
         stats.map((stat) => (
           <div class="text-right border-r-4 border-aspada-gold/20 pr-6">
-            <p class="text-white font-black text-2xl uppercase tracking-tighter">
-              {stat.summary}
-            </p>
+            <p class="text-white font-black text-2xl uppercase tracking-tighter">{stat.summary}</p>
             <p class="text-aspada-cream uppercase text-[10px] font-bold tracking-widest">
               {stat.title}
             </p>
@@ -136,9 +129,7 @@ const stats = metadatas.filter(
   </div>
 
   <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
-    <div
-      class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1"
-    >
+    <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1">
       <div class="w-1 h-2 bg-aspada-gold rounded-full animate-bounce"></div>
     </div>
   </div>

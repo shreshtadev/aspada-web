@@ -1,13 +1,11 @@
 ---
-import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
   <section class="space-y-8">
     <header>
-      <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">
-        Admin Dashboard
-      </h1>
+      <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">Admin Dashboard</h1>
       <p class="text-aspada-steel mt-2">
         Manage projects, amenities, specifications, and testimonials.
       </p>
@@ -19,14 +17,8 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
         href="/admin/projects"
         class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
       >
-        <h2
-          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
-        >
-          Projects
-        </h2>
-        <p class="mt-2 text-aspada-steel">
-          Create, edit, and manage property projects.
-        </p>
+        <h2 class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold">Projects</h2>
+        <p class="mt-2 text-aspada-steel">Create, edit, and manage property projects.</p>
       </a>
 
       <!-- Amenities -->
@@ -34,14 +26,11 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
         href="/admin/metadata"
         class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
       >
-        <h2
-          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
-        >
+        <h2 class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold">
           Project Details
         </h2>
         <p class="mt-2 text-aspada-steel">
-          Manage Project Details like adding amenities, gallery images, plot
-          details.
+          Manage Project Details like adding amenities, gallery images, plot details.
         </p>
       </a>
 
@@ -50,28 +39,28 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
         href="/admin/testimonials"
         class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
       >
-        <h2
-          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
-        >
+        <h2 class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold">
           Testimonials
         </h2>
-        <p class="mt-2 text-aspada-steel">
-          Manage customer testimonials and ratings.
-        </p>
+        <p class="mt-2 text-aspada-steel">Manage customer testimonials and ratings.</p>
       </a>
       <!-- Blog -->
       <a
         href="/admin/blog"
         class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
       >
-        <h2
-          class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold"
-        >
-          Blog
-        </h2>
+        <h2 class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold">Blog</h2>
         <p class="mt-2 text-aspada-steel">
           Manage blog posts (Offer latest news to your clients any project).
         </p>
+      </a>
+      <!-- CRM -->
+      <a
+        href="/crm/admin"
+        class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition"
+      >
+        <h2 class="text-xl font-bold text-aspada-navy group-hover:text-aspada-gold">CRM</h2>
+        <p class="mt-2 text-aspada-steel">Manage leads, agents, and track lead activities.</p>
       </a>
     </div>
   </section>

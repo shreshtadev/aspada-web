@@ -1,33 +1,22 @@
 ---
-import { actions } from "astro:actions";
-import { Toaster } from "svelte-french-toast";
-import "../styles/global.css";
-const result = Astro.getActionResult(actions.logout);
+import { actions } from 'astro:actions'
+import { Toaster } from 'svelte-french-toast'
+import '../styles/global.css'
+const result = Astro.getActionResult(actions.logout)
 ---
 
 <div class="flex min-h-screen bg-aspada-silver/10">
-  {
-    result && !result.error && (
-      <script>window.location.href = "/admin/login";</script>
-    )
-  }
+  {result && !result.error && <script>window.location.href = "/admin/login";</script>}
   <aside class="w-64 bg-aspada-cream/10 text-aspada-steel p-6 flex flex-col">
     <div class="flex-1">
       <h2 class="text-aspada-steel font-bold text-xl mb-10">ASPADA ADMIN</h2>
       <nav class="space-y-4">
-        <a href="/admin/projects" class="block hover:text-aspada-steel"
-          >Projects</a
-        >
-        <a href="/admin/socials" class="block hover:text-aspada-steel"
-          >Social Details</a
-        >
-        <a href="/admin/company" class="block hover:text-aspada-steel"
-          >Company Profile</a
-        >
-        <a href="/admin/testimonials" class="block hover:text-aspada-steel"
-          >Testimonials</a
-        >
+        <a href="/admin/projects" class="block hover:text-aspada-steel">Projects</a>
+        <a href="/admin/socials" class="block hover:text-aspada-steel">Social Details</a>
+        <a href="/admin/company" class="block hover:text-aspada-steel">Company Profile</a>
+        <a href="/admin/testimonials" class="block hover:text-aspada-steel">Testimonials</a>
         <a href="/admin/blog" class="block hover:text-aspada-steel">Blog</a>
+        <a href="/crm/admin" class="block hover:text-aspada-steel">CRM</a>
       </nav>
     </div>
 

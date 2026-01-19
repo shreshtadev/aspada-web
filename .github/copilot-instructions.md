@@ -29,10 +29,10 @@ Every data fetch uses **expand relations** for nested data. Common patterns from
 ```typescript
 // Projects include: coverImage, projectDetails (metadata), socials, brochure, etc.
 type ProjectInfoExpand = {
-  coverImage: AttachmentsResponse;
-  socials: SocialsResponse[];
-  projectDetails: MetadataResponse[];
-};
+  coverImage: AttachmentsResponse
+  socials: SocialsResponse[]
+  projectDetails: MetadataResponse[]
+}
 ```
 
 When querying PocketBase: `pb.collection('projects').getOne(id, { expand: 'coverImage,projectDetails,socials' })`
@@ -70,7 +70,7 @@ ProjectManager demonstrates a pattern for editing related metadata (amenities, s
 Example in Autocomplete:
 
 ```svelte
-<Autocomplete onedit={(id) => openMetadataEditor(id, "amenity")} />
+<Autocomplete onedit={(id) => openMetadataEditor(id, 'amenity')} />
 ```
 
 ### 6. Admin Auth & Middleware

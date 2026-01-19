@@ -1,41 +1,39 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Navbar from "../components/Navbar.astro";
-import Hero from "../components/Hero.astro";
-import Amenities from "../components/Amenities.astro";
-import ActionDock from "../components/ActionDock.astro";
-import Address from "../components/Address.astro";
-import Testimonials from "../components/Testimonials.astro";
-import Footer from "../components/Footer.astro";
-import ProjectGallery from "../components/ProjectGallery.astro";
-import LoadingSection from "../components/LoadingSection.astro";
-import pb from "../lib/pb";
-import ProjectCategory from "../components/ProjectCategory.astro";
+import Layout from '../layouts/Layout.astro'
+import Navbar from '../components/Navbar.astro'
+import Hero from '../components/Hero.astro'
+import Amenities from '../components/Amenities.astro'
+import ActionDock from '../components/ActionDock.astro'
+import Address from '../components/Address.astro'
+import Testimonials from '../components/Testimonials.astro'
+import Footer from '../components/Footer.astro'
+import ProjectGallery from '../components/ProjectGallery.astro'
+import LoadingSection from '../components/LoadingSection.astro'
+import pb from '../lib/pb'
+import ProjectCategory from '../components/ProjectCategory.astro'
 import {
   Collections,
   ProjectsStatusOptions,
   type ProjectsResponse,
-} from "../types/pocketbase-types";
-import type { ProjectExpand } from "../types";
+} from '../types/pocketbase-types'
+import type { ProjectExpand } from '../types'
 // import AspadaChat from "../components/AspadaChat.svelte";
 
 const projects = await pb
   .collection(Collections.Projects)
   .getFullList<ProjectsResponse<ProjectExpand>>({
     limit: 10,
-    expand: "coverImage,projectDetails",
-  });
+    expand: 'coverImage,projectDetails',
+  })
 
 const ongoingProjects = projects.filter(
-  (project) => project.status === ProjectsStatusOptions.ongoing,
-);
+  (project) => project.status === ProjectsStatusOptions.ongoing
+)
 
 const companyProfile = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
-const mapsUrl = "https://maps.app.goo.gl/ByMKK3ayuos1PQQt8";
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
+const mapsUrl = 'https://maps.app.goo.gl/ByMKK3ayuos1PQQt8'
 ---
 
 <Layout title="Aspada Developers | Shivamogga's Finest">

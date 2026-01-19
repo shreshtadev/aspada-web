@@ -1,120 +1,110 @@
 <script>
-  import pb from "../../lib/pb";
-  import { uploadAttachment, deleteAttachment } from "../../lib/utils";
-  import MilkdownEditor from "../MilkdownEditor.svelte";
-  import toast from "svelte-french-toast";
+  import pb from '../../lib/pb'
+  import { uploadAttachment, deleteAttachment } from '../../lib/utils'
+  import MilkdownEditor from '../MilkdownEditor.svelte'
+  import toast from 'svelte-french-toast'
 
-  const authorRoles = [
-    "property-owner",
-    "contractor",
-    "investor",
-    "agent",
-    "buyer",
-    "seller",
-  ];
+  const authorRoles = ['property-owner', 'contractor', 'investor', 'agent', 'buyer', 'seller']
 
   const authorRoleOptions = authorRoles.map((role) => ({
     value: role,
-    label: (role.charAt(0).toUpperCase() + role.slice(1)).replace("-", " "),
-  }));
+    label: (role.charAt(0).toUpperCase() + role.slice(1)).replace('-', ' '),
+  }))
 
   const findRoleLabelByValue = (value) => {
-    return authorRoleOptions.find((option) => option.value === value)?.label;
-  };
+    return authorRoleOptions.find((option) => option.value === value)?.label
+  }
 
   // Master list state
-  let testimonials = $state([]);
-  let projects = $state([]);
+  let testimonials = $state([])
+  let projects = $state([])
 
   // Detail form state
-  let selectedId = $state(null);
-  let formName = $state("");
-  let formContent = $state("");
-  let formRating = $state(5);
-  let formProject = $state("");
-  let avatarFile = $state(null);
-  let authorRole = $state("");
-  let formLoading = $state(false);
-  let deleteAvatar = $state(false);
-  let fileInputEl = $state(null);
-  let currentAvatarId = $state("");
-  let currentAvatarUrl = $state("");
+  let selectedId = $state(null)
+  let formName = $state('')
+  let formContent = $state('')
+  let formRating = $state(5)
+  let formProject = $state('')
+  let avatarFile = $state(null)
+  let authorRole = $state('')
+  let formLoading = $state(false)
+  let deleteAvatar = $state(false)
+  let fileInputEl = $state(null)
+  let currentAvatarId = $state('')
+  let currentAvatarUrl = $state('')
 
   async function loadData() {
     try {
       const [projectsList, testimonialsList] = await Promise.all([
-        pb.collection("projects").getFullList({ sort: "title" }),
-        pb.collection("testimonials").getFullList({
-          expand: "project,authorAvatar",
+        pb.collection('projects').getFullList({ sort: 'title' }),
+        pb.collection('testimonials').getFullList({
+          expand: 'project,authorAvatar',
         }),
-      ]);
-      projects = projectsList;
-      testimonials = testimonialsList;
+      ])
+      projects = projectsList
+      testimonials = testimonialsList
     } catch (err) {
-      console.error("Failed to load data:", err);
-      toast.error("Failed to load data");
+      console.error('Failed to load data:', err)
+      toast.error('Failed to load data')
     }
   }
 
   $effect(() => {
-    loadData();
-  });
+    loadData()
+  })
 
   function selectTestimonial(t) {
-    selectedId = t?.id ?? null;
-    formName = t?.name ?? t?.authorName ?? "";
-    formContent = t?.content ?? "";
-    formRating = t?.rating ?? 5;
-    formProject =
-      t?.project && typeof t.project === "object"
-        ? t.project.id
-        : t?.project || "";
-    avatarFile = undefined;
-    authorRole = t?.authorRole || "";
-    const attachment = t.expand.authorAvatar;
-    currentAvatarId = attachment?.id || "";
-    currentAvatarUrl = pb.files.getURL(attachment, attachment.attachment);
+    selectedId = t?.id ?? null
+    formName = t?.name ?? t?.authorName ?? ''
+    formContent = t?.content ?? ''
+    formRating = t?.rating ?? 5
+    formProject = t?.project && typeof t.project === 'object' ? t.project.id : t?.project || ''
+    avatarFile = undefined
+    authorRole = t?.authorRole || ''
+    const attachment = t.expand.authorAvatar
+    currentAvatarId = attachment?.id || ''
+    currentAvatarUrl = pb.files.getURL(attachment, attachment.attachment)
   }
 
   function clearAvatarSelection() {
-    avatarFile = null;
-    deleteAvatar = true; // mark for backend delete
+    avatarFile = null
+    deleteAvatar = true // mark for backend delete
 
     if (fileInputEl) {
-      fileInputEl.value = ""; // required
+      fileInputEl.value = '' // required
     }
   }
 
   function newTestimonial() {
-    selectedId = null;
-    formName = "";
-    formContent = "";
-    formRating = 5;
-    formProject = "";
-    avatarFile = null;
-    authorRole = "";
-    currentAvatarId = "";
-    currentAvatarUrl = "";
+    selectedId = null
+    formName = ''
+    formContent = ''
+    formRating = 5
+    formProject = ''
+    avatarFile = null
+    authorRole = ''
+    currentAvatarId = ''
+    currentAvatarUrl = ''
   }
 
   async function saveTestimonial() {
     if (!formName || !formContent) {
-      console.error("Name and testimonial text are required");
-      toast.error("Name and testimonial text are required");
-      return;
+      console.error('Name and testimonial text are required')
+      toast.error('Name and testimonial text are required')
+      return
     }
 
-    formLoading = true;
+    formLoading = true
 
-    const formData = new FormData();
-    formData.append("authorName", formName);
-    formData.append("content", formContent);
-    formData.append("rating", String(formRating));
-    formData.append("source", "web");
-    formData.append("authorRole", authorRole);
+    const formData = new FormData()
+    formData.append('authorName', formName)
+    formData.append('content', formContent)
+    formData.append('rating', String(formRating))
+    formData.append('source', 'web')
+    formData.append('authorRole', authorRole)
 
     if (formProject) {
-      formData.append("project", formProject);
+      formData.append('project', formProject)
     }
 
     try {
@@ -123,66 +113,62 @@
       // 1. Upload new avatar if selected
       if (avatarFile && avatarFile.length > 0) {
         const urls = await uploadAttachment(
-          `Testimonials - ${formName}` || "Testimonial Avatar",
+          `Testimonials - ${formName}` || 'Testimonial Avatar',
           Array.from(avatarFile)
-        );
+        )
         if (urls.length > 0) {
-          formData.append("authorAvatar", urls[0]);
+          formData.append('authorAvatar', urls[0])
 
           // Cleanup old avatar if it existed (replace logic)
           if (currentAvatarId) {
-            await deleteAttachment(currentAvatarId);
+            await deleteAttachment(currentAvatarId)
           }
         }
       }
       // 2. Clear avatar if requested
       else if (deleteAvatar) {
-        formData.append("authorAvatar", "");
+        formData.append('authorAvatar', '')
 
         // Cleanup old avatar
         if (currentAvatarId) {
-          await deleteAttachment(currentAvatarId);
+          await deleteAttachment(currentAvatarId)
         }
       }
       // 3. Otherwise leave authorAvatar as is (don't append anything regarding it)
 
-      let record;
+      let record
       if (selectedId) {
-        record = await pb
-          .collection("testimonials")
-          .update(selectedId, formData);
-        testimonials = testimonials.map((t) =>
-          t.id === record.id ? record : t
-        );
+        record = await pb.collection('testimonials').update(selectedId, formData)
+        testimonials = testimonials.map((t) => (t.id === record.id ? record : t))
       } else {
-        record = await pb.collection("testimonials").create(formData);
-        testimonials = [record, ...testimonials];
+        record = await pb.collection('testimonials').create(formData)
+        testimonials = [record, ...testimonials]
       }
-      selectTestimonial(record);
+      selectTestimonial(record)
     } catch (err) {
-      console.error("PocketBase error:", err?.response?.data || err);
-      toast.error(err?.message ?? "Upload failed");
+      console.error('PocketBase error:', err?.response?.data || err)
+      toast.error(err?.message ?? 'Upload failed')
     } finally {
-      formLoading = false;
-      deleteAvatar = false;
+      formLoading = false
+      deleteAvatar = false
     }
   }
 
   async function deleteTestimonial(id) {
-    if (!confirm("Delete this testimonial?")) return;
+    if (!confirm('Delete this testimonial?')) return
     try {
       // Find the testimonial to check for avatar
-      const t = testimonials.find((item) => item.id === id);
+      const t = testimonials.find((item) => item.id === id)
       if (t?.authorAvatar) {
-        const attachId = extractIdFromUrl(t.authorAvatar);
-        if (attachId) await deleteAttachment(attachId);
+        const attachId = extractIdFromUrl(t.authorAvatar)
+        if (attachId) await deleteAttachment(attachId)
       }
 
-      await pb.collection("testimonials").delete(id);
-      testimonials = testimonials.filter((t) => t.id !== id);
-      if (selectedId === id) newTestimonial();
+      await pb.collection('testimonials').delete(id)
+      testimonials = testimonials.filter((t) => t.id !== id)
+      if (selectedId === id) newTestimonial()
     } catch (err) {
-      toast.error(err?.message ?? "Delete failed");
+      toast.error(err?.message ?? 'Delete failed')
     }
   }
 </script>
@@ -195,8 +181,7 @@
         <h3 class="font-bold text-slate-900">Testimonials</h3>
         <button
           onclick={newTestimonial}
-          class="text-sm text-white bg-[#d4af37] px-3 py-1 rounded font-bold"
-          >+ New</button
+          class="text-sm text-white bg-[#d4af37] px-3 py-1 rounded font-bold">+ New</button
         >
       </div>
 
@@ -209,9 +194,9 @@
             tabindex="0"
             onclick={() => selectTestimonial(t)}
             onkeydown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                selectTestimonial(t);
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                selectTestimonial(t)
               }
             }}
           >
@@ -221,7 +206,7 @@
                   {t.authorName}
                 </div>
                 <div class="text-xs text-aspada-gold">
-                  {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
+                  {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
                 </div>
               </div>
               <div class="text-xs text-aspada-navy/70">
@@ -230,8 +215,8 @@
             </div>
             <button
               onclick={(e) => {
-                e.stopPropagation();
-                deleteTestimonial(t.id);
+                e.stopPropagation()
+                deleteTestimonial(t.id)
               }}
               class="text-red-500 text-xs mt-2 hover:underline">Delete</button
             >
@@ -245,18 +230,12 @@
   <div class="md:col-span-2">
     <div class="bg-white p-6 rounded-3xl border border-[#d4af37]/20 shadow-xl">
       <h3 class="font-bold text-slate-900 text-lg mb-6">
-        {selectedId ? "Edit Testimonial" : "Create Testimonial"}
+        {selectedId ? 'Edit Testimonial' : 'Create Testimonial'}
       </h3>
 
-      {#if currentAvatarUrl && currentAvatarUrl !== ""}
-        <div
-          class="w-20 h-20 rounded-full bg-slate-100 overflow-hidden flex-shrink-0"
-        >
-          <img
-            src={currentAvatarUrl}
-            alt={formName}
-            class="w-full h-full object-cover"
-          />
+      {#if currentAvatarUrl && currentAvatarUrl !== ''}
+        <div class="w-20 h-20 rounded-full bg-slate-100 overflow-hidden flex-shrink-0">
+          <img src={currentAvatarUrl} alt={formName} class="w-full h-full object-cover" />
         </div>
       {/if}
 
@@ -296,10 +275,7 @@
         <div class="grid grid-cols-2 gap-4">
           <label class="block">
             <span class="text-sm font-bold text-slate-700">Rating</span>
-            <select
-              bind:value={formRating}
-              class="w-full mt-1 p-3 border rounded-xl"
-            >
+            <select bind:value={formRating} class="w-full mt-1 p-3 border rounded-xl">
               <option value={1}>1 Star</option>
               <option value={2}>2 Stars</option>
               <option value={3}>3 Stars</option>
@@ -309,13 +285,8 @@
           </label>
 
           <label class="block">
-            <span class="text-sm font-bold text-slate-700"
-              >Assign to Project</span
-            >
-            <select
-              bind:value={formProject}
-              class="w-full mt-1 p-3 border rounded-xl"
-            >
+            <span class="text-sm font-bold text-slate-700">Assign to Project</span>
+            <select bind:value={formProject} class="w-full mt-1 p-3 border rounded-xl">
               <option value="">General</option>
               {#each projects as p}
                 <option value={p.id}>{p.title}</option>
@@ -360,11 +331,7 @@
           disabled={formLoading}
           class="bg-slate-900 text-aspada-cream px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform disabled:opacity-50 cursor-pointer"
         >
-          {formLoading
-            ? "Saving..."
-            : selectedId
-              ? "Update Testimonial"
-              : "Create Testimonial"}
+          {formLoading ? 'Saving...' : selectedId ? 'Update Testimonial' : 'Create Testimonial'}
         </button>
 
         {#if selectedId}

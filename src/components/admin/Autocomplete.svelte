@@ -1,49 +1,47 @@
 <script>
   let {
-    label = "",
+    label = '',
     options = [],
     selected = $bindable([]),
-    placeholder = "Select...",
+    placeholder = 'Select...',
     allowCreate = false,
     oncreate = () => {},
     onedit = (id) => {},
-  } = $props();
+  } = $props()
 
-  let isOpen = $state(false);
-  let search = $state("");
-  let container = $state(null);
+  let isOpen = $state(false)
+  let search = $state('')
+  let container = $state(null)
 
   // Derived filtered options
   let filteredOptions = $derived(
-    options.filter((opt) =>
-      opt.title.toLowerCase().includes(search.toLowerCase()),
-    ),
-  );
+    options.filter((opt) => opt.title.toLowerCase().includes(search.toLowerCase()))
+  )
 
   // Derived selected items for display
   let selectedItems = $derived(
-    selected.map((id) => options.find((o) => o.id === id)).filter(Boolean),
-  );
+    selected.map((id) => options.find((o) => o.id === id)).filter(Boolean)
+  )
 
   function select(opt) {
     if (!selected.includes(opt.id)) {
-      selected = [...selected, opt.id];
+      selected = [...selected, opt.id]
     }
-    search = "";
+    search = ''
   }
 
   function remove(id) {
-    selected = selected.filter((s) => s !== id);
+    selected = selected.filter((s) => s !== id)
   }
 
   function handleCreate() {
-    oncreate();
-    isOpen = false;
+    oncreate()
+    isOpen = false
   }
 
   function handleOutsideClick(e) {
     if (container && !container.contains(e.target)) {
-      isOpen = false;
+      isOpen = false
     }
   }
 </script>
@@ -60,17 +58,17 @@
     role="button"
     tabindex="0"
     onclick={() => (isOpen = true)}
-    onkeydown={(e) => e.key === "Enter" && (isOpen = !isOpen)}
+    onkeydown={(e) => e.key === 'Enter' && (isOpen = !isOpen)}
   >
     {#each selectedItems as item}
       <span
         class="bg-aspada-silver/30 text-aspada-navy text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 border border-aspada-steel/90 group"
       >
-        {item.title} - {item.summary ? item.summary.slice(0, 50) + "..." : ""}
+        {item.title} - {item.summary ? item.summary.slice(0, 50) + '...' : ''}
         <button
           onclick={(e) => {
-            e.stopPropagation();
-            onedit(item.id);
+            e.stopPropagation()
+            onedit(item.id)
           }}
           class="hover:text-aspada-gold rounded-full w-4 h-4 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity"
           title="Edit"
@@ -79,8 +77,8 @@
         </button>
         <button
           onclick={(e) => {
-            e.stopPropagation();
-            remove(item.id);
+            e.stopPropagation()
+            remove(item.id)
           }}
           class="hover:text-red-500 rounded-full w-4 h-4 flex items-center justify-center font-bold"
         >
@@ -107,7 +105,7 @@
         {#each filteredOptions as opt}
           <button
             class="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between group {selected.includes(
-              opt.id,
+              opt.id
             )
               ? 'bg-slate-50 text-[#d4af37] font-bold'
               : 'text-slate-700'}"
@@ -121,9 +119,7 @@
           </button>
         {/each}
       {:else if search}
-        <div class="px-4 py-3 text-sm text-slate-500 text-center">
-          No matches found.
-        </div>
+        <div class="px-4 py-3 text-sm text-slate-500 text-center">No matches found.</div>
       {/if}
 
       {#if allowCreate}
@@ -133,7 +129,7 @@
             onclick={handleCreate}
             type="button"
           >
-            <span class="text-lg">+</span> Create "{search || "New"}"
+            <span class="text-lg">+</span> Create "{search || 'New'}"
           </button>
         </div>
       {/if}

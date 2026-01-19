@@ -1,8 +1,8 @@
 ---
-import AspadaForm from "./AspadaForm.svelte";
-import LeafMap from "./LeafMap.svelte";
+import AspadaForm from './AspadaForm.svelte'
+import LeafMap from './LeafMap.svelte'
 
-const { latitude, longitude } = Astro.props;
+const { latitude, longitude } = Astro.props
 ---
 
 <section id="contact" class="py-24 px-6 relative overflow-y">
@@ -41,19 +41,13 @@ const { latitude, longitude } = Astro.props;
           <LeafMap client:load latitude={latitude} longitude={longitude} />
         </div>
 
-        <div
-          class="p-8 lg:p-12 flex flex-col justify-center relative bg-white/5"
-        >
-          <div
-            class="absolute top-6 right-6 opacity-5 group-hover:opacity-20 transition-opacity"
-          >
+        <div class="p-8 lg:p-12 flex flex-col justify-center relative bg-white/5">
+          <div class="absolute top-6 right-6 opacity-5 group-hover:opacity-20 transition-opacity">
             <span class="i-lucide-contact-2 text-7xl text-aspada-gold"></span>
           </div>
 
           <div class="relative z-10">
-            <h2 class="text-3xl font-bold text-aspada-navy mb-2">
-              Get in Touch
-            </h2>
+            <h2 class="text-3xl font-bold text-aspada-navy mb-2">Get in Touch</h2>
             <p class="text-slate-500 mb-8 text-sm">Drop us a message below.</p>
 
             <AspadaForm client:visible />

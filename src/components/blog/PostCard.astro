@@ -1,30 +1,30 @@
 ---
-import pb from "../../lib/pb";
-import type { PostsResponse } from "../../types/pocketbase-types";
-import type { PostInfoExpand } from "../../types";
+import pb from '../../lib/pb'
+import type { PostsResponse } from '../../types/pocketbase-types'
+import type { PostInfoExpand } from '../../types'
 
 interface Props {
-  post: PostsResponse<PostInfoExpand>;
+  post: PostsResponse<PostInfoExpand>
 }
 
-const { post } = Astro.props;
+const { post } = Astro.props
 const fileURL = pb.files.getURL(
   post.expand?.featuredImage,
   String(post.expand?.featuredImage?.attachment)
-);
+)
 // Format date
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 // Strip HTML/Markdown for excerpt (simple version)
 const getExcerpt = (content: string) => {
-  return content.replace(/<[^>]*>?/gm, "").slice(0, 150) + "...";
-};
+  return content.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...'
+}
 ---
 
 <a
@@ -87,9 +87,7 @@ const getExcerpt = (content: string) => {
     </div>
 
     <!-- Read More Link -->
-    <div
-      class="flex justify-between items-center pt-6 border-t border-slate-100"
-    >
+    <div class="flex justify-between items-center pt-6 border-t border-slate-100">
       <span
         class="text-sm font-semibold text-aspada-navy group-hover:text-aspada-steel transition-colors"
       >
@@ -98,8 +96,7 @@ const getExcerpt = (content: string) => {
       <div
         class="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-aspada-steel group-hover:bg-aspada-steel transition-all"
       >
-        <span
-          class="i-lucide-arrow-right text-slate-400 group-hover:text-white block text-lg"
+        <span class="i-lucide-arrow-right text-slate-400 group-hover:text-white block text-lg"
         ></span>
       </div>
     </div>

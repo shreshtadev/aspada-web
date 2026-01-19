@@ -1,27 +1,24 @@
-import { defineAction } from "astro:actions";
-import { z } from "astro:schema";
-import pb from "../lib/pb";
-import {
-  GoogleGenerativeAI,
-  HarmBlockThreshold,
-  HarmCategory,
-} from "@google/generative-ai";
-import { Collections } from "../types/pocketbase-types";
-const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY);
+import { defineAction } from 'astro:actions'
+import { z } from 'astro:schema'
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai'
+import pb from '../lib/pb'
+import { Collections } from '../types/pocketbase-types'
+
+const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY)
 
 const cosineSimilarity = (vecA: number[], vecB: number[]) => {
-  const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
-  const magA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
-  const magB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
-  return dotProduct / (magA * magB);
-};
+  const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0)
+  const magA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0))
+  const magB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0))
+  return dotProduct / (magA * magB)
+}
 
 export const server = {
   logout: defineAction({
-    accept: "form",
+    accept: 'form',
     handler: async (_, context) => {
-      pb.authStore.clear();
-      context.cookies.delete("pb_auth", { path: "/" });
+      pb.authStore.clear()
+      context.cookies.delete('pb_auth', { path: '/' })
       // Also clear any other potential auth cookies if the name varies,
       // but typically PocketBase js sdk uses 'pb_auth' by default if we were using auto-loading,
       // OR we manually managed it.
@@ -33,60 +30,55 @@ export const server = {
       // OR just simple cookie deletion which is cleaner.
 
       // Context.cookies.delete is the Astro way.
-      context.cookies.delete("pb_auth", { path: "/" });
-      return { success: true };
+      context.cookies.delete('pb_auth', { path: '/' })
+      return { success: true }
     },
   }),
 
   chatWithAI: defineAction({
-    accept: "json",
+    accept: 'json',
     input: z.object({
       message: z.string(),
       history: z.array(z.any()).optional(),
       sessionId: z.string(),
     }),
     handler: async ({ message, history, sessionId }) => {
-      const cleanMsg = message.trim().toLowerCase();
+      const cleanMsg = message.trim().toLowerCase()
       const exactMatch = await pb
         .collection(Collections.ChatCache)
         .getFirstListItem(`question = "${cleanMsg}"`)
-        .catch(() => null);
+        .catch(() => null)
       if (exactMatch) {
         return {
           text: exactMatch.answer,
           cacheId: exactMatch.id,
           isSemantic: false,
-        };
+        }
       }
       const embedVecModel = genAI.getGenerativeModel({
-        model: "text-embedding-004",
-      });
-      const embedVecUser = await embedVecModel.embedContent(cleanMsg);
-      const currentVector = embedVecUser.embedding.values;
+        model: 'text-embedding-004',
+      })
+      const embedVecUser = await embedVecModel.embedContent(cleanMsg)
+      const currentVector = embedVecUser.embedding.values
 
-      let validHistory = history || [];
-      if (validHistory.length > 0 && validHistory[0].role === "model") {
-        validHistory = validHistory.slice(1);
+      let validHistory = history || []
+      if (validHistory.length > 0 && validHistory[0].role === 'model') {
+        validHistory = validHistory.slice(1)
       }
 
-      const cachedEntries = await pb
-        .collection(Collections.ChatCache)
-        .getFullList({
-          // filter: `sessionId = "${sessionId}"`,
-          // sort: "-created",
-          // query: { sessionId: sessionId }, // For API Rules
-        });
-      let bestMatch = null;
-      let highestScore = 0;
+      const cachedEntries = await pb.collection(Collections.ChatCache).getFullList({
+        // filter: `sessionId = "${sessionId}"`,
+        // sort: "-created",
+        // query: { sessionId: sessionId }, // For API Rules
+      })
+      let bestMatch = null
+      let highestScore = 0
       for (const entry of cachedEntries) {
-        if (!entry.embedding) continue;
-        const score = cosineSimilarity(
-          currentVector,
-          entry.embedding as number[]
-        );
+        if (!entry.embedding) continue
+        const score = cosineSimilarity(currentVector, entry.embedding as number[])
         if (score > highestScore) {
-          highestScore = score;
-          bestMatch = entry;
+          highestScore = score
+          bestMatch = entry
         }
       }
 
@@ -96,14 +88,13 @@ export const server = {
           text: bestMatch?.answer,
           cacheId: bestMatch?.id,
           isSemantic: true,
-        };
+        }
       }
 
       // 1. Fetch live data from PocketBase to feed the AI context
       const projects = await pb.collection(Collections.Projects).getFullList({
-        fields:
-          "title,category,status,addressLine1,city,district,state,pincode,description",
-      });
+        fields: 'title,category,status,addressLine1,city,district,state,pincode,description',
+      })
 
       // 2. Format project data into a readable string for the AI
       const projectContext = projects
@@ -111,15 +102,13 @@ export const server = {
           (p) =>
             `- ${p.title}: A ${p.category} project located at ${
               p.addressLine1
-            }, ${p.city} ${p.district} ${p.state} ${p.pincode ?? ""}.${
-              p.description
-            }`
+            }, ${p.city} ${p.district} ${p.state} ${p.pincode ?? ''}.${p.description}`
         )
-        .join("\n");
+        .join('\n')
 
       // 3. Initialize Gemini 2.0 Flash
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash-lite", // Using the latest Flash model
+        model: 'gemini-2.5-flash-lite', // Using the latest Flash model
         safetySettings: [
           {
             category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -134,57 +123,55 @@ export const server = {
           You are the Aspada Assistant. You represent Aspada Developers in Shivamogga.
           Use the following live project data to answer user queries:
           ${projectContext}
-          
+
           Guidelines:
           - If a user asks about a project not listed above, say we are constantly expanding and ask for their contact info.
           - Be concise, professional, and luxury-oriented.
           - Always mention that site visits are available upon request.
         `,
-      });
+      })
 
-      const chat = model.startChat({ history: validHistory || [] });
-      const result = await chat.sendMessage(message);
-      const aiResponse = result.response.text();
+      const chat = model.startChat({ history: validHistory || [] })
+      const result = await chat.sendMessage(message)
+      const aiResponse = result.response.text()
       // 5. ASYNC BACKGROUND TASKS (Don't 'await' these to keep chat fast)
 
       // Save to Server Cache
-      const newCache = await pb
-        .collection(Collections.ChatCache)
-        .create({
-          question: cleanMsg,
-          answer: aiResponse,
-          embedding: embedVecUser.embedding.values,
-          isSemantic: false,
-        });
+      const newCache = await pb.collection(Collections.ChatCache).create({
+        question: cleanMsg,
+        answer: aiResponse,
+        embedding: embedVecUser.embedding.values,
+        isSemantic: false,
+      })
 
       // Save to Conversation Logs (Realtime trigger)
       pb.collection(Collections.ChatLogs)
         .create({
           session_id: sessionId,
-          role: "user",
+          role: 'user',
           content: message,
         })
         .then(() => {
-          pb.collection("chat_logs").create({
+          pb.collection('chat_logs').create({
             session_id: sessionId,
-            role: "model",
+            role: 'model',
             content: aiResponse,
-          });
-        });
+          })
+        })
 
       // LEAD EXTRACTION: Check if user shared a 10-digit Indian phone number
-      const phoneMatch = message.match(/[6-9]\d{9}/);
+      const phoneMatch = message.match(/[6-9]\d{9}/)
       if (phoneMatch) {
-        pb.collection("leads")
+        pb.collection('leads')
           .create({
             contactNo: phoneMatch[0],
-            status: "new",
+            status: 'New',
             interest: `Inquiry during session ${sessionId}`,
           })
-          .catch(() => null);
+          .catch(() => null)
       }
 
-      return { text: aiResponse, cacheId: newCache.id, isSemantic: false };
+      return { text: aiResponse, cacheId: newCache.id, isSemantic: false }
     },
   }),
 
@@ -194,11 +181,11 @@ export const server = {
       isHelpful: z.boolean(),
     }),
     handler: async ({ cacheId, isHelpful }) => {
-      const field = isHelpful ? "helpful_count+" : "unhelpful_count+";
+      const field = isHelpful ? 'helpful_count+' : 'unhelpful_count+'
       // Atomic increment in PocketBase
       return await pb.collection(Collections.ChatCache).update(cacheId, {
-        [isHelpful ? "helpful_count+" : "unhelpful_count+"]: 1,
-      });
+        [isHelpful ? 'helpful_count+' : 'unhelpful_count+']: 1,
+      })
     },
   }),
 
@@ -206,7 +193,11 @@ export const server = {
     input: z.object({
       fullName: z.string(),
       contactEmail: z.string().email(),
-      contactNo: z.string().min(10).max(10).regex(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
+      contactNo: z
+        .string()
+        .min(10)
+        .max(10)
+        .regex(/^[6-9]\d{9}$/, 'Invalid Indian phone number'),
       interest: z.string().max(512),
     }),
     handler: async ({ fullName, contactEmail, contactNo, interest }) => {
@@ -215,9 +206,9 @@ export const server = {
         contactEmail,
         contactNo,
         interest,
-        source: "aspadaForms",
-        status: "new",
-      });
+        source: 'aspadaForms',
+        status: 'new',
+      })
     },
   }),
-};
+}

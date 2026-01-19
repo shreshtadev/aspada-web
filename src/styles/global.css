@@ -3,77 +3,77 @@
 
 /* 2. Base Modern Reset */
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-	/* Enables smooth scrolling for the "View Projects" buttons */
-	scroll-behavior: smooth;
-	/* Optimization for 2026: Stops text from flickering during transitions */
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  /* Enables smooth scrolling for the "View Projects" buttons */
+  scroll-behavior: smooth;
+  /* Optimization for 2026: Stops text from flickering during transitions */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-	overflow-x: hidden;
+  overflow-x: hidden;
 }
-
 
 /* 4. Selection Color */
 ::selection {
-	background-color: #fffbed;
-	color: #3f5068;
+  background-color: #fffbed;
+  color: #3f5068;
 }
 
 /* === Milkdown / ProseMirror base === */
 /* Base for editable area */
 .milkdown-container .ProseMirror {
-	outline: none;
-	min-height: 180px;
-	color: #2c2d30;
-	/* text-neutral-200 */
-	caret-color: #2c2d30;
-	font-size: 15px;
-	line-height: 1.6;
+  outline: none;
+  min-height: 180px;
+  color: #2c2d30;
+  /* text-neutral-200 */
+  caret-color: #2c2d30;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* Paragraph spacing */
 .milkdown-container .ProseMirror p {
-	margin: 0.5em 0;
+  margin: 0.5em 0;
 }
 
 /* Headings */
 .milkdown-container .ProseMirror h1 {
-	font-size: 1.8rem;
-	font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
 .milkdown-container .ProseMirror h2 {
-	font-size: 1.4rem;
-	font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 /* Lists */
 .milkdown-container .ProseMirror ul,
 .milkdown-container .ProseMirror ol {
-	padding-left: 1.25rem;
+  padding-left: 1.25rem;
 }
 
 @layer base {
   /* Global Fruity Text Inputs & Textareas */
-  input[type="text"],
-  input[type="email"],
-  input[type="number"],
-  input[type="password"],
+  input[type='text'],
+  input[type='email'],
+  input[type='number'],
+  input[type='password'],
   textarea {
     @apply w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl 
            outline-none transition-all duration-300 font-bold text-aspada-navy;
   }
 
   /* Fruity Interaction: Elevation and Ring on Focus */
-  input:focus, textarea:focus {
+  input:focus,
+  textarea:focus {
     @apply bg-white border-aspada-gold/30 ring-4 ring-aspada-gold/10 shadow-xl -translate-y-[1px];
   }
 
@@ -94,13 +94,13 @@ body {
   }
 
   /* Fruity Buttons */
-  button[type="submit"] {
+  button[type='submit'] {
     @apply px-8 py-4 bg-aspada-navy text-white rounded-2xl font-black 
            uppercase tracking-widest transition-all duration-500 
            ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-95;
   }
 
-  button[type="submit"]:hover {
+  button[type='submit']:hover {
     @apply bg-aspada-gold shadow-2xl -translate-y-1;
   }
 

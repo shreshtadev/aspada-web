@@ -1,6 +1,6 @@
 ---
-import Layout from "../../layouts/Layout.astro"; // Your main site layout
-import LoginForm from "../../components/admin/LoginForm.svelte";
+import Layout from '../../layouts/Layout.astro' // Your main site layout
+import LoginForm from '../../components/admin/LoginForm.svelte'
 ---
 
 <Layout title="Admin Login | Aspada Developers">
@@ -13,8 +13,7 @@ import LoginForm from "../../components/admin/LoginForm.svelte";
           <div
             class="w-12 h-12 border-2 border-aspada-gold rounded-sm rotate-45 flex items-center justify-center"
           >
-            <span class="text-aspada-gold -rotate-45 font-bold text-xl">AD</span
-            >
+            <span class="text-aspada-gold -rotate-45 font-bold text-xl">AD</span>
           </div>
         </div>
         <h1 class="text-2xl font-bold text-slate-900 tracking-tight uppercase">
@@ -26,10 +25,7 @@ import LoginForm from "../../components/admin/LoginForm.svelte";
       <LoginForm client:load />
 
       <div class="mt-8 text-center">
-        <a
-          href="/"
-          class="text-xs text-aspada-steel hover:text-aspada-gold transition-colors"
-        >
+        <a href="/" class="text-xs text-aspada-steel hover:text-aspada-gold transition-colors">
           &larr; Back to Public Website
         </a>
       </div>

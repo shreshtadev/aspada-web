@@ -1,29 +1,29 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte'
 
   let { title, shareUrl, shareUrlType, index } = $props<{
-    title: string;
-    shareUrl: string;
-    shareUrlType: "instagram" | "youtube" | "facebook";
-    index: number;
-  }>();
+    title: string
+    shareUrl: string
+    shareUrlType: 'instagram' | 'youtube' | 'facebook'
+    index: number
+  }>()
 
   onMount(() => {
     // Only load Instagram embed if we actually render it
-    if (shareUrl && shareUrlType === "instagram" && index === 0) {
+    if (shareUrl && shareUrlType === 'instagram' && index === 0) {
       if (!(window as any).instgrm) {
-        const script = document.createElement("script");
-        script.src = "https://www.instagram.com/embed.js";
-        script.async = true;
-        document.body.appendChild(script);
+        const script = document.createElement('script')
+        script.src = 'https://www.instagram.com/embed.js'
+        script.async = true
+        document.body.appendChild(script)
         script.onload = () => {
-          (window as any).instgrm?.Embeds?.process();
-        };
+          ;(window as any).instgrm?.Embeds?.process()
+        }
       } else {
-        (window as any).instgrm.Embeds.process();
+        ;(window as any).instgrm.Embeds.process()
       }
     }
-  });
+  })
 </script>
 
 <section
@@ -42,11 +42,9 @@
   <!-- Content -->
   <div class="p-4 space-y-6">
     <!-- Instagram (latest post embed) -->
-    {#if shareUrlType === "instagram" && index === 0}
+    {#if shareUrlType === 'instagram' && index === 0}
       <div>
-        <p
-          class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500"
-        >
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
           Latest on Instagram
         </p>
 
@@ -74,7 +72,7 @@
 
     <!-- Other platforms (links only) -->
     <div class="space-y-3">
-      {#if shareUrlType === "youtube"}
+      {#if shareUrlType === 'youtube'}
         <a
           href={shareUrl}
           target="_blank"
@@ -89,7 +87,7 @@
         </a>
       {/if}
 
-      {#if shareUrlType === "facebook"}
+      {#if shareUrlType === 'facebook'}
         <a
           href={shareUrl}
           target="_blank"

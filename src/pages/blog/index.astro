@@ -1,31 +1,26 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import PostList from "../../components/blog/PostList.astro";
-import Navbar from "../../components/Navbar.astro";
-import Footer from "../../components/Footer.astro";
-import pb from "../../lib/pb";
-import toast from "svelte-french-toast";
-import {
-  type CompaniesResponse,
-  Collections,
-} from "../../types/pocketbase-types";
-import ActionDock from "../../components/ActionDock.astro";
+import Layout from '../../layouts/Layout.astro'
+import PostList from '../../components/blog/PostList.astro'
+import Navbar from '../../components/Navbar.astro'
+import Footer from '../../components/Footer.astro'
+import pb from '../../lib/pb'
+import toast from 'svelte-french-toast'
+import { type CompaniesResponse, Collections } from '../../types/pocketbase-types'
+import ActionDock from '../../components/ActionDock.astro'
 
 // Fetch posts
-let posts: string | any[] = [];
+let posts: string | any[] = []
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 try {
-  posts = await pb.collection("posts").getFullList({
-    sort: "-created",
-    expand: "category,featuredImage",
-  });
+  posts = await pb.collection('posts').getFullList({
+    sort: '-created',
+    expand: 'category,featuredImage',
+  })
 } catch (e) {
-  console.error("Error fetching posts:", e);
-  toast.error("Error fetching posts");
+  console.error('Error fetching posts:', e)
+  toast.error('Error fetching posts')
 }
 ---
 
@@ -35,18 +30,11 @@ try {
 >
   <Navbar companyProfile={companyProfile} />
   <!-- Simple Hero -->
-  <section
-    class="relative bg-aspada-navy py-24 px-4 sm:py-30 sm:px-8 overflow-hidden"
-  >
+  <section class="relative bg-aspada-navy py-24 px-4 sm:py-30 sm:px-8 overflow-hidden">
     <div class="max-w-7xl mx-auto relative z-10">
-      <h1
-        class="text-3xl sm:text-4xl md:text-6xl font-bold text-aspada-cream mb-6"
-      >
-        Latest News
-      </h1>
+      <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-aspada-cream mb-6">Latest News</h1>
       <p class="text-lg sm:text-xl text-aspada-cream max-w-2xl">
-        Insights, updates, and stories from the world of luxury real estate
-        development.
+        Insights, updates, and stories from the world of luxury real estate development.
       </p>
     </div>
 

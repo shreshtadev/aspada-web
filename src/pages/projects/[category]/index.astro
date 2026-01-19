@@ -122,7 +122,9 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
           >
         </h1>
       </div>
+      <div>
           <ProjectList projects={completedProjects} />
+      </div>
         )
       }
       {
@@ -136,7 +138,9 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
           >
         </h1>
       </div>
+      <div>
           <ProjectList projects={upcomingProjects} />
+      </div>
         )
       }
     </div>

@@ -1,31 +1,27 @@
 ---
-import { Image } from "astro:assets";
+import { Image } from 'astro:assets'
 
 interface Props {
   /** Optimized local map image (recommended) */
-  image: ImageMetadata;
+  image: ImageMetadata
 
   /** Alt text for accessibility & SEO */
-  alt: string;
+  alt: string
 
   /** Google Maps link (opens interactive map) */
-  mapsUrl: string;
+  mapsUrl: string
 
   /** Optional height ratio (defaults to 16:9) */
-  aspect?: "16/9" | "4/3" | "1/1";
+  aspect?: '16/9' | '4/3' | '1/1'
 
   /** Show overlay CTA text */
-  ctaText?: string;
+  ctaText?: string
 }
 
-const { image, alt, mapsUrl, aspect = "16/9" } = Astro.props;
+const { image, alt, mapsUrl, aspect = '16/9' } = Astro.props
 
 const aspectClass =
-  aspect === "4/3"
-    ? "aspect-[4/3]"
-    : aspect === "1/1"
-      ? "aspect-square"
-      : "aspect-[16/9]";
+  aspect === '4/3' ? 'aspect-[4/3]' : aspect === '1/1' ? 'aspect-square' : 'aspect-[16/9]'
 ---
 
 <a
@@ -44,8 +40,5 @@ const aspectClass =
   />
 
   <!-- Subtle overlay -->
-  <div
-    class="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/10"
-  >
-  </div>
+  <div class="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/10"></div>
 </a>

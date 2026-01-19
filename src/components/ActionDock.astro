@@ -1,20 +1,21 @@
 ---
-const {companyProfile} = Astro.props;
+const { companyProfile } = Astro.props
 ---
+
 <div
   class="fixed bottom-20 right-6 md:left-1/2 md:right-auto md:-translate-x-1/2 z-50 w-auto max-w-sm"
 >
   <div
     class="bg-aspada-navy/60 backdrop-blur-2xl border border-white/10 rounded-full p-1.5 shadow-2xl flex items-center gap-3 px-3"
   >
-    <a href={`tel:+${companyProfile.companyMainPhone}`} class="flex flex-col items-center group px-2">
-      <div
-        class="p-2 rounded-full group-hover:bg-aspada-gold/10 transition-colors"
-      >
+    <a
+      href={`tel:+${companyProfile.companyMainPhone}`}
+      class="flex flex-col items-center group px-2"
+    >
+      <div class="p-2 rounded-full group-hover:bg-aspada-gold/10 transition-colors">
         <span class="i-lucide-phone text-aspada-gold text-lg"></span>
       </div>
-      <span
-        class="text-[9px] uppercase font-bold tracking-tighter text-aspada-silver -mt-1"
+      <span class="text-[9px] uppercase font-bold tracking-tighter text-aspada-silver -mt-1"
         >Call</span
       >
     </a>
@@ -23,13 +24,10 @@ const {companyProfile} = Astro.props;
       href={`https://wa.me/${companyProfile.companyMainPhone}`}
       class="flex flex-col items-center group px-2"
     >
-      <div
-        class="p-2 rounded-full group-hover:bg-green-500/10 transition-colors"
-      >
+      <div class="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
         <span class="i-lucide-message-circle text-[#25D366] text-lg"></span>
       </div>
-      <span
-        class="text-[9px] uppercase font-bold tracking-tighter text-aspada-silver -mt-1"
+      <span class="text-[9px] uppercase font-bold tracking-tighter text-aspada-silver -mt-1"
         >Chat</span
       >
     </a>

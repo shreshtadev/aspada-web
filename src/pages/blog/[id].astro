@@ -1,72 +1,64 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Navbar from "../../components/Navbar.astro";
-import Footer from "../../components/Footer.astro";
-import pb from "../../lib/pb";
-import { marked } from "marked";
-import toast from "svelte-french-toast";
-import type { PostInfoExpand } from "../../types";
+import Layout from '../../layouts/Layout.astro'
+import Navbar from '../../components/Navbar.astro'
+import Footer from '../../components/Footer.astro'
+import pb from '../../lib/pb'
+import { marked } from 'marked'
+import toast from 'svelte-french-toast'
+import type { PostInfoExpand } from '../../types'
 import {
   Collections,
   type CompaniesResponse,
   type PostsResponse,
-} from "../../types/pocketbase-types";
-import ActionDock from "../../components/ActionDock.astro";
+} from '../../types/pocketbase-types'
+import ActionDock from '../../components/ActionDock.astro'
 
-const { id } = Astro.params;
+const { id } = Astro.params
 
-let post: PostsResponse<PostInfoExpand>;
-let contentHtml = "";
-let companyProfile: CompaniesResponse;
+let post: PostsResponse<PostInfoExpand>
+let contentHtml = ''
+let companyProfile: CompaniesResponse
 // Format date helper
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 try {
-  if (!id) throw new Error("No ID provided");
-  post = await pb
-    .collection("posts")
-    .getOne(id, { expand: "category,featuredImage" });
+  if (!id) throw new Error('No ID provided')
+  post = await pb.collection('posts').getOne(id, { expand: 'category,featuredImage' })
 
   // Parse markdown content to HTML
-  contentHtml = await marked.parse(post.content || "");
+  contentHtml = await marked.parse(post.content || '')
 } catch (e) {
-  console.error("Error fetching post:", e);
-  toast.error("Error fetching post");
-  return Astro.redirect("/404");
+  console.error('Error fetching post:', e)
+  toast.error('Error fetching post')
+  return Astro.redirect('/404')
 }
 
 if (!post) {
-  return Astro.redirect("/404");
+  return Astro.redirect('/404')
 }
 
 // Generate simpler description for meta tags from content
 const description = post.content
-  ? post.content.replace(/<[^>]*>?/gm, "").slice(0, 160) + "..."
-  : "Read this article on Aspada Developers.";
+  ? post.content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...'
+  : 'Read this article on Aspada Developers.'
 
 const fileURL = pb.files.getURL(
   post.expand?.featuredImage,
-  String(post.expand?.featuredImage?.attachment),
-);
+  String(post.expand?.featuredImage?.attachment)
+)
 
 companyProfile = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
-<Layout
-  title={`${post.title} - Aspada Blog`}
-  description={description}
-  image={fileURL}
->
+<Layout title={`${post.title} - Aspada Blog`} description={description} image={fileURL}>
   <Navbar companyProfile={companyProfile} />
 
   <main class="min-h-screen bg-slate-50 pt-24 pb-12 sm:pt-32 sm:pb-16">
@@ -93,9 +85,7 @@ companyProfile = await pb
           {post.title}
         </h1>
 
-        <div
-          class="flex items-center justify-center gap-4 text-aspada-steel font-medium"
-        >
+        <div class="flex items-center justify-center gap-4 text-aspada-steel font-medium">
           <time datetime={post.created}>{formatDate(post.created)}</time>
           <span>•</span>
           <span>Aspada Team</span>
@@ -106,11 +96,7 @@ companyProfile = await pb
       {
         post.featuredImage && (
           <div class="mb-8 sm:mb-16 rounded-3xl overflow-hidden shadow-2xl aspect-video relative">
-            <img
-              src={fileURL}
-              alt={post.title}
-              class="w-full h-full object-cover"
-            />
+            <img src={fileURL} alt={post.title} class="w-full h-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
           </div>
         )

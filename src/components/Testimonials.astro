@@ -1,55 +1,46 @@
 ---
-import pb from "../lib/pb";
-import type { TestimonialsResponse } from "../types/pocketbase-types";
-import type { TestimonialInfoExpand } from "../types";
+import pb from '../lib/pb'
+import type { TestimonialsResponse } from '../types/pocketbase-types'
+import type { TestimonialInfoExpand } from '../types'
 interface Testimonial {
-  name: string;
-  role: string;
-  text: string;
-  avatar: string;
+  name: string
+  role: string
+  text: string
+  avatar: string
 }
 const testimonialsFromBe = await pb
-  .collection("testimonials")
+  .collection('testimonials')
   .getFullList<TestimonialsResponse<TestimonialInfoExpand>>({
-    sort: "-created",
+    sort: '-created',
     limit: 3,
-    expand: "authorAvatar",
-  });
+    expand: 'authorAvatar',
+  })
 const testimonials = testimonialsFromBe.map((t) => ({
   name: t.authorName,
   role: t.authorRole,
   text: t.content,
-  avatar: pb.files.getURL(
-    t.expand.authorAvatar,
-    t.expand.authorAvatar?.attachment,
-  ),
-}));
+  avatar: pb.files.getURL(t.expand.authorAvatar, t.expand.authorAvatar?.attachment),
+}))
 ---
 
 <section class="py-8 px-6 overflow-hidden">
   <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
     <div class="space-y-6">
-      <span
-        class="text-aspada-gold font-bold tracking-[0.3em] uppercase text-xs"
-        >Testimonials</span
+      <span class="text-aspada-gold font-bold tracking-[0.3em] uppercase text-xs">Testimonials</span
       >
       <h2 class="text-5xl font-bold text-aspada-steel tracking-tight">
         Voice of <br />
         <span class="text-aspada-gold/70 italic font-light">Confidence.</span>
       </h2>
       <p class="text-aspada-steel/60 text-lg max-w-md">
-        Our legacy is built on the trust of our clients. Tap to shuffle or wait
-        to see more stories <a
+        Our legacy is built on the trust of our clients. Tap to shuffle or wait to see more stories <a
           class="text-aspada-gold text-2xl hover:text-aspada-steel hover:underline transition-all duration-300"
           href="/testimonials">here</a
         >.
       </p>
     </div>
 
-    <div
-      class="relative h-[450px] w-full max-w-md mx-auto lg:mx-0 group"
-      id="card-stack"
-    >
+    <div class="relative h-[450px] w-full max-w-md mx-auto lg:mx-0 group" id="card-stack">
       {
         testimonials.map((t, i) => (
           <div
@@ -73,7 +64,7 @@ const testimonials = testimonialsFromBe.map((t) => ({
               <div class="i-lucide-quote text-4xl text-[#d4af37]/20 absolute -top-4 -left-2 rotate-180" />
               <p class="text-aspada-steel-200 italic text-xl leading-relaxed relative z-10 pl-4">
                 {t.text.slice(0, 100)}
-                {t.text.length > 120 && "..."}
+                {t.text.length > 120 && '...'}
               </p>
             </div>
           </div>
@@ -85,76 +76,73 @@ const testimonials = testimonialsFromBe.map((t) => ({
 
 <script>
   function setupStack() {
-    const cards = document.querySelectorAll("[data-testimonial-card]");
-    const stack = document.getElementById("card-stack");
-    let currentIndex = 0;
-    let autoPlayTimer: number | null = null;
-    const INTERVAL_TIME = 5000; // 5 seconds
+    const cards = document.querySelectorAll('[data-testimonial-card]')
+    const stack = document.getElementById('card-stack')
+    let currentIndex = 0
+    let autoPlayTimer: number | null = null
+    const INTERVAL_TIME = 5000 // 5 seconds
 
     function updateStack() {
       cards.forEach((card, i) => {
-        const relIndex = (i - currentIndex + cards.length) % cards.length;
-        const el = card as HTMLElement;
+        const relIndex = (i - currentIndex + cards.length) % cards.length
+        const el = card as HTMLElement
 
-        el.style.zIndex = `${cards.length - relIndex}`;
-        el.style.transform = `translateY(${relIndex * 25}px) scale(${1 - relIndex * 0.05})`;
-        el.style.opacity = relIndex > 2 ? "0" : `${1 - relIndex * 0.3}`;
-        el.style.pointerEvents = relIndex === 0 ? "auto" : "none";
-        el.style.filter = relIndex === 0 ? "blur(0px)" : "blur(2px)";
-      });
+        el.style.zIndex = `${cards.length - relIndex}`
+        el.style.transform = `translateY(${relIndex * 25}px) scale(${1 - relIndex * 0.05})`
+        el.style.opacity = relIndex > 2 ? '0' : `${1 - relIndex * 0.3}`
+        el.style.pointerEvents = relIndex === 0 ? 'auto' : 'none'
+        el.style.filter = relIndex === 0 ? 'blur(0px)' : 'blur(2px)'
+      })
     }
 
     function rotate() {
-      const topCard = cards[currentIndex] as HTMLElement;
+      const topCard = cards[currentIndex] as HTMLElement
 
       // The "Throw" Animation
-      topCard.style.transform = "translateX(120%) rotate(20deg)";
-      topCard.style.opacity = "0";
+      topCard.style.transform = 'translateX(120%) rotate(20deg)'
+      topCard.style.opacity = '0'
 
       setTimeout(() => {
-        currentIndex = (currentIndex + 1) % cards.length;
-        updateStack();
-      }, 300);
+        currentIndex = (currentIndex + 1) % cards.length
+        updateStack()
+      }, 300)
     }
 
     // Auto-play management
     function startAutoPlay() {
       if (!autoPlayTimer) {
-        autoPlayTimer = window.setInterval(rotate, INTERVAL_TIME);
+        autoPlayTimer = window.setInterval(rotate, INTERVAL_TIME)
       }
     }
 
     function stopAutoPlay() {
       if (autoPlayTimer) {
-        clearInterval(autoPlayTimer);
-        autoPlayTimer = null;
+        clearInterval(autoPlayTimer)
+        autoPlayTimer = null
       }
     }
 
     if (cards.length !== 0 && stack !== null) {
       // Manual Interaction
-      stack?.addEventListener("click", () => {
-        stopAutoPlay();
-        rotate();
-        startAutoPlay(); // Restart timer after click
-      });
+      stack?.addEventListener('click', () => {
+        stopAutoPlay()
+        rotate()
+        startAutoPlay() // Restart timer after click
+      })
 
       // Pause on hover
-      stack?.addEventListener("mouseenter", stopAutoPlay);
-      stack?.addEventListener("mouseleave", startAutoPlay);
+      stack?.addEventListener('mouseenter', stopAutoPlay)
+      stack?.addEventListener('mouseleave', startAutoPlay)
 
       // Initial setup
-      updateStack();
-      startAutoPlay();
+      updateStack()
+      startAutoPlay()
     }
   }
 
   // Handle Astro page loads & View Transitions
-  document.addEventListener("astro:page-load", setupStack);
-  if (
-    document.readyState === "complete" ||
-    document.readyState === "interactive"
-  ) {
-    setupStack();
+  document.addEventListener('astro:page-load', setupStack)
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupStack()
   }
 </script>

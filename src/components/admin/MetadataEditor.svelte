@@ -1,131 +1,128 @@
 <script lang="ts">
-  import pb from "../../lib/pb";
-  import { uploadAttachment, deleteAttachment } from "../../lib/utils";
-  import toast from "svelte-french-toast";
-  import {
-    Collections,
-    MetadataCategoryTypeOptions,
-  } from "../../types/pocketbase-types";
-  import Autocomplete from "./Autocomplete.svelte";
+  import pb from '../../lib/pb'
+  import { uploadAttachment, deleteAttachment } from '../../lib/utils'
+  import toast from 'svelte-french-toast'
+  import { Collections, MetadataCategoryTypeOptions } from '../../types/pocketbase-types'
+  import Autocomplete from './Autocomplete.svelte'
 
   type Metadata = {
-    id?: string;
-    title: string;
-    categoryType: string;
-    summary: string;
-    showInTiles: boolean;
-    attachments: string[];
-    projectSlugs: string[];
+    id?: string
+    title: string
+    categoryType: string
+    summary: string
+    showInTiles: boolean
+    attachments: string[]
+    projectSlugs: string[]
     expand?: {
-      attachments?: any[];
-    };
-    created?: string;
-    updated?: string;
-  };
+      attachments?: any[]
+    }
+    created?: string
+    updated?: string
+  }
 
   const categories = [
-    { value: "amenity", label: "Amenity" },
-    { value: "postCategory", label: "Post Category" },
-    { value: "tag", label: "Tag" },
-    { value: "specification", label: "Gallery" },
-    { value: "statsSettings", label: "Stats Settings" },
-    { value: "contactSettings", label: "Contact Settings" },
-    { value: "gallery", label: "Gallery Images" },
-  ];
+    { value: 'amenity', label: 'Amenity' },
+    { value: 'postCategory', label: 'Post Category' },
+    { value: 'tag', label: 'Tag' },
+    { value: 'specification', label: 'Gallery' },
+    { value: 'statsSettings', label: 'Stats Settings' },
+    { value: 'contactSettings', label: 'Contact Settings' },
+    { value: 'gallery', label: 'Gallery Images' },
+  ]
 
-  let { initialCategory = "amenity" } = $props<{
-    initialCategory?: string;
-  }>();
+  let { initialCategory = 'amenity' } = $props<{
+    initialCategory?: string
+  }>()
 
-  let items = $state<Metadata[]>([]);
+  let items = $state<Metadata[]>([])
   // svelte-ignore state_referenced_locally
-  let selectedCategory = $state(initialCategory);
-  let loading = $state(false);
-  let formLoading = $state(false);
-  let projects = $state<any[]>([]);
+  let selectedCategory = $state(initialCategory)
+  let loading = $state(false)
+  let formLoading = $state(false)
+  let projects = $state<any[]>([])
 
   // Sync selectedCategory with initialCategory prop if it changes externally
   $effect(() => {
-    selectedCategory = initialCategory;
-  });
+    selectedCategory = initialCategory
+  })
 
   // Detail form state
-  let selectedId = $state<string | null>(null);
-  let formTitle = $state("");
-  let formSummary = $state("");
-  let formCategory = $state("amenity");
-  let formShowInTiles = $state(false);
-  let formFiles = $state<FileList | null>(null);
-  let currentAttachments = $state<string[]>([]);
-  let currentAttachmentUrls = $state<{ id: string; url: string }[]>([]);
+  let selectedId = $state<string | null>(null)
+  let formTitle = $state('')
+  let formSummary = $state('')
+  let formCategory = $state('amenity')
+  let formShowInTiles = $state(false)
+  let formFiles = $state<FileList | null>(null)
+  let currentAttachments = $state<string[]>([])
+  let currentAttachmentUrls = $state<{ id: string; url: string }[]>([])
 
   async function loadData() {
     try {
-      loading = true;
-      projects = await pb.collection(Collections.Projects).getFullList();
+      loading = true
+      projects = await pb.collection(Collections.Projects).getFullList()
       const list = await pb.collection(Collections.Metadata).getFullList({
         filter: `categoryType = '${selectedCategory}'`,
-        expand: "attachments",
-      });
-      items = list as unknown as Metadata[];
+        expand: 'attachments',
+      })
+      items = list as unknown as Metadata[]
     } catch (err) {
-      console.error("Failed to load metadata:", err);
-      toast.error("Failed to load data");
+      console.error('Failed to load metadata:', err)
+      toast.error('Failed to load data')
     } finally {
-      loading = false;
+      loading = false
     }
   }
 
   $effect(() => {
-    loadData();
-  });
+    loadData()
+  })
 
   function selectItem(item: Metadata) {
-    selectedId = item.id ?? null;
-    formTitle = item.title ?? "";
-    formSummary = item.summary ?? "";
-    formShowInTiles = item.showInTiles ?? false;
-    formCategory = item.categoryType ?? MetadataCategoryTypeOptions.amenity;
-    currentAttachments = item.attachments ?? [];
+    selectedId = item.id ?? null
+    formTitle = item.title ?? ''
+    formSummary = item.summary ?? ''
+    formShowInTiles = item.showInTiles ?? false
+    formCategory = item.categoryType ?? MetadataCategoryTypeOptions.amenity
+    currentAttachments = item.attachments ?? []
 
-    const attachments = item.expand?.attachments;
+    const attachments = item.expand?.attachments
     currentAttachmentUrls =
       attachments?.map((a) => ({
         id: a.id,
         url: pb.files.getURL(a, a.attachment),
-      })) ?? [];
+      })) ?? []
 
-    formFiles = null;
+    formFiles = null
   }
 
   function newItem() {
-    selectedId = null;
-    formTitle = "";
-    formSummary = "";
-    formCategory = selectedCategory;
-    formShowInTiles = false;
-    currentAttachments = [];
-    currentAttachmentUrls = [];
-    formFiles = null;
+    selectedId = null
+    formTitle = ''
+    formSummary = ''
+    formCategory = selectedCategory
+    formShowInTiles = false
+    currentAttachments = []
+    currentAttachmentUrls = []
+    formFiles = null
   }
 
   async function saveItem() {
     if (!formTitle) {
-      toast.error("Title is required");
-      return;
+      toast.error('Title is required')
+      return
     }
 
-    formLoading = true;
-    let finalAttachments = [...currentAttachments];
+    formLoading = true
+    let finalAttachments = [...currentAttachments]
 
     try {
       // 1. Upload new files if any
       if (formFiles && formFiles.length > 0) {
         const uploadedIds = await uploadAttachment(
           `${formCategory} - ${formTitle}`,
-          Array.from(formFiles),
-        );
-        finalAttachments = [...finalAttachments, ...uploadedIds];
+          Array.from(formFiles)
+        )
+        finalAttachments = [...finalAttachments, ...uploadedIds]
       }
 
       const data = {
@@ -134,105 +131,92 @@
         showInTiles: formShowInTiles,
         categoryType: formCategory,
         attachments: finalAttachments,
-      };
+      }
 
       if (selectedId) {
-        const updated = await pb
-          .collection("metadata")
-          .update(selectedId, data, {
-            expand: "attachments",
-          });
-        items = items.map((it) =>
-          it.id === selectedId ? (updated as unknown as Metadata) : it,
-        );
-        selectItem(updated as unknown as Metadata);
-        toast.success("Updated successfully");
+        const updated = await pb.collection('metadata').update(selectedId, data, {
+          expand: 'attachments',
+        })
+        items = items.map((it) => (it.id === selectedId ? (updated as unknown as Metadata) : it))
+        selectItem(updated as unknown as Metadata)
+        toast.success('Updated successfully')
       } else {
-        const created = await pb.collection("metadata").create(data, {
-          expand: "attachments",
-        });
-        items = [created as unknown as Metadata, ...items];
-        selectItem(created as unknown as Metadata);
-        toast.success("Created successfully");
+        const created = await pb.collection('metadata').create(data, {
+          expand: 'attachments',
+        })
+        items = [created as unknown as Metadata, ...items]
+        selectItem(created as unknown as Metadata)
+        toast.success('Created successfully')
       }
     } catch (err) {
-      console.error(err);
-      toast.error(err?.message || "Failed to save");
+      console.error(err)
+      toast.error(err?.message || 'Failed to save')
     } finally {
-      formLoading = false;
+      formLoading = false
     }
   }
 
   async function deleteItem(id?: string) {
-    if (!id) return;
-    if (!confirm("Are you sure you want to delete this item?")) return;
+    if (!id) return
+    if (!confirm('Are you sure you want to delete this item?')) return
 
     try {
       // Delete attachments first if any
-      const item = items.find((it) => it.id === id);
+      const item = items.find((it) => it.id === id)
       if (item?.attachments?.length) {
         for (const attachId of item.attachments) {
-          await deleteAttachment(attachId);
+          await deleteAttachment(attachId)
         }
       }
 
-      await pb.collection("metadata").delete(id);
-      items = items.filter((it) => it.id !== id);
-      if (selectedId === id) newItem();
-      toast.success("Deleted successfully");
+      await pb.collection('metadata').delete(id)
+      items = items.filter((it) => it.id !== id)
+      if (selectedId === id) newItem()
+      toast.success('Deleted successfully')
     } catch (err) {
-      toast.error(err?.message || "Delete failed");
+      toast.error(err?.message || 'Delete failed')
     }
   }
 
   async function removeAttachment(attach: { id: string }) {
-    if (!confirm("Remove this attachment?")) return;
+    if (!confirm('Remove this attachment?')) return
 
     try {
-      const success = await deleteAttachment(attach.id);
+      const success = await deleteAttachment(attach.id)
       if (success) {
-        currentAttachments = currentAttachments.filter(
-          (id) => id !== attach.id,
-        );
-        currentAttachmentUrls = currentAttachmentUrls.filter(
-          (u) => u.id !== attach.id,
-        );
+        currentAttachments = currentAttachments.filter((id) => id !== attach.id)
+        currentAttachmentUrls = currentAttachmentUrls.filter((u) => u.id !== attach.id)
 
         // Update the record immediately
         if (selectedId) {
-          await pb.collection("metadata").update(selectedId, {
+          await pb.collection('metadata').update(selectedId, {
             attachments: currentAttachments,
-          });
+          })
           // Update the list item too
           items = items.map((it) =>
-            it.id === selectedId
-              ? { ...it, attachments: currentAttachments }
-              : it,
-          );
+            it.id === selectedId ? { ...it, attachments: currentAttachments } : it
+          )
         }
-        toast.success("Attachment removed");
+        toast.success('Attachment removed')
       }
     } catch (err) {
-      toast.error("Failed to remove attachment");
+      toast.error('Failed to remove attachment')
     }
   }
 
   function handleCategoryChange(e: Event) {
-    const target = e.target as HTMLSelectElement;
-    selectedCategory = target.value;
-    newItem();
+    const target = e.target as HTMLSelectElement
+    selectedCategory = target.value
+    newItem()
   }
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
   <!-- Sidebar: Category Selector & List -->
   <div class="md:col-span-1 space-y-6">
-    <div
-      class="bg-white p-6 rounded-3xl border border-aspada-gold/20 shadow-xl overflow-hidden"
-    >
+    <div class="bg-white p-6 rounded-3xl border border-aspada-gold/20 shadow-xl overflow-hidden">
       <label class="block mb-6">
-        <span
-          class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 block"
+        <span class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 block"
           >Category Type</span
         >
         <select
@@ -247,9 +231,7 @@
       </label>
 
       <div class="flex items-center justify-between mb-4 mt-8">
-        <h3
-          class="font-black uppercase tracking-tighter text-aspada-navy text-xl"
-        >
+        <h3 class="font-black uppercase tracking-tighter text-aspada-navy text-xl">
           {categories.find((c) => c.value === selectedCategory)?.label}s
         </h3>
         <button
@@ -269,9 +251,7 @@
           </div>
         {:else if items.length === 0}
           <div class="text-center py-10">
-            <p class="text-slate-400 text-sm">
-              No items found for this category.
-            </p>
+            <p class="text-slate-400 text-sm">No items found for this category.</p>
           </div>
         {:else}
           {#each items as item}
@@ -283,23 +263,20 @@
               role="button"
               tabindex="0"
               onclick={() => selectItem(item)}
-              onkeydown={(e) =>
-                (e.key === "Enter" || e.key === " ") && selectItem(item)}
+              onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectItem(item)}
             >
               <div class="min-w-0 flex-1">
                 <div class="font-bold text-aspada-navy truncate">
                   {item.title}
                 </div>
-                <div
-                  class="text-[10px] uppercase tracking-widest text-slate-400 mt-1"
-                >
+                <div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1">
                   {item.attachments?.length || 0} attachments
                 </div>
               </div>
               <button
                 onclick={(e) => {
-                  e.stopPropagation();
-                  deleteItem(item.id);
+                  e.stopPropagation()
+                  deleteItem(item.id)
                 }}
                 class="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 transition-opacity"
                 title="Delete item"
@@ -331,17 +308,13 @@
             <span class="i-lucide-edit-3 text-2xl"></span>
           </div>
           <div>
-            <h2
-              class="text-2xl font-black text-aspada-navy tracking-tight uppercase"
-            >
-              {selectedId ? "Edit Item" : "Create New Item"}
+            <h2 class="text-2xl font-black text-aspada-navy tracking-tight uppercase">
+              {selectedId ? 'Edit Item' : 'Create New Item'}
             </h2>
-            <p
-              class="text-slate-400 text-sm font-medium uppercase tracking-widest"
-            >
+            <p class="text-slate-400 text-sm font-medium uppercase tracking-widest">
               Managing in <span class="text-aspada-gold"
-                >{formCategory === "specification"
-                  ? "Gallery (Add project specifics)"
+                >{formCategory === 'specification'
+                  ? 'Gallery (Add project specifics)'
                   : formCategory}</span
               >
             </p>
@@ -361,7 +334,7 @@
             />
           </label>
 
-          {#if selectedCategory === "specification"}
+          {#if selectedCategory === 'specification'}
             <label class="block cursor-pointer group">
               <span
                 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 block ml-1 transition-colors group-hover:text-aspada-navy"
@@ -370,11 +343,7 @@
               </span>
 
               <div class="relative inline-flex items-center">
-                <input
-                  type="checkbox"
-                  bind:checked={formShowInTiles}
-                  class="sr-only peer"
-                />
+                <input type="checkbox" bind:checked={formShowInTiles} class="sr-only peer" />
 
                 <div
                   class="
@@ -387,7 +356,7 @@
                 ></div>
 
                 <span class="ml-3 text-sm font-bold text-aspada-navy">
-                  {formShowInTiles ? "Enabled" : "Disabled"}
+                  {formShowInTiles ? 'Enabled' : 'Disabled'}
                 </span>
               </div>
             </label>
@@ -426,9 +395,7 @@
                     <span class="i-lucide-upload-cloud"></span>
                   </div>
                   <span class="text-sm font-bold text-slate-500 truncate">
-                    {formFiles
-                      ? `${formFiles.length} files selected`
-                      : "Drop files here or click"}
+                    {formFiles ? `${formFiles.length} files selected` : 'Drop files here or click'}
                   </span>
                 </div>
               </div>
@@ -471,19 +438,13 @@
           </div>
         </div>
 
-        <div
-          class="flex items-center gap-4 mt-12 pt-8 border-t border-slate-100"
-        >
+        <div class="flex items-center gap-4 mt-12 pt-8 border-t border-slate-100">
           <button
             onclick={saveItem}
             disabled={formLoading}
             class="flex-1 bg-aspada-navy text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-aspada-navy/90 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 shadow-xl shadow-aspada-navy/20"
           >
-            {formLoading
-              ? "Processing..."
-              : selectedId
-                ? "Sync Changes"
-                : "Create Record"}
+            {formLoading ? 'Processing...' : selectedId ? 'Sync Changes' : 'Create Record'}
           </button>
 
           {#if selectedId}

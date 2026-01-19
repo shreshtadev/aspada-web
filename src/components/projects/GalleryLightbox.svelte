@@ -1,50 +1,50 @@
 <script lang="ts">
-  import { fade, scale } from "svelte/transition";
+  import { fade, scale } from 'svelte/transition'
 
   interface Image {
-    url: string;
-    title?: string;
+    url: string
+    title?: string
   }
 
-  let { images = [], projectTitle = "" } = $props<{
-    images: Image[];
-    projectTitle: string;
-  }>();
+  let { images = [], projectTitle = '' } = $props<{
+    images: Image[]
+    projectTitle: string
+  }>()
 
-  let selectedIndex = $state(-1);
-  let isOpen = $derived(selectedIndex !== -1);
+  let selectedIndex = $state(-1)
+  let isOpen = $derived(selectedIndex !== -1)
 
   function openLightbox(index: number) {
-    selectedIndex = index;
-    document.body.style.overflow = "hidden";
+    selectedIndex = index
+    document.body.style.overflow = 'hidden'
   }
 
   function closeLightbox() {
-    selectedIndex = -1;
-    document.body.style.overflow = "auto";
+    selectedIndex = -1
+    document.body.style.overflow = 'auto'
   }
 
   function next() {
     if (selectedIndex < images.length - 1) {
-      selectedIndex++;
+      selectedIndex++
     } else {
-      selectedIndex = 0;
+      selectedIndex = 0
     }
   }
 
   function prev() {
     if (selectedIndex > 0) {
-      selectedIndex--;
+      selectedIndex--
     } else {
-      selectedIndex = images.length - 1;
+      selectedIndex = images.length - 1
     }
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (!isOpen) return;
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowRight") next();
-    if (e.key === "ArrowLeft") prev();
+    if (!isOpen) return
+    if (e.key === 'Escape') closeLightbox()
+    if (e.key === 'ArrowRight') next()
+    if (e.key === 'ArrowLeft') prev()
   }
 </script>
 
@@ -70,9 +70,7 @@
           class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/60 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         >
           <p class="text-white text-lg sm:text-2xl font-medium">
-            {(img.title as string).indexOf("-")
-              ? (img.title as string).split("-")[1]
-              : img.title}
+            {(img.title as string).indexOf('-') ? (img.title as string).split('-')[1] : img.title}
           </p>
         </div>
       {/if}
@@ -100,8 +98,8 @@
     <!-- Navigation Buttons -->
     <button
       onclick={(e) => {
-        e.stopPropagation();
-        prev();
+        e.stopPropagation()
+        prev()
       }}
       class="absolute left-4 sm:left-10 z-[110] text-white/50 hover:text-white transition-colors p-2"
       aria-label="Previous image"
@@ -111,8 +109,8 @@
 
     <button
       onclick={(e) => {
-        e.stopPropagation();
-        next();
+        e.stopPropagation()
+        next()
       }}
       class="absolute right-4 sm:right-10 z-[110] text-white/50 hover:text-white transition-colors p-2"
       aria-label="Next image"
@@ -132,15 +130,12 @@
         >
           <img
             src={images[selectedIndex].url}
-            alt={images[selectedIndex].title ||
-              `${projectTitle} image ${selectedIndex + 1}`}
+            alt={images[selectedIndex].title || `${projectTitle} image ${selectedIndex + 1}`}
             class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
           />
 
           {#if images[selectedIndex].title}
-            <p
-              class="mt-6 text-white text-lg sm:text-2xl font-medium text-center px-4"
-            >
+            <p class="mt-6 text-white text-lg sm:text-2xl font-medium text-center px-4">
               {images[selectedIndex].title}
             </p>
           {/if}

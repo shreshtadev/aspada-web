@@ -1,31 +1,31 @@
 <script lang="ts">
-  import AspadaForm from "./AspadaForm.svelte";
-  import LeafMap from "./LeafMap.svelte";
+  import AspadaForm from './AspadaForm.svelte'
+  import LeafMap from './LeafMap.svelte'
 
   let { projectTitle, latitude, longitude } = $props<{
-    projectTitle: string;
-    latitude: number;
-    longitude: number;
-  }>();
+    projectTitle: string
+    latitude: number
+    longitude: number
+  }>()
 
-  let isOpen = $state(false);
+  let isOpen = $state(false)
 
   function toggleModal() {
-    isOpen = !isOpen;
+    isOpen = !isOpen
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = ''
     }
   }
 
   function portal(node: HTMLElement) {
-    document.body.appendChild(node);
+    document.body.appendChild(node)
     return {
       destroy() {
-        if (node.parentNode) node.parentNode.removeChild(node);
+        if (node.parentNode) node.parentNode.removeChild(node)
       },
-    };
+    }
   }
 </script>
 
@@ -47,7 +47,7 @@
       onclick={toggleModal}
       role="button"
       tabindex="0"
-      onkeydown={(e) => e.key === "Escape" && toggleModal()}
+      onkeydown={(e) => e.key === 'Escape' && toggleModal()}
     ></div>
 
     <div
@@ -77,14 +77,11 @@
           >
             Priority Request
           </span>
-          <h2
-            class="text-3xl font-black text-aspada-navy mb-2 uppercase tracking-tighter"
-          >
+          <h2 class="text-3xl font-black text-aspada-navy mb-2 uppercase tracking-tighter">
             Enquire for <span class="text-aspada-gold">{projectTitle}</span>
           </h2>
           <p class="text-slate-500 mb-8 text-sm font-medium">
-            Fill out the form below and our project consultant will get back to
-            you within 24 hours.
+            Fill out the form below and our project consultant will get back to you within 24 hours.
           </p>
 
           <AspadaForm {projectTitle} />

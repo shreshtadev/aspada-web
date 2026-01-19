@@ -1,31 +1,23 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Navbar from "../components/Navbar.astro";
-import pb from "../lib/pb";
-import { Collections, type CompaniesResponse } from "../types/pocketbase-types";
+import Layout from '../layouts/Layout.astro'
+import Navbar from '../components/Navbar.astro'
+import pb from '../lib/pb'
+import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
 <Layout title={`Terms | ${companyProfile.companyName}`}>
   <Navbar companyProfile={companyProfile} />
 
   <main>
-    <section
-      class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10"
-    >
+    <section class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10">
       <div
         class="max-w-4xl mx-auto bg-white border border-aspada-gold/20 rounded-3xl shadow-xl overflow-hidden"
       >
-        <div
-          class="bg-aspada-steel p-6 sm:p-10 text-center relative overflow-hidden"
-        >
-          <div
-            class="absolute -top-10 -right-10 w-40 h-40 bg-[#d4af37]/10 blur-3xl rounded-full"
-          >
+        <div class="bg-aspada-steel p-6 sm:p-10 text-center relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#d4af37]/10 blur-3xl rounded-full">
           </div>
           <h1
             class="text-3xl sm:text-4xl font-bold text-white relative z-10 uppercase tracking-widest"
@@ -50,91 +42,71 @@ const companyProfile: CompaniesResponse = await pb
           <hr class="border-aspada-gold/10" />
 
           <div>
-            <h2
-              class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4"
-            >
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4">
               <span class="text-aspada-gold">01.</span> Acceptance of Terms
             </h2>
             <p>
-              By visiting our Website, you acknowledge that you have read,
-              understood, and agree to comply with these Terms and our Privacy
-              Policy. If you do not agree, you must discontinue use immediately.
+              By visiting our Website, you acknowledge that you have read, understood, and agree to
+              comply with these Terms and our Privacy Policy. If you do not agree, you must
+              discontinue use immediately.
             </p>
           </div>
 
-          <div
-            class="bg-aspada-cream/50 p-6 rounded-2xl border border-aspada-gold/10"
-          >
-            <h2
-              class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4"
-            >
+          <div class="bg-aspada-cream/50 p-6 rounded-2xl border border-aspada-gold/10">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4">
               <span class="text-aspada-gold">02.</span> User Conduct & Registration
             </h2>
             <ul class="space-y-3 list-none">
               <li class="flex gap-2">
                 <span class="text-aspada-gold font-bold">•</span>
                 <span
-                  ><strong>Accuracy:</strong> Information provided must be accurate
-                  and up-to-date.</span
+                  ><strong>Accuracy:</strong> Information provided must be accurate and up-to-date.</span
                 >
               </li>
               <li class="flex gap-2">
                 <span class="text-aspada-gold font-bold">•</span>
                 <span
-                  ><strong>Confidentiality:</strong> You are responsible for account
-                  login security and all activities under your account.</span
+                  ><strong>Confidentiality:</strong> You are responsible for account login security and
+                  all activities under your account.</span
                 >
               </li>
               <li class="flex gap-2">
                 <span class="text-aspada-gold font-bold">•</span>
                 <span
-                  ><strong>Data Usage:</strong> You consent to promotional communications
-                  (Email/SMS) subject to our Privacy Policy.</span
+                  ><strong>Data Usage:</strong> You consent to promotional communications (Email/SMS)
+                  subject to our Privacy Policy.</span
                 >
               </li>
             </ul>
           </div>
 
           <div>
-            <h2
-              class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4"
-            >
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4">
               <span class="text-[#d4af37]">03.</span> Prohibited Uses & Security
             </h2>
             <p class="mb-4">
-              You are strictly prohibited from unauthorized access via automated
-              tools ("scraping"), disrupting networks, or deploying malicious
-              code. Such acts may be prosecuted under the <em
-                class="text-slate-900 font-medium"
-                >Information Technology Act, 2000</em
-              >.
+              You are strictly prohibited from unauthorized access via automated tools ("scraping"),
+              disrupting networks, or deploying malicious code. Such acts may be prosecuted under
+              the <em class="text-slate-900 font-medium">Information Technology Act, 2000</em>.
             </p>
           </div>
 
           <div>
-            <h2
-              class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4"
-            >
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-3 mb-4">
               <span class="text-[#d4af37]">04.</span> Intellectual Property Rights
             </h2>
             <p>
-              All content including text, graphics, logos, and designs is the
-              exclusive property of <span class="font-bold"
-                >ASPADA DEVELOPERS LLP</span
+              All content including text, graphics, logos, and designs is the exclusive property of <span
+                class="font-bold">ASPADA DEVELOPERS LLP</span
               >. No license is granted for use without prior written consent.
             </p>
           </div>
 
-          <div
-            class="border-l-4 border-[#d4af37] pl-6 py-2 italic text-slate-600"
-          >
-            <h2 class="text-lg font-bold text-slate-900 not-italic mb-2">
-              Liability Disclaimer
-            </h2>
-            Your use of this Website is at your <span
-              class="uppercase font-bold">sole risk</span
-            >. Aspada Developers LLP shall not be liable for direct or indirect
-            losses arising from the use of this site.
+          <div class="border-l-4 border-[#d4af37] pl-6 py-2 italic text-slate-600">
+            <h2 class="text-lg font-bold text-slate-900 not-italic mb-2">Liability Disclaimer</h2>
+            Your use of this Website is at your <span class="uppercase font-bold">sole risk</span>.
+            Aspada Developers LLP shall not be liable for direct or indirect losses arising from the
+            use of this site.
           </div>
 
           <div
@@ -148,11 +120,8 @@ const companyProfile: CompaniesResponse = await pb
               <h3 class="font-bold text-slate-900 mb-2">Contact Us</h3>
               <p>Email: {companyProfile.companyMainEmail}</p>
               <p>
-                Address: <span class="block">{companyProfile.addressLine1}</span
-                ><span class="block"
-                  >{companyProfile.city}, {companyProfile.state}, {
-                    companyProfile.pincode
-                  }</span
+                Address: <span class="block">{companyProfile.addressLine1}</span><span class="block"
+                  >{companyProfile.city}, {companyProfile.state}, {companyProfile.pincode}</span
                 >
               </p>
             </div>

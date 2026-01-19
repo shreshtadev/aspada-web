@@ -1,19 +1,19 @@
 ---
-import type { ProjectExpand } from "../../types";
-import type { ProjectsResponse } from "../../types/pocketbase-types";
+import type { ProjectExpand } from '../../types'
+import type { ProjectsResponse } from '../../types/pocketbase-types'
 
 interface Props {
-  project: ProjectsResponse<ProjectExpand>;
+  project: ProjectsResponse<ProjectExpand>
 }
 
-const { project } = Astro.props;
+const { project } = Astro.props
 
 if (!project.city || !project.district) {
-  project.city = project.city ?? "Unknown";
-  project.district = project.district ?? "Unknown";
+  project.city = project.city ?? 'Unknown'
+  project.district = project.district ?? 'Unknown'
 }
-const location = `${project.city}, ${project.district}`;
-const status = project.status || "Ongoing";
+const location = `${project.city}, ${project.district}`
+const status = project.status || 'Ongoing'
 ---
 
 <a
@@ -47,9 +47,7 @@ const status = project.status || "Ongoing";
   <div class="p-6 flex flex-col flex-grow">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-1.5 h-1.5 bg-aspada-gold rounded-full"></span>
-      <span
-        class="text-aspada-navy/60 text-sm font-bold uppercase tracking-[0.2em]"
-      >
+      <span class="text-aspada-navy/60 text-sm font-bold uppercase tracking-[0.2em]">
         {project.category}
       </span>
     </div>
@@ -68,9 +66,7 @@ const status = project.status || "Ongoing";
       </div>
     </div>
 
-    <div
-      class="mt-6 pt-5 border-t border-aspada-steel/20 flex items-center justify-between"
-    >
+    <div class="mt-6 pt-5 border-t border-aspada-steel/20 flex items-center justify-between">
       <span
         class="text-aspada-navy text-md font-bold uppercase tracking-widest opacity-75 group-hover:opacity-100 transition-opacity duration-300 group"
       >
@@ -79,9 +75,7 @@ const status = project.status || "Ongoing";
       <div
         class="flex items-center justify-center w-10 h-10 bg-aspada-navy text-white rounded-lg group-hover:bg-aspada-gold transition-all duration-300"
       >
-        <div
-          class="i-lucide-arrow-right text-lg group-hover:translate-x-0.5 transition-transform"
-        >
+        <div class="i-lucide-arrow-right text-lg group-hover:translate-x-0.5 transition-transform">
         </div>
       </div>
     </div>

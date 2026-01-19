@@ -1,21 +1,17 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Navbar from "../components/Navbar.astro";
-import pb from "../lib/pb";
-import { Collections, type CompaniesResponse } from "../types/pocketbase-types";
+import Layout from '../layouts/Layout.astro'
+import Navbar from '../components/Navbar.astro'
+import pb from '../lib/pb'
+import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
 <Layout title="Aspada Developers | Shivamogga's Finest">
   <Navbar />
   <main>
-    <section
-      class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10"
-    >
+    <section class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10">
       <div
         class="max-w-4xl mx-auto bg-white/90 backdrop-blur-md border border-aspada-gold/20 rounded-3xl shadow-2xl overflow-hidden"
       >
@@ -28,9 +24,7 @@ const companyProfile: CompaniesResponse = await pb
           <h1
             class="text-3xl sm:text-4xl font-bold text-white relative z-10 uppercase tracking-[0.2em]"
           >
-            Privacy <span class="italic text-[#d4af37] font-light text-5xl"
-              >Policy</span
-            >
+            Privacy <span class="italic text-[#d4af37] font-light text-5xl">Policy</span>
           </h1>
           <p class="text-aspada-silver mt-4 text-sm relative z-10 font-medium">
             EFFECTIVE DATE: {`JANUARY ${new Date().getFullYear()}`}
@@ -39,16 +33,14 @@ const companyProfile: CompaniesResponse = await pb
 
         <div class="p-6 sm:p-12 border-b border-slate-100">
           <p class="text-lg text-slate-700 leading-relaxed">
-            This Privacy Policy governs how <span
-              class="font-bold text-slate-900 uppercase"
+            This Privacy Policy governs how <span class="font-bold text-slate-900 uppercase"
               >{companyProfile.companyName}</span
             > collects and manages information from users of
             <a
               href="https://aspadadevelopers.com"
               class="text-[#d4af37] font-semibold underline-offset-4 hover:underline"
               >aspadadevelopers.com</a
-            >. This policy applies to the Site and all products and services
-            offered by the Company.
+            >. This policy applies to the Site and all products and services offered by the Company.
           </p>
         </div>
 
@@ -60,35 +52,28 @@ const companyProfile: CompaniesResponse = await pb
               >
                 01
               </div>
-              <h2 class="text-2xl font-bold text-slate-900">
-                Information We Collect
-              </h2>
+              <h2 class="text-2xl font-bold text-slate-900">Information We Collect</h2>
             </div>
             <div class="grid md:grid-cols-2 gap-6">
               <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                 <h3 class="font-bold text-slate-900 mb-2">Personal Data</h3>
                 <p class="text-sm text-slate-600">
-                  Collected via voluntary submission: Name, email, mailing
-                  address, and phone number provided through forms or booking
-                  engines.
+                  Collected via voluntary submission: Name, email, mailing address, and phone number
+                  provided through forms or booking engines.
                 </p>
               </div>
               <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                 <h3 class="font-bold text-slate-900 mb-2">Non-Personal Data</h3>
                 <p class="text-sm text-slate-600">
-                  Automatically collected : Browser type, device info, operating
-                  system, and IP address.
+                  Automatically collected : Browser type, device info, operating system, and IP
+                  address.
                 </p>
               </div>
             </div>
           </section>
 
-          <section
-            class="bg-aspada-navy text-white p-8 rounded-3xl relative overflow-hidden"
-          >
-            <div
-              class="absolute right-0 top-0 opacity-10 p-4 text-9xl font-bold text-aspada-gold"
-            >
+          <section class="bg-aspada-navy text-white p-8 rounded-3xl relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-10 p-4 text-9xl font-bold text-aspada-gold">
               !
             </div>
             <h2 class="text-xl font-bold text-aspada-gold mb-4">
@@ -96,24 +81,19 @@ const companyProfile: CompaniesResponse = await pb
             </h2>
             <p class="text-slate-300 leading-relaxed">
               By submitting your details, you authorize <span
-                class="text-white font-semibold uppercase"
-                >{companyProfile.companyName}</span
+                class="text-white font-semibold uppercase">{companyProfile.companyName}</span
               > to contact you via Calls, SMS, Email, or WhatsApp.
-              <span
-                class="block mt-4 p-3 bg-white/5 border-l-2 border-aspada-gold italic"
-              >
-                This consent applies even if you are registered under National
-                DND/DNC registries. You explicitly waive your right to claim DND
-                violations for these solicited communications.
+              <span class="block mt-4 p-3 bg-white/5 border-l-2 border-aspada-gold italic">
+                This consent applies even if you are registered under National DND/DNC registries.
+                You explicitly waive your right to claim DND violations for these solicited
+                communications.
               </span>
             </p>
           </section>
 
           <section class="grid md:grid-cols-2 gap-12">
             <div>
-              <h2 class="text-xl font-bold text-slate-900 mb-4">
-                How We Use Data
-              </h2>
+              <h2 class="text-xl font-bold text-slate-900 mb-4">How We Use Data</h2>
               <ul class="space-y-3 text-slate-600 text-sm">
                 <li class="flex gap-2">
                   <span class="text-aspada-gold">•</span>
@@ -132,22 +112,18 @@ const companyProfile: CompaniesResponse = await pb
             <div>
               <h2 class="text-xl font-bold text-slate-900 mb-4">Cookies</h2>
               <p class="text-sm text-slate-600 leading-relaxed">
-                Our site uses "cookies" to enhance your experience. You may
-                refuse cookies via your browser, though some site functions may
-                be limited.
+                Our site uses "cookies" to enhance your experience. You may refuse cookies via your
+                browser, though some site functions may be limited.
               </p>
             </div>
           </section>
 
           <section class="border-t border-slate-100 pt-10">
-            <h2 class="text-xl font-bold text-slate-900 mb-4">
-              Data Protection Disclaimer
-            </h2>
+            <h2 class="text-xl font-bold text-slate-900 mb-4">Data Protection Disclaimer</h2>
             <p class="text-slate-600 text-sm italic">
-              While we implement robust security measures, no internet
-              transmission is 100% secure. The Company disclaims liability for
-              data breaches or unauthorized access occurring despite our best
-              efforts.
+              While we implement robust security measures, no internet transmission is 100% secure.
+              The Company disclaims liability for data breaches or unauthorized access occurring
+              despite our best efforts.
             </p>
           </section>
 
@@ -155,16 +131,14 @@ const companyProfile: CompaniesResponse = await pb
             class="bg-aspada-cream/5 p-8 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border border-aspada-gold/10"
           >
             <div>
-              <p
-                class="font-bold text-slate-900 uppercase tracking-tight uppercase"
-              >
+              <p class="font-bold text-slate-900 uppercase tracking-tight uppercase">
                 {companyProfile.companyName}
               </p>
               <p class="text-xs text-slate-500 max-w-xs mt-1">
                 {companyProfile.addressLine1}
                 {companyProfile.city}
                 {companyProfile.state}
-                {companyProfile.pincode ?? ""}
+                {companyProfile.pincode ?? ''}
               </p>
             </div>
             <div class="flex flex-col gap-1 text-sm">

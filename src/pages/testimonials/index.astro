@@ -1,32 +1,27 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Navbar from "../../components/Navbar.astro";
-import Footer from "../../components/Footer.astro";
-import TestimonialList from "../../components/testimonials/TestimonialList.svelte";
-import pb from "../../lib/pb";
-import toast from "svelte-french-toast";
-import type { TestimonialInfoExpand } from "../../types";
-import {
-  Collections,
-  type TestimonialsResponse,
-} from "../../types/pocketbase-types";
+import Layout from '../../layouts/Layout.astro'
+import Navbar from '../../components/Navbar.astro'
+import Footer from '../../components/Footer.astro'
+import TestimonialList from '../../components/testimonials/TestimonialList.svelte'
+import pb from '../../lib/pb'
+import toast from 'svelte-french-toast'
+import type { TestimonialInfoExpand } from '../../types'
+import { Collections, type TestimonialsResponse } from '../../types/pocketbase-types'
 
-let testimonials: TestimonialsResponse<TestimonialInfoExpand>[] = [];
+let testimonials: TestimonialsResponse<TestimonialInfoExpand>[] = []
 const companyProfile = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 try {
   testimonials = await pb
-    .collection("testimonials")
+    .collection('testimonials')
     .getFullList<TestimonialsResponse<TestimonialInfoExpand>>({
-      sort: "-created",
-      expand: "project,authorAvatar",
-    });
+      sort: '-created',
+      expand: 'project,authorAvatar',
+    })
 } catch (e) {
-  console.error("Error fetching testimonials:", e);
-  toast.error("Error fetching testimonials");
+  console.error('Error fetching testimonials:', e)
+  toast.error('Error fetching testimonials')
 }
 ---
 
@@ -35,40 +30,31 @@ try {
 
   <main class="min-h-screen bg-slate-50">
     <!-- Header Section -->
-    <div
-      class="relative bg-aspada-navy py-20 px-4 sm:py-28 sm:px-6 overflow-hidden"
-    >
+    <div class="relative bg-aspada-navy py-20 px-4 sm:py-28 sm:px-6 overflow-hidden">
       <div class="absolute inset-0 bg-slate-900/50 z-0"></div>
       <!-- Abstract Background Decoration -->
-      <div
-        class="absolute -top-24 -right-24 w-96 h-96 bg-[#d4af37]/10 rounded-full blur-3xl"
-      >
-      </div>
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#d4af37]/10 rounded-full blur-3xl"></div>
       <div
         class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-slate-50 to-transparent z-10"
       >
       </div>
 
       <div class="relative z-20 max-w-7xl mx-auto text-center">
-        <span
-          class="text-[#d4af37] font-bold tracking-[0.3em] uppercase text-xs mb-4 block"
-        >
+        <span class="text-[#d4af37] font-bold tracking-[0.3em] uppercase text-xs mb-4 block">
           Client Stories
         </span>
         <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6">
           Voices of <span class="text-[#d4af37] italic font-serif">Trust</span>
         </h1>
         <p class="text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
-          Discover why families and investors choose Aspada Developers to build
-          their dreams and secure their future.
+          Discover why families and investors choose Aspada Developers to build their dreams and
+          secure their future.
         </p>
       </div>
     </div>
 
     <!-- Content Section -->
-    <div
-      class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 -mt-16 sm:-mt-20 relative z-30"
-    >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 -mt-16 sm:-mt-20 relative z-30">
       <TestimonialList {testimonials} client:load />
     </div>
   </main>

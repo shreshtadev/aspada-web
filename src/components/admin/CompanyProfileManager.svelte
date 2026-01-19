@@ -1,76 +1,71 @@
 <script lang="ts">
-  import pb from "../../lib/pb";
-  import toast from "svelte-french-toast";
-  import {
-    Collections,
-    type CompaniesRecord,
-  } from "../../types/pocketbase-types";
+  import pb from '../../lib/pb'
+  import toast from 'svelte-french-toast'
+  import { Collections, type CompaniesRecord } from '../../types/pocketbase-types'
 
-  let loading = $state(false);
-  let saving = $state(false);
-  let record = $state<CompaniesRecord | null>(null);
+  let loading = $state(false)
+  let saving = $state(false)
+  let record = $state<CompaniesRecord | null>(null)
 
   // Form state
-  let companyName = $state("");
-  let companyMainPhone = $state("");
-  let companyAlternatePhone1 = $state("");
-  let companyAlternatePhone2 = $state("");
-  let companyMainEmail = $state("");
-  let companyFacebook = $state("");
-  let companyInsta = $state("");
-  let companyYoutube = $state("");
-  let addressLine1 = $state("");
-  let city = $state("");
-  let state = $state("");
-  let pincode = $state("");
+  let companyName = $state('')
+  let companyMainPhone = $state('')
+  let companyAlternatePhone1 = $state('')
+  let companyAlternatePhone2 = $state('')
+  let companyMainEmail = $state('')
+  let companyFacebook = $state('')
+  let companyInsta = $state('')
+  let companyYoutube = $state('')
+  let addressLine1 = $state('')
+  let city = $state('')
+  let state = $state('')
+  let pincode = $state('')
 
   function formatPhone(phone: string) {
-    return phone.replace(/[^0-9]/g, "");
+    return phone.replace(/[^0-9]/g, '')
   }
 
   async function loadData() {
     try {
-      loading = true;
+      loading = true
       const list = await pb
         .collection(Collections.Companies)
-        .getFirstListItem(
-          "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'"
-        );
+        .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
       if (list) {
-        record = list as unknown as CompaniesRecord;
-        syncForm();
+        record = list as unknown as CompaniesRecord
+        syncForm()
       }
     } catch (err) {
-      console.error("Failed to load company profile:", err);
-      toast.error("Failed to load company profile");
+      console.error('Failed to load company profile:', err)
+      toast.error('Failed to load company profile')
     } finally {
-      loading = false;
+      loading = false
     }
   }
 
   function syncForm() {
-    if (!record) return;
-    companyName = record.companyName || "";
-    companyMainPhone = record.companyMainPhone || "";
-    companyAlternatePhone1 = record.companyAlternatePhone1 || "";
-    companyAlternatePhone2 = record.companyAlternatePhone2 || "";
-    companyMainEmail = record.companyMainEmail || "";
-    companyFacebook = record.companyFacebook || "";
-    companyInsta = record.companyInsta || "";
-    companyYoutube = record.companyYoutube || "";
-    addressLine1 = record.addressLine1 || "";
-    city = record.city || "";
-    state = record.state || "";
-    pincode = record.pincode || "";
+    if (!record) return
+    companyName = record.companyName || ''
+    companyMainPhone = record.companyMainPhone || ''
+    companyAlternatePhone1 = record.companyAlternatePhone1 || ''
+    companyAlternatePhone2 = record.companyAlternatePhone2 || ''
+    companyMainEmail = record.companyMainEmail || ''
+    companyFacebook = record.companyFacebook || ''
+    companyInsta = record.companyInsta || ''
+    companyYoutube = record.companyYoutube || ''
+    addressLine1 = record.addressLine1 || ''
+    city = record.city || ''
+    state = record.state || ''
+    pincode = record.pincode || ''
   }
 
   async function saveProfile() {
     if (!companyName) {
-      toast.error("Company Name is required");
-      return;
+      toast.error('Company Name is required')
+      return
     }
 
-    saving = true;
+    saving = true
     try {
       const data = {
         companyName,
@@ -85,30 +80,28 @@
         city,
         state,
         pincode,
-      };
+      }
 
       if (record?.id) {
-        const updated = await pb
-          .collection(Collections.Companies)
-          .update(record.id, data);
-        record = updated as unknown as CompaniesRecord;
-        toast.success("Profile updated successfully");
+        const updated = await pb.collection(Collections.Companies).update(record.id, data)
+        record = updated as unknown as CompaniesRecord
+        toast.success('Profile updated successfully')
       } else {
-        const created = await pb.collection(Collections.Companies).create(data);
-        record = created as unknown as CompaniesRecord;
-        toast.success("Profile created successfully");
+        const created = await pb.collection(Collections.Companies).create(data)
+        record = created as unknown as CompaniesRecord
+        toast.success('Profile created successfully')
       }
     } catch (err: any) {
-      console.error("Failed to save profile:", err);
-      toast.error(err.message || "Failed to save profile");
+      console.error('Failed to save profile:', err)
+      toast.error(err.message || 'Failed to save profile')
     } finally {
-      saving = false;
+      saving = false
     }
   }
 
   $effect(() => {
-    loadData();
-  });
+    loadData()
+  })
 </script>
 
 <div class="max-w-4xl mx-auto">
@@ -128,14 +121,10 @@
           <span class="i-lucide-building-2 text-2xl"></span>
         </div>
         <div>
-          <h2
-            class="text-2xl font-black text-aspada-navy tracking-tight uppercase"
-          >
+          <h2 class="text-2xl font-black text-aspada-navy tracking-tight uppercase">
             Company Profile
           </h2>
-          <p
-            class="text-slate-400 text-sm font-medium uppercase tracking-widest"
-          >
+          <p class="text-slate-400 text-sm font-medium uppercase tracking-widest">
             Manage your corporate identity & contact details
           </p>
         </div>
@@ -251,9 +240,7 @@
               <div
                 class="ml-3 pr-3 border-r border-slate-200 flex items-center justify-center select-none"
               >
-                <span class="text-aspada-navy font-bold text-sm tracking-tight"
-                  >+91</span
-                >
+                <span class="text-aspada-navy font-bold text-sm tracking-tight">+91</span>
               </div>
 
               <input
@@ -265,11 +252,8 @@
               />
 
               {#if companyMainPhone.length === 13}
-                <div
-                  class="pr-4 transition-all animate-in zoom-in fade-in duration-500"
-                >
-                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"
-                  ></span>
+                <div class="pr-4 transition-all animate-in zoom-in fade-in duration-500">
+                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"></span>
                 </div>
               {/if}
             </div>
@@ -294,9 +278,7 @@
               <div
                 class="ml-3 pr-3 border-r border-slate-200 flex items-center justify-center select-none"
               >
-                <span class="text-aspada-navy font-bold text-sm tracking-tight"
-                  >+91</span
-                >
+                <span class="text-aspada-navy font-bold text-sm tracking-tight">+91</span>
               </div>
 
               <input
@@ -308,11 +290,8 @@
               />
 
               {#if companyAlternatePhone1.length === 13}
-                <div
-                  class="pr-4 transition-all animate-in zoom-in fade-in duration-500"
-                >
-                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"
-                  ></span>
+                <div class="pr-4 transition-all animate-in zoom-in fade-in duration-500">
+                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"></span>
                 </div>
               {/if}
             </div>
@@ -337,9 +316,7 @@
               <div
                 class="ml-3 pr-3 border-r border-slate-200 flex items-center justify-center select-none"
               >
-                <span class="text-aspada-navy font-bold text-sm tracking-tight"
-                  >+91</span
-                >
+                <span class="text-aspada-navy font-bold text-sm tracking-tight">+91</span>
               </div>
 
               <input
@@ -351,11 +328,8 @@
               />
 
               {#if companyAlternatePhone2.length === 13}
-                <div
-                  class="pr-4 transition-all animate-in zoom-in fade-in duration-500"
-                >
-                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"
-                  ></span>
+                <div class="pr-4 transition-all animate-in zoom-in fade-in duration-500">
+                  <span class="i-lucide-check-circle-2 text-green-500 text-xl"></span>
                 </div>
               {/if}
             </div>
@@ -363,9 +337,7 @@
 
           <!-- Social Media -->
           <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-4">
-            <h3
-              class="text-xs font-black uppercase tracking-[0.2em] text-aspada-gold mb-6"
-            >
+            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-aspada-gold mb-6">
               Social Media Presence
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -423,9 +395,7 @@
           </div>
         </div>
 
-        <div
-          class="flex items-center gap-4 mt-12 pt-8 border-t border-slate-100"
-        >
+        <div class="flex items-center gap-4 mt-12 pt-8 border-t border-slate-100">
           <button
             onclick={saveProfile}
             disabled={saving}

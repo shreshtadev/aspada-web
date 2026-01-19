@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro'
+import CRMManager from '../../../components/crm/admin/CRMManager.svelte'
+---
+
+<AdminLayout>
+  <section class="space-y-8 h-full flex flex-col">
+    <header>
+      <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">CRM Management</h1>
+      <p class="text-aspada-steel mt-2">
+        Manage leads, agents, and lead activities for your sales pipeline.
+      </p>
+    </header>
+
+    <div class="flex-1 min-h-0">
+      <CRMManager client:load />
+    </div>
+  </section>
+</AdminLayout>

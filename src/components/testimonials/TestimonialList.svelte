@@ -1,7 +1,7 @@
 <script>
-  import TestimonialCard from "./TestimonialCard.svelte";
+  import TestimonialCard from './TestimonialCard.svelte'
 
-  let { testimonials = [] } = $props();
+  let { testimonials = [] } = $props()
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">

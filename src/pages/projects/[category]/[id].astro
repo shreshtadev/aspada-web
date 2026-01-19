@@ -1,13 +1,13 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-import Navbar from "../../../components/Navbar.astro";
-import Footer from "../../../components/Footer.astro";
-import ActionDock from "../../../components/ActionDock.astro";
-import SocialEmbed from "../../../components/SocialEmbed.svelte";
-import pb from "../../../lib/pb";
+import Layout from '../../../layouts/Layout.astro'
+import Navbar from '../../../components/Navbar.astro'
+import Footer from '../../../components/Footer.astro'
+import ActionDock from '../../../components/ActionDock.astro'
+import SocialEmbed from '../../../components/SocialEmbed.svelte'
+import pb from '../../../lib/pb'
 // import { getLocationName } from "../../../lib/utils";
-import { marked } from "marked";
-import toast from "svelte-french-toast";
+import { marked } from 'marked'
+import toast from 'svelte-french-toast'
 import {
   Collections,
   MetadataCategoryTypeOptions,
@@ -15,32 +15,32 @@ import {
   type CompaniesResponse,
   type MetadataResponse,
   type ProjectsResponse,
-} from "../../../types/pocketbase-types";
-import type { ProjectInfoExpand } from "../../../types";
-import ProjectAddress from "../../../components/ProjectAddress.astro";
-import ProjectEnquiryModal from "../../../components/ProjectEnquiryModal.svelte";
-import GalleryLightbox from "../../../components/projects/GalleryLightbox.svelte";
+} from '../../../types/pocketbase-types'
+import type { ProjectInfoExpand } from '../../../types'
+import ProjectAddress from '../../../components/ProjectAddress.astro'
+import ProjectEnquiryModal from '../../../components/ProjectEnquiryModal.svelte'
+import GalleryLightbox from '../../../components/projects/GalleryLightbox.svelte'
 
-const { category, id } = Astro.params;
+const { category, id } = Astro.params
 if (!id || !category) {
-  return Astro.redirect(`/projects/${category}`);
+  return Astro.redirect(`/projects/${category}`)
 }
 
-let project: ProjectsResponse<ProjectInfoExpand>;
-let galleryImages: any[] = [];
-let amenities: MetadataResponse[] = [];
-let specifications: any[] = [];
-let socials: any[] = [];
-let projectGallery: any[] = [];
-let brochureUrl = "";
-let companyProfile: CompaniesResponse;
+let project: ProjectsResponse<ProjectInfoExpand>
+let galleryImages: any[] = []
+let amenities: MetadataResponse[] = []
+let specifications: any[] = []
+let socials: any[] = []
+let projectGallery: any[] = []
+let brochureUrl = ''
+let companyProfile: CompaniesResponse
 // let fullAddress: Address;
 try {
   const record = await pb
     .collection(Collections.Projects)
     .getOne<ProjectsResponse<ProjectInfoExpand>>(id, {
-      expand: "projectDetails,socials,coverImage,coverVideo,brochure",
-    });
+      expand: 'projectDetails,socials,coverImage,coverVideo,brochure',
+    })
 
   // Process Cover Image
   const coverImageUrl = pb.files.getURL(
@@ -48,23 +48,20 @@ try {
     record.expand?.coverImage?.attachment,
     {
       quality: 90,
-    },
-  );
+    }
+  )
 
   const coverVideoUrl = pb.files.getURL(
     record.expand?.coverVideo,
     record.expand?.coverVideo?.attachment,
     {
       quality: 90,
-    },
-  );
+    }
+  )
 
   // Process Brochure
   if (record.expand?.brochure) {
-    brochureUrl = pb.files.getURL(
-      record.expand?.brochure,
-      record.expand?.brochure?.attachment,
-    );
+    brochureUrl = pb.files.getURL(record.expand?.brochure, record.expand?.brochure?.attachment)
   }
 
   // Process Relations
@@ -72,60 +69,49 @@ try {
     amenities =
       (await Promise.all(
         record.expand.projectDetails
-          ?.filter(
-            (y) => y.categoryType === MetadataCategoryTypeOptions.amenity,
-          )
+          ?.filter((y) => y.categoryType === MetadataCategoryTypeOptions.amenity)
           .map(async (md: MetadataResponse) => {
-            const iconAttachmentID = md.attachments[0] || "";
-            if (iconAttachmentID !== "") {
+            const iconAttachmentID = md.attachments[0] || ''
+            if (iconAttachmentID !== '') {
               const iconAttachment: AttachmentsResponse = await pb
                 .collection(Collections.Attachments)
-                .getOne(iconAttachmentID);
-              const iconAttachmentUrl = pb.files.getURL(
-                iconAttachment,
-                iconAttachment.attachment,
-              );
-              md.attachments = [iconAttachmentUrl];
+                .getOne(iconAttachmentID)
+              const iconAttachmentUrl = pb.files.getURL(iconAttachment, iconAttachment.attachment)
+              md.attachments = [iconAttachmentUrl]
             }
-            return md;
-          }),
-      )) || [];
+            return md
+          })
+      )) || []
     specifications =
       record.expand.projectDetails?.filter(
-        (y) => y.categoryType === MetadataCategoryTypeOptions.specification,
-      ) || [];
+        (y) => y.categoryType === MetadataCategoryTypeOptions.specification
+      ) || []
     projectGallery =
       record.expand.projectDetails?.filter(
-        (y) => y.categoryType === MetadataCategoryTypeOptions.gallery,
-      ) || [];
-    socials = record.expand.socials || [];
+        (y) => y.categoryType === MetadataCategoryTypeOptions.gallery
+      ) || []
+    socials = record.expand.socials || []
     // Process Gallery Images (if any)
-    const specAttachments = specifications.flatMap(
-      (spec) => spec.attachments || [],
-    );
+    const specAttachments = specifications.flatMap((spec) => spec.attachments || [])
 
-    const projectGalleryAttachments = projectGallery.flatMap(
-      (pj) => pj.attachments || [],
-    );
-    specAttachments.push(...projectGalleryAttachments);
+    const projectGalleryAttachments = projectGallery.flatMap((pj) => pj.attachments || [])
+    specAttachments.push(...projectGalleryAttachments)
 
     if (specAttachments?.length > 0) {
-      const filterString = specAttachments
-        .map((id) => `id="${id}"`)
-        .join(" || ");
+      const filterString = specAttachments.map((id) => `id="${id}"`).join(' || ')
       const galleryAttachments = await pb
-        .collection("attachments")
-        .getFullList({ filter: filterString });
+        .collection('attachments')
+        .getFullList({ filter: filterString })
       galleryImages = galleryAttachments?.map((attachment) => {
         const url = pb.files.getURL(attachment, attachment.attachment, {
           quality: 80,
-          thumb: "1200x800",
-        });
+          thumb: '1200x800',
+        })
         return {
           url,
           title: attachment.title,
-        };
-      });
+        }
+      })
     }
   }
   // fullAddress =
@@ -152,23 +138,21 @@ try {
     pincode: record.pincode,
     brochure: brochureUrl,
     status: record.status,
-    description: await marked.parse(record.description || ""),
+    description: await marked.parse(record.description || ''),
     created: record.created,
     updated: record.updated,
     projectDetails: record.projectDetails,
     socials: record.socials,
-  };
+  }
 } catch (e) {
-  console.error("Error fetching project:", e);
-  toast.error("Error fetching project");
-  return Astro.redirect("/404");
+  console.error('Error fetching project:', e)
+  toast.error('Error fetching project')
+  return Astro.redirect('/404')
 }
 
 companyProfile = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
 <Layout title={`${project.title} | Aspada Developers`}>
@@ -203,9 +187,7 @@ companyProfile = await pb
       <div
         class="absolute inset-0 z-20 flex flex-col justify-end pb-12 px-4 sm:pb-20 sm:px-12 max-w-7xl mx-auto w-full"
       >
-        <div
-          class="space-y-4 animate-in slide-in-from-bottom-10 fade-in duration-700"
-        >
+        <div class="space-y-4 animate-in slide-in-from-bottom-10 fade-in duration-700">
           <div class="flex items-center gap-3">
             <span
               class="px-4 py-1.5 rounded-full bg-[#d4af37] text-white font-bold text-xs tracking-widest uppercase"
@@ -214,9 +196,9 @@ companyProfile = await pb
             </span>
             <span
               class={`px-4 py-1.5 rounded-full font-bold text-xs tracking-widest uppercase backdrop-blur-md ${
-                project.status === "completed"
-                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                project.status === 'completed'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
               }`}
             >
               {project.status}
@@ -234,8 +216,7 @@ companyProfile = await pb
               <div class="flex items-center gap-2 text-slate-300 text-lg">
                 <span class="i-lucide-map-pin text-[#d4af37]" />
                 <span>
-                  {project.addressLine1 || ""}, {project.city || ""},{" "}
-                  {project.district || ""}
+                  {project.addressLine1 || ''}, {project.city || ''}, {project.district || ''}
                 </span>
               </div>
             )
@@ -245,44 +226,31 @@ companyProfile = await pb
     </div>
 
     {/* Action Bar */}
-    <div
-      class="sticky top-24 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200"
-    >
+    <div class="sticky top-24 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200">
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-4"
       >
         <div
           class="flex gap-4 sm:gap-6 text-sm font-semibold text-aspada-navy overflow-x-auto no-scrollbar whitespace-nowrap mask-linear-fade pb-1 sm:pb-0 w-full sm:w-auto"
         >
-          <a href="#overview" class="hover:text-aspada-gold transition-colors"
-            >Overview</a
-          >
+          <a href="#overview" class="hover:text-aspada-gold transition-colors">Overview</a>
           {
             amenities.length > 0 && (
-              <a
-                href="#amenities"
-                class="hover:text-aspada-gold transition-colors"
-              >
+              <a href="#amenities" class="hover:text-aspada-gold transition-colors">
                 Amenities
               </a>
             )
           }
           {
             specifications.length > 0 && (
-              <a
-                href="#specifications"
-                class="hover:text-aspada-gold transition-colors"
-              >
+              <a href="#specifications" class="hover:text-aspada-gold transition-colors">
                 Specifications
               </a>
             )
           }
           {
             galleryImages.length > 0 && (
-              <a
-                href="#gallery"
-                class="hover:text-aspada-steel transition-colors"
-              >
+              <a href="#gallery" class="hover:text-aspada-steel transition-colors">
                 Gallery
               </a>
             )
@@ -325,9 +293,7 @@ companyProfile = await pb
                         <p class="text-aspada-navy font-semibold text-md leading-6 mb-4">
                           {item.title}
                         </p>
-                        <span class="text-aspada-steel text-xs leading-6 mb-4">
-                          {item.summary}
-                        </span>
+                        <span class="text-aspada-steel text-xs leading-6 mb-4">{item.summary}</span>
                       </div>
                     </div>
                   ))}
@@ -338,9 +304,7 @@ companyProfile = await pb
 
           {/* Overview */}
           <section id="overview" class="scroll-mt-42">
-            <h2
-              class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-3"
-            >
+            <h2 class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-3">
               <span class="w-8 h-1 bg-aspada-steel"></span>
               Project Overview
             </h2>
@@ -390,11 +354,7 @@ companyProfile = await pb
                   <span class="w-8 h-1 bg-aspada-steel" />
                   Gallery
                 </h2>
-                <GalleryLightbox
-                  client:load
-                  images={galleryImages}
-                  projectTitle={project.title}
-                />
+                <GalleryLightbox client:load images={galleryImages} projectTitle={project.title} />
               </section>
             )
           }
@@ -403,9 +363,7 @@ companyProfile = await pb
         {/* Sidebar */}
         <div class="space-y-8">
           {/* Quick Info Card */}
-          <div
-            class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-32"
-          >
+          <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-32">
             <div class="pb-6 mb-6 border-b border-slate-100">
               <h3 class="text-xl font-bold text-slate-800">At a Glance</h3>
             </div>
@@ -418,11 +376,7 @@ companyProfile = await pb
                   <span class="i-lucide-home"></span>
                 </div>
                 <div>
-                  <p
-                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
-                  >
-                    Type
-                  </p>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Type</p>
                   <p class="font-semibold text-slate-800 uppercase">
                     {project.category}
                   </p>
@@ -436,11 +390,7 @@ companyProfile = await pb
                   <span class="i-lucide-activity"></span>
                 </div>
                 <div>
-                  <p
-                    class="text-xs font-bold text-slate-400 uppercase tracking-wider"
-                  >
-                    Status
-                  </p>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</p>
                   <p class="font-semibold text-slate-800 uppercase">
                     {project.status}
                   </p>

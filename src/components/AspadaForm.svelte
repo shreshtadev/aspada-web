@@ -1,42 +1,42 @@
 <script lang="ts">
-  import { actions } from "astro:actions";
+  import { actions } from 'astro:actions'
 
   // Svelte 5 Props & State
-  let { projectTitle = "General Inquiry" } = $props();
+  let { projectTitle = 'General Inquiry' } = $props()
 
-  let fullName = $state("");
-  let contactNo = $state("");
-  let contactEmail = $state("");
-  let message = $state("");
-  let status = $state("idle"); // idle | sending | success | error
+  let fullName = $state('')
+  let contactNo = $state('')
+  let contactEmail = $state('')
+  let message = $state('')
+  let status = $state('idle') // idle | sending | success | error
 
   $effect(() => {
     contactNo = contactNo
-      .replace(/\D/g, "") // Remove everything that isn't a number
-      .slice(0, 10); // Stop at 10 digits
-  });
+      .replace(/\D/g, '') // Remove everything that isn't a number
+      .slice(0, 10) // Stop at 10 digits
+  })
 
-  let isValid = $derived(/^[6-9]\d{9}$/.test(contactNo));
+  let isValid = $derived(/^[6-9]\d{9}$/.test(contactNo))
 
   async function handleSubmit(e: Event) {
-    e.preventDefault();
-    status = "sending";
+    e.preventDefault()
+    status = 'sending'
 
     const { data, error } = await actions.submitContact({
       fullName,
       contactEmail,
       contactNo,
       interest: `Project: ${projectTitle} | Message: ${message}`,
-    });
+    })
 
     if (error) {
-      status = "error";
+      status = 'error'
     } else {
-      status = "success";
-      fullName = "";
-      contactEmail = "";
-      contactNo = "";
-      message = "";
+      status = 'success'
+      fullName = ''
+      contactEmail = ''
+      contactNo = ''
+      message = ''
     }
   }
 </script>
@@ -109,24 +109,17 @@
             : 'border-aspada-gold/60 focus:border-aspada-gold focus:ring-4 focus:ring-aspada-gold/10'}"
         />
 
-        <div
-          class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center"
-        >
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
           {#if isValid}
-            <span
-              class="i-lucide-check-circle-2 text-emerald-500 animate-in zoom-in"
-            ></span>
+            <span class="i-lucide-check-circle-2 text-emerald-500 animate-in zoom-in"></span>
           {:else if contactNo.length > 0}
-            <span class="i-lucide-alert-circle text-rose-400 animate-pulse"
-            ></span>
+            <span class="i-lucide-alert-circle text-rose-400 animate-pulse"></span>
           {/if}
         </div>
       </div>
 
       {#if contactNo.length > 0 && !isValid}
-        <p
-          class="text-xs text-rose-500 font-medium ml-1 animate-in slide-in-from-top-1"
-        >
+        <p class="text-xs text-rose-500 font-medium ml-1 animate-in slide-in-from-top-1">
           Please enter a valid 10-digit mobile number
         </p>
       {/if}
@@ -150,17 +143,15 @@
 
     <button
       type="submit"
-      disabled={status === "sending"}
+      disabled={status === 'sending'}
       class="w-full bg-aspada-navy text-white font-bold py-3 sm:py-4 rounded-xl transition-all hover:bg-opacity-90 active:scale-95 disabled:opacity-50"
     >
-      {status === "sending" ? "Submitting..." : "Send Message"}
+      {status === 'sending' ? 'Submitting...' : 'Send Message'}
     </button>
   </div>
 
-  {#if status === "success"}
-    <p
-      class="mt-4 text-emerald-600 text-sm font-medium text-center animate-bounce"
-    >
+  {#if status === 'success'}
+    <p class="mt-4 text-emerald-600 text-sm font-medium text-center animate-bounce">
       ✓ Thank you! We will contact you shortly.
     </p>
   {/if}

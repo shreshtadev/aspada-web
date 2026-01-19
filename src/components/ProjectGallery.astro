@@ -1,46 +1,39 @@
 ---
-import pb from "../lib/pb";
-import type { ProjectExpand } from "../types";
-import { type ProjectsResponse } from "../types/pocketbase-types";
-import HomeProjectCard from "./projects/HomeProjectCard.astro";
+import pb from '../lib/pb'
+import type { ProjectExpand } from '../types'
+import { type ProjectsResponse } from '../types/pocketbase-types'
+import HomeProjectCard from './projects/HomeProjectCard.astro'
 
 interface ProjectProps {
-  projects: ProjectsResponse<ProjectExpand>[];
+  projects: ProjectsResponse<ProjectExpand>[]
 }
 
 // Fetching projects with the 'ongoing' filter
-const { projects: projectsFromBe } = Astro.props as ProjectProps;
+const { projects: projectsFromBe } = Astro.props as ProjectProps
 
 const projects = projectsFromBe.map((project) => {
   const coverImageUrl = pb.files.getURL(
     project.expand?.coverImage,
     project.expand?.coverImage?.attachment,
-    { thumb: "1200", quality: 80 }
-  );
-  project.coverImage = coverImageUrl;
-  return project;
-});
+    { thumb: '1200', quality: 80 }
+  )
+  project.coverImage = coverImageUrl
+  return project
+})
 
-const totalProjects = projects.length;
-const isLoading = totalProjects === 0;
+const totalProjects = projects.length
+const isLoading = totalProjects === 0
 ---
 
 <section class="py-24 px-6 overflow-hidden bg-white">
   <div class="max-w-7xl mx-auto">
-    <div
-      class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
-    >
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
       <div class="font-display">
-        <span
-          class="text-aspada-gold font-bold uppercase tracking-[0.2em] text-xs"
+        <span class="text-aspada-gold font-bold uppercase tracking-[0.2em] text-xs"
           >Offering the Whole Range of Properties.</span
         >
-        <h2
-          class="text-4xl md:text-6xl font-bold mt-2 text-aspada-navy uppercase tracking-tighter"
-        >
-          Ongoing <span class="text-aspada-gold/70 italic font-light"
-            >Projects</span
-          >
+        <h2 class="text-4xl md:text-6xl font-bold mt-2 text-aspada-navy uppercase tracking-tighter">
+          Ongoing <span class="text-aspada-gold/70 italic font-light">Projects</span>
         </h2>
       </div>
 
@@ -48,10 +41,7 @@ const isLoading = totalProjects === 0;
         !isLoading && (
           <div class="flex items-center gap-8">
             <div class="flex items-center gap-4 text-slate-400 font-bold text-sm">
-              <span
-                id="current-slide-idx"
-                class="text-aspada-navy min-w-[20px]"
-              >
+              <span id="current-slide-idx" class="text-aspada-navy min-w-[20px]">
                 01
               </span>
               <div class="w-20 h-[1px] bg-slate-100 relative overflow-hidden">
@@ -60,7 +50,7 @@ const isLoading = totalProjects === 0;
                   class="absolute inset-y-0 left-0 bg-aspada-gold w-0 transition-all duration-300"
                 />
               </div>
-              <span>{totalProjects.toString().padStart(2, "0")}</span>
+              <span>{totalProjects.toString().padStart(2, '0')}</span>
             </div>
 
             <div class="flex gap-2">
@@ -155,146 +145,144 @@ const isLoading = totalProjects === 0;
 
 <script>
   function initProjectSlider() {
-    const slider = document.querySelector<HTMLElement>("#project-slider");
-    const nextBtn = document.querySelector("#next-btn");
-    const prevBtn = document.querySelector("#prev-btn");
-    const currentText = document.querySelector("#current-slide-idx");
-    const progressBar = document.querySelector(
-      "#scroll-progress-bar"
-    ) as HTMLElement;
+    const slider = document.querySelector<HTMLElement>('#project-slider')
+    const nextBtn = document.querySelector('#next-btn')
+    const prevBtn = document.querySelector('#prev-btn')
+    const currentText = document.querySelector('#current-slide-idx')
+    const progressBar = document.querySelector('#scroll-progress-bar') as HTMLElement
 
-    if (!slider || slider.dataset.initialized) return;
-    slider.dataset.initialized = "true";
+    if (!slider || slider.dataset.initialized) return
+    slider.dataset.initialized = 'true'
 
-    const originalItems = Array.from(slider.children) as HTMLElement[];
-    const totalCount = originalItems.length;
-    if (totalCount === 0) return;
+    const originalItems = Array.from(slider.children) as HTMLElement[]
+    const totalCount = originalItems.length
+    if (totalCount === 0) return
 
     // 1. Setup Clones for Infinity (Clone all items to ensure no gaps)
     if (totalCount >= 2) {
       originalItems.forEach((item) => {
-        const clone = item.cloneNode(true);
-        slider.appendChild(clone);
-      });
+        const clone = item.cloneNode(true)
+        slider.appendChild(clone)
+      })
     }
 
     const getConstants = () => {
-      const firstItem = slider.firstElementChild as HTMLElement;
-      const itemWidth = firstItem.offsetWidth + 24; // Width + gap
-      const maxScroll = totalCount * itemWidth;
-      return { itemWidth, maxScroll };
-    };
+      const firstItem = slider.firstElementChild as HTMLElement
+      const itemWidth = firstItem.offsetWidth + 24 // Width + gap
+      const maxScroll = totalCount * itemWidth
+      return { itemWidth, maxScroll }
+    }
 
-    let isDown = false;
-    let isPaused = false;
-    let startX: number;
-    let scrollLeft: number;
+    let isDown = false
+    let isPaused = false
+    let startX: number
+    let scrollLeft: number
 
     // 2. The Animation Engine
     function animate() {
-      const { maxScroll } = getConstants();
+      const { maxScroll } = getConstants()
 
       if (!isDown && !isPaused && totalCount >= 2) {
         // Auto-play move
-        slider!.scrollLeft += 0.7; // Slightly faster for visibility
+        slider!.scrollLeft += 0.7 // Slightly faster for visibility
 
         // Seamless wrap-around
         if (slider!.scrollLeft >= maxScroll) {
-          slider!.scrollLeft = 0;
+          slider!.scrollLeft = 0
         }
       }
 
-      updateUI();
-      requestAnimationFrame(animate);
+      updateUI()
+      requestAnimationFrame(animate)
     }
-    requestAnimationFrame(animate);
+    requestAnimationFrame(animate)
 
     // 3. UI Update Logic
     function updateUI() {
-      if (!slider || !currentText || !progressBar) return;
-      const { itemWidth } = getConstants();
+      if (!slider || !currentText || !progressBar) return
+      const { itemWidth } = getConstants()
 
       // Calculate index based on modulo of total items
-      const scrollPos = slider.scrollLeft;
-      const rawIdx = Math.round(scrollPos / itemWidth);
-      const currentIdx = (rawIdx % totalCount) + 1;
+      const scrollPos = slider.scrollLeft
+      const rawIdx = Math.round(scrollPos / itemWidth)
+      const currentIdx = (rawIdx % totalCount) + 1
 
-      const displayVal = currentIdx.toString().padStart(2, "0");
+      const displayVal = currentIdx.toString().padStart(2, '0')
       if (currentText.textContent !== displayVal) {
-        currentText.textContent = displayVal;
+        currentText.textContent = displayVal
       }
-      progressBar.style.width = `${(currentIdx / totalCount) * 100}%`;
+      progressBar.style.width = `${(currentIdx / totalCount) * 100}%`
     }
 
     // 4. Fixed Button Logic
-    const handleNav = (direction: "next" | "prev") => {
-      const { itemWidth, maxScroll } = getConstants();
+    const handleNav = (direction: 'next' | 'prev') => {
+      const { itemWidth, maxScroll } = getConstants()
 
       // Temporarily disable snapping to allow manual smooth scroll
-      slider.style.scrollSnapType = "none";
-      isPaused = true;
+      slider.style.scrollSnapType = 'none'
+      isPaused = true
 
-      if (direction === "next") {
-        if (slider.scrollLeft >= maxScroll - 10) slider.scrollLeft = 0;
-        slider.scrollBy({ left: itemWidth, behavior: "smooth" });
+      if (direction === 'next') {
+        if (slider.scrollLeft >= maxScroll - 10) slider.scrollLeft = 0
+        slider.scrollBy({ left: itemWidth, behavior: 'smooth' })
       } else {
-        if (slider.scrollLeft <= 5) slider.scrollLeft = maxScroll;
-        slider.scrollBy({ left: -itemWidth, behavior: "smooth" });
+        if (slider.scrollLeft <= 5) slider.scrollLeft = maxScroll
+        slider.scrollBy({ left: -itemWidth, behavior: 'smooth' })
       }
 
       // Re-enable snapping and auto-play after scroll completes
       setTimeout(() => {
-        slider.style.scrollSnapType = "x mandatory";
-        isPaused = false;
-      }, 500);
-    };
+        slider.style.scrollSnapType = 'x mandatory'
+        isPaused = false
+      }, 500)
+    }
 
-    nextBtn?.addEventListener("click", () => handleNav("next"));
-    prevBtn?.addEventListener("click", () => handleNav("prev"));
+    nextBtn?.addEventListener('click', () => handleNav('next'))
+    prevBtn?.addEventListener('click', () => handleNav('prev'))
 
     // 5. Drag Logic
-    slider.addEventListener("mousedown", (e) => {
-      isDown = true;
-      isPaused = true;
-      slider.classList.add("active-grabbing");
-      slider.style.scrollSnapType = "none";
-      startX = e.pageX - slider.offsetLeft;
-      scrollLeft = slider.scrollLeft;
-    });
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true
+      isPaused = true
+      slider.classList.add('active-grabbing')
+      slider.style.scrollSnapType = 'none'
+      startX = e.pageX - slider.offsetLeft
+      scrollLeft = slider.scrollLeft
+    })
 
     const endDrag = () => {
-      isDown = false;
-      isPaused = false;
-      slider.classList.remove("active-grabbing");
-      slider.style.scrollSnapType = "x mandatory";
-    };
+      isDown = false
+      isPaused = false
+      slider.classList.remove('active-grabbing')
+      slider.style.scrollSnapType = 'x mandatory'
+    }
 
-    slider.addEventListener("mouseup", endDrag);
-    slider.addEventListener("mouseleave", endDrag);
+    slider.addEventListener('mouseup', endDrag)
+    slider.addEventListener('mouseleave', endDrag)
 
-    slider.addEventListener("mousemove", (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const { maxScroll } = getConstants();
-      const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      slider.scrollLeft = scrollLeft - walk;
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return
+      e.preventDefault()
+      const { maxScroll } = getConstants()
+      const x = e.pageX - slider.offsetLeft
+      const walk = (x - startX) * 1.5
+      slider.scrollLeft = scrollLeft - walk
 
       // Wrap during drag
-      if (slider.scrollLeft >= maxScroll) slider.scrollLeft = 0;
-      if (slider.scrollLeft < 0) slider.scrollLeft = maxScroll;
-    });
+      if (slider.scrollLeft >= maxScroll) slider.scrollLeft = 0
+      if (slider.scrollLeft < 0) slider.scrollLeft = maxScroll
+    })
 
     // Pause on Hover
-    slider.addEventListener("mouseenter", () => (isPaused = true));
-    slider.addEventListener("mouseleave", () => (isPaused = false));
+    slider.addEventListener('mouseenter', () => (isPaused = true))
+    slider.addEventListener('mouseleave', () => (isPaused = false))
   }
 
   // Initialization
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initProjectSlider);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProjectSlider)
   } else {
-    initProjectSlider();
+    initProjectSlider()
   }
-  document.addEventListener("astro:after-swap", initProjectSlider);
+  document.addEventListener('astro:after-swap', initProjectSlider)
 </script>

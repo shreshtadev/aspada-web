@@ -1,49 +1,48 @@
 <script lang="ts">
-  import { actions } from "astro:actions";
-  import { onMount } from "svelte";
-  import pb from "../lib/pb";
+  import { actions } from 'astro:actions'
+  import { onMount } from 'svelte'
+  import pb from '../lib/pb'
 
-  let isOpen = $state(false);
-  let isTyping = $state(false);
-  let userInput = $state("");
-  let chatElement = $state(null);
-  let isConnected = $state(false);
+  let isOpen = $state(false)
+  let isTyping = $state(false)
+  let userInput = $state('')
+  let chatElement = $state(null)
+  let isConnected = $state(false)
 
   let sessionId = $state(
-    (typeof window !== "undefined" && localStorage.getItem("chat_session")) ||
-      crypto.randomUUID()
-  );
+    (typeof window !== 'undefined' && localStorage.getItem('chat_session')) || crypto.randomUUID()
+  )
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("chat_session", sessionId);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('chat_session', sessionId)
   }
 
   const welcomeMessage = {
-    role: "model",
+    role: 'model',
     parts: [
       {
-        text: "Namaste! I am your Aspada Assistant. I can help you with project details, locations, or scheduling a site visit in Shivamogga. What is on your mind?",
+        text: 'Namaste! I am your Aspada Assistant. I can help you with project details, locations, or scheduling a site visit in Shivamogga. What is on your mind?',
       },
     ],
     // Welcome message doesn't need feedback
     cacheId: null,
     isSemantic: false,
-  };
+  }
 
-  let dbMessages = $state([]);
-  let messages = $derived([welcomeMessage, ...dbMessages]);
+  let dbMessages = $state([])
+  let messages = $derived([welcomeMessage, ...dbMessages])
 
   onMount(() => {
-    pb.realtime.addListener("connection", (e) => {
-      isConnected = e === "connected";
-    });
-    if (pb.realtime.isConnected) isConnected = true;
+    pb.realtime.addListener('connection', (e) => {
+      isConnected = e === 'connected'
+    })
+    if (pb.realtime.isConnected) isConnected = true
 
     // 1. Fetch History
-    pb.collection("chat_logs")
+    pb.collection('chat_logs')
       .getList(1, 50, {
         filter: `sessionId = "${sessionId}"`,
-        sort: "created",
+        sort: 'created',
         query: { sessionId: sessionId },
       })
       .then((result) => {
@@ -53,17 +52,15 @@
           // metadata could be stored in record if you want history to show badges
           cacheId: record.cacheId || null,
           isSemantic: record.isSemantic || false,
-        }));
-      });
+        }))
+      })
 
     // 2. Realtime Subscribe
-    const unsubscribe = pb.collection("chat_logs").subscribe(
-      "*",
+    const unsubscribe = pb.collection('chat_logs').subscribe(
+      '*',
       (e) => {
-        if (e.action === "create" && e.record.sessionId === sessionId) {
-          const isDuplicate = dbMessages.some(
-            (m) => m.parts[0].text === e.record.content
-          );
+        if (e.action === 'create' && e.record.sessionId === sessionId) {
+          const isDuplicate = dbMessages.some((m) => m.parts[0].text === e.record.content)
           if (!isDuplicate) {
             dbMessages = [
               ...dbMessages,
@@ -73,55 +70,53 @@
                 cacheId: e.record.cacheId || null,
                 isSemantic: e.record.isSemantic || false,
               },
-            ];
+            ]
           }
         }
       },
       { query: { sessionId: sessionId } }
-    );
+    )
 
     return () => {
-      unsubscribe();
-      pb.realtime.removeListener("connection");
-    };
-  });
+      unsubscribe()
+      pb.realtime.removeListener('connection')
+    }
+  })
 
   $effect(() => {
     if (messages.length && chatElement) {
       chatElement.scrollTo({
         top: chatElement.scrollHeight,
-        behavior: "smooth",
-      });
+        behavior: 'smooth',
+      })
     }
-  });
+  })
 
   // NEW: Feedback Handler
   async function submitFeedback(cacheId: string, isHelpful: boolean) {
-    if (!cacheId) return;
-    const { error } = await actions.submitFeedback({ cacheId, isHelpful });
+    if (!cacheId) return
+    const { error } = await actions.submitFeedback({ cacheId, isHelpful })
     if (!error) {
       // Optional: Visual toast or disable buttons
-      console.log("Feedback submitted");
+      console.log('Feedback submitted')
     }
   }
 
   async function sendMessage() {
-    if (!userInput.trim() || isTyping) return;
+    if (!userInput.trim() || isTyping) return
 
-    const userText = userInput;
-    dbMessages = [...dbMessages, { role: "user", parts: [{ text: userText }] }];
-    userInput = "";
-    isTyping = true;
+    const userText = userInput
+    dbMessages = [...dbMessages, { role: 'user', parts: [{ text: userText }] }]
+    userInput = ''
+    isTyping = true
 
     try {
       const { data, error } = await actions.chatWithAI({
         message: userText,
         // Map history back to plain text format Gemini expects
-        history: dbMessages
-          .map((m) => ({ role: m.role, parts: m.parts }))
-          .slice(0, -1),
+        history: dbMessages.map((m) => ({ role: m.role, parts: m.parts })).slice(0, -1),
         sessionId: sessionId,
-      });
+      })
 
       if (data) {
         // 'data' is now an object: { text, cacheId, isSemantic }
@@ -129,23 +124,20 @@
           dbMessages = [
             ...dbMessages,
             {
-              role: "model",
+              role: 'model',
               parts: [{ text: data.text }],
               cacheId: data.cacheId, // STORED FOR FEEDBACK
               isSemantic: data.isSemantic, // STORED FOR UI BADGE
             },
-          ];
+          ]
         }
       } else if (error) {
-        dbMessages = [
-          ...dbMessages,
-          { role: "model", parts: [{ text: "Error connecting..." }] },
-        ];
+        dbMessages = [...dbMessages, { role: 'model', parts: [{ text: 'Error connecting...' }] }]
       }
     } catch (err) {
-      console.error("Chat Error:", err);
+      console.error('Chat Error:', err)
     } finally {
-      isTyping = false;
+      isTyping = false
     }
   }
 </script>
@@ -174,11 +166,7 @@
       </div>
       <div>
         <h3 class="font-bold tracking-tight">Aspada Assistant</h3>
-        <p
-          class="text-[10px] uppercase tracking-widest text-aspada-gold/80 font-black"
-        >
-          Online •
-        </p>
+        <p class="text-[10px] uppercase tracking-widest text-aspada-gold/80 font-black">Online •</p>
       </div>
     </div>
 
@@ -202,21 +190,15 @@
       {/each} -->
 
       {#each messages as msg}
-        <div
-          class="flex {msg.role === 'model'
-            ? 'justify-start'
-            : 'justify-end'} group"
-        >
+        <div class="flex {msg.role === 'model' ? 'justify-start' : 'justify-end'} group">
           <div
             class="max-w-[85%] p-4 rounded-[1.5rem] relative
       {msg.role === 'model' ? 'bg-white border' : 'bg-aspada-navy text-white'}"
           >
             {msg.parts[0].text}
 
-            {#if msg.role === "model" && msg.cacheId}
-              <div
-                class="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
+            {#if msg.role === 'model' && msg.cacheId}
+              <div class="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onclick={() =>
                     actions.submitFeedback({
@@ -253,11 +235,8 @@
 
       {#if isTyping}
         <div class="flex justify-start animate-pulse">
-          <div
-            class="bg-slate-100 p-4 rounded-[1.5rem] rounded-tl-none flex gap-1"
-          >
-            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
-            ></span>
+          <div class="bg-slate-100 p-4 rounded-[1.5rem] rounded-tl-none flex gap-1">
+            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
             <span
               class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]"
             ></span>
@@ -273,7 +252,7 @@
       <div class="relative flex items-center group">
         <input
           bind:value={userInput}
-          onkeydown={(e) => e.key === "Enter" && sendMessage()}
+          onkeydown={(e) => e.key === 'Enter' && sendMessage()}
           placeholder="Ask me anything..."
           class="w-full p-4 pr-14 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all
                  focus:bg-white focus:border-aspada-gold/50 focus:ring-4 focus:ring-aspada-gold/10 font-medium"
@@ -289,9 +268,7 @@
           <span class="i-lucide-send-horizontal text-lg"></span>
         </button>
       </div>
-      <p
-        class="text-[8px] text-center text-slate-400 mt-3 uppercase tracking-tighter"
-      >
+      <p class="text-[8px] text-center text-slate-400 mt-3 uppercase tracking-tighter">
         Powered by <a
           href="https://shreshtasmg.in"
           class="text-aspada-gold hover:underline"

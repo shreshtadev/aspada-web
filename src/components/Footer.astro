@@ -1,23 +1,23 @@
 ---
-import { Image } from "astro:assets";
-import FooterLogo from "../assets/Logo.png";
+import { Image } from 'astro:assets'
+import FooterLogo from '../assets/Logo.png'
 
-const { companyProfile } = Astro.props;
-const currYear = new Date().getFullYear();
+const { companyProfile } = Astro.props
+const currYear = new Date().getFullYear()
 
 const links = {
   company: [
-    { name: "Residential Layouts", href: "/projects/residential" },
-    { name: "Commercial Projects", href: "/projects/commercial" },
-    { name: "Layouts", href: "/projects/plots" },
+    { name: 'Residential Layouts', href: '/projects/residential' },
+    { name: 'Commercial Projects', href: '/projects/commercial' },
+    { name: 'Layouts', href: '/projects/plots' },
   ],
   support: [
-    { name: "Official Disclaimer", href: "/disclaimer" },
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms & Conditions", href: "/terms" },
-    { name: "Contact Us", href: "/contactus" },
+    { name: 'Official Disclaimer', href: '/disclaimer' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms & Conditions', href: '/terms' },
+    { name: 'Contact Us', href: '/contactus' },
   ],
-};
+}
 ---
 
 <footer class="bg-aspada-navy text-white px-6">
@@ -26,26 +26,21 @@ const links = {
     <div class="grid gap-14 md:grid-cols-12">
       <!-- Brand -->
       <div class="md:col-span-4">
-        <Image
-          src={FooterLogo}
-          alt="Aspada Developers"
-          class="mb-8 w-36 brightness-0 invert"
-        />
+        <Image src={FooterLogo} alt="Aspada Developers" class="mb-8 w-36 brightness-0 invert" />
 
         <p class="max-w-md text-sm leading-relaxed text-white/55">
-          Aspada Developers is a premier real estate firm in Shivamogga,
-          committed to architectural excellence and legal transparency.
-          Transforming dreams into addresses since 2010.
+          Aspada Developers is a premier real estate firm in Shivamogga, committed to architectural
+          excellence and legal transparency. Transforming dreams into addresses since 2010.
         </p>
 
         <div class="mt-8 flex items-center gap-4">
           {
-            ["facebook", "instagram", "youtube"].map((social) => (
+            ['facebook', 'instagram', 'youtube'].map((social) => (
               <a
                 href={
-                  social === "facebook"
+                  social === 'facebook'
                     ? companyProfile.companyFacebook
-                    : social === "instagram"
+                    : social === 'instagram'
                       ? companyProfile.companyInsta
                       : companyProfile.companyYoutube
                 }
@@ -75,10 +70,7 @@ const links = {
             {
               links.company.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="transition-colors hover:text-white"
-                  >
+                  <a href={link.href} class="transition-colors hover:text-white">
                     {link.name}
                   </a>
                 </li>
@@ -98,10 +90,7 @@ const links = {
             {
               links.support.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="transition-colors hover:text-white"
-                  >
+                  <a href={link.href} class="transition-colors hover:text-white">
                     {link.name}
                   </a>
                 </li>
@@ -122,32 +111,23 @@ const links = {
 
         <div class="space-y-6 text-sm text-white/65">
           <div class="flex gap-4">
-            <div class="i-lucide-map-pin text-xl text-aspada-gold shrink-0">
-            </div>
+            <div class="i-lucide-map-pin text-xl text-aspada-gold shrink-0"></div>
             <p class="leading-relaxed">
               {companyProfile.addressLine1}<br />
-              {companyProfile.city}, {companyProfile.state} &hyphen; {
-                companyProfile.pincode
-              }
+              {companyProfile.city}, {companyProfile.state} &hyphen; {companyProfile.pincode}
             </p>
           </div>
 
           <div class="flex items-center gap-4">
             <div class="i-lucide-phone text-xl text-aspada-gold"></div>
-            <a
-              href={`tel:+91${companyProfile.companyMainPhone}`}
-              class="hover:text-white"
-            >
+            <a href={`tel:+91${companyProfile.companyMainPhone}`} class="hover:text-white">
               +91 {companyProfile.companyMainPhone}
             </a>
           </div>
 
           <div class="flex items-center gap-4">
             <div class="i-lucide-mail text-xl text-aspada-gold"></div>
-            <a
-              href={`mailto:${companyProfile.companyMainEmail}`}
-              class="hover:text-white"
-            >
+            <a href={`mailto:${companyProfile.companyMainEmail}`} class="hover:text-white">
               {companyProfile.companyMainEmail}
             </a>
           </div>
@@ -159,22 +139,16 @@ const links = {
     <div class="my-12 h-px bg-white/5"></div>
 
     <!-- Bottom bar -->
-    <div
-      class="flex flex-col items-center justify-between
-             gap-6 md:flex-row"
-    >
-      <p
-        class="text-[10px] font-semibold uppercase
-               tracking-[0.2em] text-white/40"
-      >
+    <div class="flex flex-col items-center justify-between
+             gap-6 md:flex-row">
+      <p class="text-[10px] font-semibold uppercase
+               tracking-[0.2em] text-white/40">
         © {currYear} Aspada Developers. All rights reserved.
       </p>
 
-      <p
-        class="text-[10px] font-semibold uppercase
-               tracking-[0.2em] text-white/40"
-      >
-        Handcrafted by{" "}
+      <p class="text-[10px] font-semibold uppercase
+               tracking-[0.2em] text-white/40">
+        Handcrafted by{' '}
         <a
           href="https://shreshtasmg.in"
           target="_blank"

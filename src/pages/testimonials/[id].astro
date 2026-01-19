@@ -1,49 +1,47 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import Navbar from "../../components/Navbar.astro";
-import Footer from "../../components/Footer.astro";
-import pb from "../../lib/pb";
-import toast from "svelte-french-toast";
-import type { TestimonialInfoExpand } from "../../types";
+import Layout from '../../layouts/Layout.astro'
+import Navbar from '../../components/Navbar.astro'
+import Footer from '../../components/Footer.astro'
+import pb from '../../lib/pb'
+import toast from 'svelte-french-toast'
+import type { TestimonialInfoExpand } from '../../types'
 import {
   Collections,
   type AttachmentsResponse,
   type ProjectsResponse,
   type TestimonialsResponse,
-} from "../../types/pocketbase-types";
-import { marked } from "marked";
+} from '../../types/pocketbase-types'
+import { marked } from 'marked'
 
-const { id } = Astro.params;
+const { id } = Astro.params
 const companyProfile = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 
-let testimonial: TestimonialsResponse<TestimonialInfoExpand>;
-let project: ProjectsResponse;
-let authorAvatar: AttachmentsResponse;
+let testimonial: TestimonialsResponse<TestimonialInfoExpand>
+let project: ProjectsResponse
+let authorAvatar: AttachmentsResponse
 if (id === undefined) {
-  return Astro.redirect("/404");
+  return Astro.redirect('/404')
 }
 
 try {
-  testimonial = await pb.collection("testimonials").getOne(String(id), {
-    expand: "project,authorAvatar",
-  });
-  project = testimonial.expand?.project;
-  authorAvatar = testimonial.expand?.authorAvatar;
+  testimonial = await pb.collection('testimonials').getOne(String(id), {
+    expand: 'project,authorAvatar',
+  })
+  project = testimonial.expand?.project
+  authorAvatar = testimonial.expand?.authorAvatar
 } catch (e) {
-  console.error("Error fetching testimonial:", e);
-  toast.error("Error fetching testimonial");
-  return Astro.redirect("/404");
+  console.error('Error fetching testimonial:', e)
+  toast.error('Error fetching testimonial')
+  return Astro.redirect('/404')
 }
 
 const avatarUrl = testimonial.authorAvatar
   ? pb.files.getURL(authorAvatar, authorAvatar.attachment)
-  : "https://i.pravatar.cc/150?u=" + testimonial.id;
+  : 'https://i.pravatar.cc/150?u=' + testimonial.id
 
-const testimonialContent = await marked.parse(testimonial.content);
+const testimonialContent = await marked.parse(testimonial.content)
 ---
 
 <Layout title={`${testimonial.authorName} - Testimonial | Aspada Developers`}>
@@ -62,17 +60,13 @@ const testimonialContent = await marked.parse(testimonial.content);
       </div>
     </div>
 
-    <div
-      class="flex-1 flex items-center justify-center py-6 px-4 sm:py-12 sm:px-6"
-    >
+    <div class="flex-1 flex items-center justify-center py-6 px-4 sm:py-12 sm:px-6">
       <div class="max-w-4xl w-full">
         <div
           class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-[#d4af37]/20 relative"
         >
           <!-- Decorative Quote -->
-          <div
-            class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none"
-          >
+          <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
             <svg
               width="200"
               height="200"
@@ -103,18 +97,16 @@ const testimonialContent = await marked.parse(testimonial.content);
                   {testimonial.authorName}
                 </h1>
 
-                <div
-                  class="flex text-[#d4af37] justify-center gap-1 mb-6 text-lg"
-                >
+                <div class="flex text-[#d4af37] justify-center gap-1 mb-6 text-lg">
                   {
                     Array.from({
                       length: testimonial.rating,
-                    }).map(() => "★")
+                    }).map(() => '★')
                   }
                   {
                     Array.from({
                       length: 5 - testimonial.rating,
-                    }).map(() => "☆")
+                    }).map(() => '☆')
                   }
                 </div>
 
@@ -124,9 +116,7 @@ const testimonialContent = await marked.parse(testimonial.content);
                       <span class="block text-xs text-slate-400 uppercase tracking-widest mb-1">
                         Project
                       </span>
-                      <span class="text-aspada-cream font-medium">
-                        {project.title}
-                      </span>
+                      <span class="text-aspada-cream font-medium">{project.title}</span>
                     </div>
                   )
                 }

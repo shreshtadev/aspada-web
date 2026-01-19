@@ -1,13 +1,11 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Navbar from "../components/Navbar.astro";
-import { Collections, type CompaniesResponse } from "../types/pocketbase-types";
-import pb from "../lib/pb";
+import Layout from '../layouts/Layout.astro'
+import Navbar from '../components/Navbar.astro'
+import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
+import pb from '../lib/pb'
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
-  .getFirstListItem(
-    "companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'",
-  );
+  .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
 <Layout title="Official Disclaimer | Aspada Developers">
@@ -33,9 +31,7 @@ const companyProfile: CompaniesResponse = await pb
           >
             Official <span class="text-aspada-gold">Disclaimer</span>
           </h1>
-          <p
-            class="text-aspada-steel uppercase tracking-[0.3em] text-xs font-bold"
-          >
+          <p class="text-aspada-steel uppercase tracking-[0.3em] text-xs font-bold">
             Legal Notice & Terms of Information
           </p>
         </div>
@@ -44,62 +40,49 @@ const companyProfile: CompaniesResponse = await pb
           <div
             class="bg-white/5 border border-aspada-steel/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm"
           >
-            <h2
-              class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3"
-            >
+            <h2 class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3">
               <span class="text-aspada-gold">01.</span> General Disclaimer
             </h2>
             <p class="text-sm">
               The information provided on this website,
-              <a
-                href="https://aspadadevelopers.com"
-                class="text-aspada-gold underline"
+              <a href="https://aspadadevelopers.com" class="text-aspada-gold underline"
                 >https://aspadadevelopers.com</a
-              >, is for general informational purposes only. While Aspada
-              Developers LLP strives to keep the information up-to-date and
-              correct, we make no representations or warranties of any kind,
-              express or implied, about the completeness, accuracy, or
-              availability of the website or the information contained herein.
-              Any reliance you place on such information is strictly at your own
-              risk.
+              >, is for general informational purposes only. While Aspada Developers LLP strives to
+              keep the information up-to-date and correct, we make no representations or warranties
+              of any kind, express or implied, about the completeness, accuracy, or availability of
+              the website or the information contained herein. Any reliance you place on such
+              information is strictly at your own risk.
             </p>
           </div>
 
           <div
             class="bg-white/5 border border-aspada-steel/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm"
           >
-            <h2
-              class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3"
-            >
-              <span class="text-aspada-gold">02.</span> Artistic Impression & Technical
-              Specifications
+            <h2 class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3">
+              <span class="text-aspada-gold">02.</span> Artistic Impression & Technical Specifications
             </h2>
             <div class="space-y-4 text-sm">
               <p>
-                <strong
-                  class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
+                <strong class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
                   >Visual Representation:</strong
                 >
-                The artistic work contained in this website—including 360-degree views,
-                elevations, walkthroughs, and layout plans—are for representation
-                purposes only and do not form part of any legally binding contract.
+                The artistic work contained in this website—including 360-degree views, elevations, walkthroughs,
+                and layout plans—are for representation purposes only and do not form part of any legally
+                binding contract.
               </p>
               <p>
-                <strong
-                  class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
+                <strong class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
                   >Not a Deliverable:</strong
                 >
-                Soft furnishings, furniture, gadgets, and landscaping displayed in
-                images are for illustrative purposes only and are not part of the
-                standard offering.
+                Soft furnishings, furniture, gadgets, and landscaping displayed in images are for illustrative
+                purposes only and are not part of the standard offering.
               </p>
               <p>
-                <strong
-                  class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
+                <strong class="text-aspada-steel block mb-1 uppercase text-xs tracking-widest"
                   >Subject to Change:</strong
                 >
-                Specifications, dimensions, and designs are indicative and subject
-                to change at the sole discretion of the Company or competent authorities.
+                Specifications, dimensions, and designs are indicative and subject to change at the sole
+                discretion of the Company or competent authorities.
               </p>
             </div>
           </div>
@@ -107,15 +90,11 @@ const companyProfile: CompaniesResponse = await pb
           <div
             class="bg-aspada-cream/5 border border-aspada-steel/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm border-l-4 border-l-aspada-steel"
           >
-            <h2
-              class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3"
-            >
-              <span class="text-aspada-gold">03.</span> Website Authenticity & Fraud
-              alert
+            <h2 class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3">
+              <span class="text-aspada-gold">03.</span> Website Authenticity & Fraud alert
             </h2>
             <p class="text-sm mb-4">
-              Aspada Developers LLP recognizes <span
-                class="text-aspada-gold font-bold"
+              Aspada Developers LLP recognizes <span class="text-aspada-gold font-bold"
                 >https://aspadadevelopers.com</span
               >
               as its official and ONLY authorized website.
@@ -123,36 +102,30 @@ const companyProfile: CompaniesResponse = await pb
             <div
               class="bg-aspada-navy/20 p-4 rounded-xl text-xs border border-aspada-steel/5 italic"
             >
-              <strong>Fraud alert:</strong> Legitimate communication will always originate
-              from our official domain. We do not authorize external agencies to collect
-              cash or payments on our behalf unless explicitly validated by us.
+              <strong>Fraud alert:</strong> Legitimate communication will always originate from our official
+              domain. We do not authorize external agencies to collect cash or payments on our behalf
+              unless explicitly validated by us.
             </div>
           </div>
 
           <div
             class="bg-aspada-cream/5 border border-aspada-steel/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm"
           >
-            <h2
-              class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3"
-            >
+            <h2 class="text-xl font-bold text-aspada-steel mb-4 flex items-center gap-3">
               <span class="text-aspada-gold">04.</span> Limitation of Liability
             </h2>
             <p class="text-sm">
-              In no event shall Aspada Developers LLP, its affiliates, or
-              employees be liable for any direct, indirect, incidental, or
-              consequential damages (including loss of data or profit) arising
-              out of the use of the information herein.
+              In no event shall Aspada Developers LLP, its affiliates, or employees be liable for
+              any direct, indirect, incidental, or consequential damages (including loss of data or
+              profit) arising out of the use of the information herein.
             </p>
           </div>
         </div>
 
-        <div
-          class="mt-16 text-center text-aspada-steel/40 text-[10px] uppercase tracking-[0.4em]"
-        >
+        <div class="mt-16 text-center text-aspada-steel/40 text-[10px] uppercase tracking-[0.4em]">
           Contact: <a
-            href={"mailto:" + companyProfile.companyMainEmail}
-            class="hover:text-aspada-gold transition-colors"
-            >{companyProfile.companyMainEmail}</a
+            href={'mailto:' + companyProfile.companyMainEmail}
+            class="hover:text-aspada-gold transition-colors">{companyProfile.companyMainEmail}</a
           >
           <br />
           © Aspada Developers LLP

@@ -1,24 +1,22 @@
 <script>
-  import pb from "../../lib/pb";
+  import pb from '../../lib/pb'
 
-  let email = $state("");
-  let password = $state("");
-  let error = $state("");
+  let email = $state('')
+  let password = $state('')
+  let error = $state('')
 
   async function login() {
     try {
-      await pb.collection("users").authWithPassword(email, password);
-      document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
-      window.location.href = "/admin/projects";
+      await pb.collection('users').authWithPassword(email, password)
+      document.cookie = pb.authStore.exportToCookie({ httpOnly: false })
+      window.location.href = '/admin/projects'
     } catch {
-      error = "Invalid credentials";
+      error = 'Invalid credentials'
     }
   }
 </script>
 
-<div
-  class="max-w-md mx-auto mt-20 p-8 rounded-2xl shadow-xl border border-aspada-gold/20"
->
+<div class="max-w-md mx-auto mt-20 p-8 rounded-2xl shadow-xl border border-aspada-gold/20">
   <h1 class="text-2xl font-bold mb-6 text-aspada-steel">Admin Login</h1>
 
   {#if error}<p class="text-red-500 mb-4">{error}</p>{/if}
