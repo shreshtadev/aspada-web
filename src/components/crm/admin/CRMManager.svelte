@@ -11,12 +11,14 @@
     LeadActivitiesContactTypeOptions,
     AgentsRoleOptions,
   } from '../../../types/pocketbase-types'
+  import AspadaForm from '../../AspadaForm.svelte'
 
   type TabType = 'leads' | 'agents' | 'activities'
 
   let activeTab = $state<TabType>('leads')
   let loading = $state(false)
   let formLoading = $state(false)
+  let searchTerm = $state('')
 
   // Leads state
   let leads = $state<LeadsResponse[]>([])
@@ -59,6 +61,29 @@
     completedAt: '',
     createdBy: '',
   })
+  // Helper to format date for datetime-local input
+  export function formatForInput(dateStr: string | undefined | null): string {
+    if (!dateStr) {
+      return ''
+    }
+
+    const date = new Date(dateStr)
+
+    if (Number.isNaN(date.getTime())) {
+      return ''
+    }
+
+    try {
+      const offset = date.getTimezoneOffset() * 60000
+      const localDate = new Date(date.getTime() - offset)
+      const formatted = localDate.toISOString().slice(0, 16)
+
+      return formatted
+    } catch (err) {
+      return ''
+    }
+  }
+
   // Load data based on active tab
   async function loadData(reqSeq: number = 0) {
     loading = true
@@ -162,7 +187,7 @@
         preferredLocation: leadForm.preferredLocation,
         source: leadForm.source,
         status: leadForm.status,
-        assignedAgent: leadForm.assignedAgent || undefined,
+        assignedAgent: leadForm.assignedAgent || null,
       }
 
       if (leadForm.id) {
@@ -240,7 +265,7 @@
         contactPhone: agentForm.contactPhone,
         role: agentForm.role,
         isActive: agentForm.isActive,
-        staffUser: agentForm.staffUser || undefined,
+        staffUser: agentForm.staffUser || null,
       }
 
       if (agentForm.id) {
@@ -284,8 +309,8 @@
       lead: activity.lead || '',
       contactType: activity.contactType || LeadActivitiesContactTypeOptions.Call,
       note: activity.note || '',
-      scheduledAt: activity.scheduledAt || '',
-      completedAt: activity.completedAt || '',
+      scheduledAt: formatForInput(activity.scheduledAt),
+      completedAt: formatForInput(activity.completedAt),
       createdBy: activity.createdBy || '',
     }
   }
@@ -311,23 +336,13 @@
 
     formLoading = true
     try {
-      if (activityForm.scheduledAt !== undefined) {
-        activityForm.scheduledAt = new Date(activityForm.scheduledAt)
-          .toISOString()
-          .replace('T', ' ')
-      }
-      if (activityForm.completedAt !== undefined) {
-        activityForm.completedAt = new Date(activityForm.completedAt)
-          .toISOString()
-          .replace('T', ' ')
-      }
       const data = {
         lead: activityForm.lead,
         contactType: activityForm.contactType,
         note: activityForm.note,
-        scheduledAt: activityForm.scheduledAt || undefined,
-        completedAt: activityForm.completedAt || undefined,
-        createdBy: activityForm.createdBy || undefined,
+        scheduledAt: activityForm.scheduledAt || null,
+        completedAt: activityForm.completedAt || null,
+        createdBy: activityForm.createdBy || null,
       }
 
       if (activityForm.id) {
@@ -395,6 +410,36 @@
     loadAgentsForDropdown()
     loadLeadsForDropdown()
   })
+
+  // Derived filtered lists
+  const filteredLeads = $derived(
+    leads.filter(
+      (l) =>
+        !searchTerm ||
+        l.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.contactEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.contactNo?.includes(searchTerm)
+    )
+  )
+
+  const filteredAgents = $derived(
+    agents.filter(
+      (a) =>
+        !searchTerm ||
+        a.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        a.contactPhone?.includes(searchTerm)
+    )
+  )
+
+  const filteredActivities = $derived(
+    activities.filter(
+      (a) =>
+        !searchTerm ||
+        a.contactType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        a.expand?.lead?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        a.note?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  )
 </script>
 
 <div class="flex flex-col h-full bg-aspada-silver/5 rounded-3xl">
@@ -438,20 +483,43 @@
   <div class="flex flex-1 overflow-hidden bg-white">
     <!-- List Panel -->
     <div class="w-1/3 border-r border-aspada-steel/20 overflow-y-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold text-aspada-navy">
-          {activeTab === 'leads' ? 'Leads' : activeTab === 'agents' ? 'Agents' : 'Activities'}
-        </h3>
-        <button
-          class="px-4 py-2 bg-aspada-gold text-aspada-navy font-bold rounded-lg hover:bg-aspada-gold/90 transition"
-          onclick={() => {
-            if (activeTab === 'leads') newLead()
-            else if (activeTab === 'agents') newAgent()
-            else newActivity()
-          }}
-        >
-          + New
-        </button>
+      <div class="space-y-4 mb-6">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xl font-bold text-aspada-navy">
+            {activeTab === 'leads' ? 'Leads' : activeTab === 'agents' ? 'Agents' : 'Activities'}
+          </h3>
+          <button
+            class="px-4 py-2 bg-aspada-gold text-aspada-navy font-bold rounded-lg hover:bg-aspada-gold/90 transition"
+            onclick={() => {
+              if (activeTab === 'leads') newLead()
+              else if (activeTab === 'agents') newAgent()
+              else newActivity()
+            }}
+          >
+            + New
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+          <input
+            type="text"
+            placeholder={`Search ${activeTab}...`}
+            bind:value={searchTerm}
+            class="w-full pl-10 pr-4 py-2 bg-aspada-silver/10 border border-aspada-steel/20 rounded-xl focus:border-aspada-gold focus:outline-none transition text-sm text-aspada-navy hover:bg-white"
+          />
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-aspada-steel opacity-50">
+            🔍
+          </span>
+          {#if searchTerm}
+            <button
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-aspada-steel hover:text-aspada-navy text-xl"
+              onclick={() => (searchTerm = '')}
+            >
+              ×
+            </button>
+          {/if}
+        </div>
       </div>
 
       {#if loading}
@@ -462,7 +530,7 @@
         </div>
       {:else if activeTab === 'leads'}
         <div class="space-y-3">
-          {#each leads as lead}
+          {#each filteredLeads as lead}
             <button
               class={`w-full text-left p-4 rounded-xl border-2 transition ${
                 selectedLead?.id === lead.id
@@ -480,13 +548,15 @@
               </div>
             </button>
           {/each}
-          {#if leads.length === 0}
-            <p class="text-aspada-steel/50 text-center py-8">No leads found</p>
+          {#if filteredLeads.length === 0}
+            <p class="text-aspada-steel/50 text-center py-8">
+              {searchTerm ? 'No matching leads' : 'No leads found'}
+            </p>
           {/if}
         </div>
       {:else if activeTab === 'agents'}
         <div class="space-y-3">
-          {#each agents as agent}
+          {#each filteredAgents as agent}
             <button
               class={`w-full text-left p-4 rounded-xl border-2 transition ${
                 selectedAgent?.id === agent.id
@@ -506,13 +576,15 @@
               </div>
             </button>
           {/each}
-          {#if agents.length === 0}
-            <p class="text-aspada-steel/50 text-center py-8">No agents found</p>
+          {#if filteredAgents.length === 0}
+            <p class="text-aspada-steel/50 text-center py-8">
+              {searchTerm ? 'No matching agents' : 'No agents found'}
+            </p>
           {/if}
         </div>
       {:else}
         <div class="space-y-3">
-          {#each activities as activity}
+          {#each filteredActivities as activity}
             <button
               class={`w-full text-left p-4 rounded-xl border-2 transition ${
                 selectedActivity?.id === activity.id
@@ -534,8 +606,10 @@
               </div>
             </button>
           {/each}
-          {#if activities.length === 0}
-            <p class="text-aspada-steel/50 text-center py-8">No activities found</p>
+          {#if filteredActivities.length === 0}
+            <p class="text-aspada-steel/50 text-center py-8">
+              {searchTerm ? 'No matching activities' : 'No activities found'}
+            </p>
           {/if}
         </div>
       {/if}

@@ -16,7 +16,15 @@ const result = Astro.getActionResult(actions.logout)
         <a href="/admin/company" class="block hover:text-aspada-steel">Company Profile</a>
         <a href="/admin/testimonials" class="block hover:text-aspada-steel">Testimonials</a>
         <a href="/admin/blog" class="block hover:text-aspada-steel">Blog</a>
-        <!-- <a href="/crm/admin" class="block hover:text-aspada-steel">CRM</a> -->
+        <div class="mt-6">
+          <p class="text-aspada-steel/50 text-xs font-bold mb-2 uppercase tracking-wider">CRM</p>
+          <div class="space-y-2 ml-2 border-l-2 border-aspada-steel/20 pl-3">
+            <a href="/crm" class="block hover:text-aspada-steel text-sm">Dashboard</a>
+            <a href="/crm/pipeline" class="block hover:text-aspada-steel text-sm">Pipeline</a>
+            <a href="/crm/agents" class="block hover:text-aspada-steel text-sm">Agents</a>
+            <a href="/crm/admin" class="block hover:text-aspada-steel text-sm">Manage</a>
+          </div>
+        </div>
       </nav>
     </div>
 

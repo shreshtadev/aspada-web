@@ -207,7 +207,7 @@ export const server = {
         contactNo,
         interest,
         source: 'aspadaForms',
-        status: 'new',
+        status: 'New',
       })
     },
   }),
