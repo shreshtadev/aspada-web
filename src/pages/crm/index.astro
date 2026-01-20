@@ -1,0 +1,414 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import pb from "../../lib/pb";
+import { Collections, LeadsStatusOptions } from "../../types/pocketbase-types";
+
+// Load all data server-side
+const leads = await pb.collection(Collections.Leads).getFullList({
+  expand: "assignedAgent",
+  sort: "-created",
+});
+
+const agents = await pb.collection(Collections.Agents).getFullList({
+  filter: "isActive = true",
+});
+
+const activities = await pb.collection(Collections.LeadActivities).getFullList({
+  expand: "lead",
+  sort: "scheduledAt",
+});
+
+// Calculate statistics
+const stats = {
+  totalLeads: leads.length,
+  newLeads: leads.filter((l) => l.status === LeadsStatusOptions.New).length,
+  contactedLeads: leads.filter((l) => l.status === LeadsStatusOptions.Contacted)
+    .length,
+  qualifiedLeads: leads.filter((l) => l.status === LeadsStatusOptions.Qualified)
+    .length,
+  negotiationLeads: leads.filter(
+    (l) => l.status === LeadsStatusOptions.Negotiation,
+  ).length,
+  closedLeads: leads.filter((l) => l.status === LeadsStatusOptions.Closed)
+    .length,
+  lostLeads: leads.filter((l) => l.status === LeadsStatusOptions.Lost).length,
+  activeAgents: agents.length,
+};
+
+// Get conversion rate
+const conversionRate =
+  stats.totalLeads > 0
+    ? ((stats.closedLeads / stats.totalLeads) * 100).toFixed(1)
+    : 0;
+
+// Recent leads (last 5)
+const recentLeads = leads.slice(0, 5);
+
+// Top agents by lead count
+const agentLeadCounts = agents
+  .map((agent) => ({
+    agent,
+    leadCount: leads.filter((l) => l.assignedAgent === agent.id).length,
+  }))
+  .sort((a, b) => b.leadCount - a.leadCount)
+  .slice(0, 5);
+
+// Today's and upcoming activities
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const todayActivities = activities.filter((a) => {
+  if (!a.scheduledAt) return false;
+  const schedDate = new Date(a.scheduledAt);
+  return schedDate >= today && schedDate < tomorrow && !a.completedAt;
+});
+
+const upcomingActivities = activities
+  .filter((a) => {
+    if (!a.scheduledAt || a.completedAt) return false;
+    const schedDate = new Date(a.scheduledAt);
+    return schedDate >= today;
+  })
+  .slice(0, 5);
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "New":
+      return "bg-blue-100 text-blue-700";
+    case "Contacted":
+      return "bg-purple-100 text-purple-700";
+    case "Qualified":
+      return "bg-green-100 text-green-700";
+    case "Site Visit":
+      return "bg-cyan-100 text-cyan-700";
+    case "Negotiation":
+      return "bg-yellow-100 text-yellow-700";
+    case "Closed":
+      return "bg-emerald-100 text-emerald-700";
+    case "Lost":
+      return "bg-red-100 text-red-700";
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+}
+---
+
+<AdminLayout>
+  <div class="space-y-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">
+          CRM Dashboard
+        </h1>
+        <p class="text-aspada-steel mt-2">
+          Overview of your sales pipeline and team performance
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <a
+          href="/crm/pipeline"
+          class="px-6 py-3 bg-white border-2 border-aspada-steel/20 text-aspada-navy font-bold rounded-xl hover:border-aspada-gold transition"
+        >
+          Pipeline View
+        </a>
+        <a
+          href="/crm/admin"
+          class="px-6 py-3 bg-aspada-gold text-aspada-navy font-bold rounded-xl hover:bg-aspada-gold/90 transition shadow-lg"
+        >
+          Manage CRM
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Total Leads -->
+      <div
+        class="bg-gradient-to-br from-aspada-navy to-aspada-steel rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-aspada-cream/70 text-sm font-medium">Total Leads</p>
+            <p class="text-4xl font-bold mt-2">{stats.totalLeads}</p>
+            <p class="text-aspada-cream/50 text-xs mt-2">
+              {conversionRate}% conversion rate
+            </p>
+          </div>
+          <div class="text-aspada-gold text-5xl opacity-20">📊</div>
+        </div>
+      </div>
+
+      <!-- New Leads -->
+      <div
+        class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white/70 text-sm font-medium">New Leads</p>
+            <p class="text-4xl font-bold mt-2">{stats.newLeads}</p>
+            <p class="text-white/50 text-xs mt-2">Awaiting contact</p>
+          </div>
+          <div class="text-white text-5xl opacity-20">🆕</div>
+        </div>
+      </div>
+
+      <!-- Qualified Leads -->
+      <div
+        class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white/70 text-sm font-medium">Qualified</p>
+            <p class="text-4xl font-bold mt-2">{stats.qualifiedLeads}</p>
+            <p class="text-white/50 text-xs mt-2">Ready for negotiation</p>
+          </div>
+          <div class="text-white text-5xl opacity-20">✓</div>
+        </div>
+      </div>
+
+      <!-- Closed Deals -->
+      <div
+        class="bg-gradient-to-br from-aspada-gold to-yellow-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-white/70 text-sm font-medium">Closed Deals</p>
+            <p class="text-4xl font-bold mt-2">{stats.closedLeads}</p>
+            <p class="text-white/50 text-xs mt-2">Successfully converted</p>
+          </div>
+          <div class="text-white text-5xl opacity-20">🏆</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div
+        class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10 hover:border-aspada-gold/30 transition"
+      >
+        <div class="flex items-center gap-4">
+          <div class="bg-purple-500/10 p-4 rounded-xl">
+            <span class="text-3xl">👔</span>
+          </div>
+          <div>
+            <p class="text-aspada-steel text-sm">Active Agents</p>
+            <p class="text-3xl font-bold text-aspada-navy">
+              {stats.activeAgents}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10 hover:border-aspada-gold/30 transition"
+      >
+        <div class="flex items-center gap-4">
+          <div class="bg-blue-500/10 p-4 rounded-xl">
+            <span class="text-3xl">📅</span>
+          </div>
+          <div>
+            <p class="text-aspada-steel text-sm">Today's Tasks</p>
+            <p class="text-3xl font-bold text-aspada-navy">
+              {todayActivities.length}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10 hover:border-aspada-gold/30 transition"
+      >
+        <div class="flex items-center gap-4">
+          <div class="bg-yellow-500/10 p-4 rounded-xl">
+            <span class="text-3xl">💬</span>
+          </div>
+          <div>
+            <p class="text-aspada-steel text-sm">In Negotiation</p>
+            <p class="text-3xl font-bold text-aspada-navy">
+              {stats.negotiationLeads}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10 hover:border-aspada-gold/30 transition"
+      >
+        <div class="flex items-center gap-4">
+          <div class="bg-red-500/10 p-4 rounded-xl">
+            <span class="text-3xl">❌</span>
+          </div>
+          <div>
+            <p class="text-aspada-steel text-sm">Lost Leads</p>
+            <p class="text-3xl font-bold text-aspada-navy">
+              {stats.lostLeads}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Recent Leads -->
+      <div class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-aspada-navy">Recent Leads</h3>
+          <a
+            href="/crm/admin"
+            class="text-aspada-gold hover:text-aspada-navy text-sm font-bold transition"
+          >
+            View All →
+          </a>
+        </div>
+        <div class="space-y-3">
+          {
+            recentLeads.map((lead) => (
+              <div class="flex items-center justify-between p-4 bg-aspada-silver/20 rounded-xl hover:bg-aspada-silver/40 transition">
+                <div class="flex-1">
+                  <p class="font-bold text-aspada-navy">{lead.fullName}</p>
+                  <p class="text-sm text-aspada-steel">
+                    {lead.contactEmail || lead.contactNo}
+                  </p>
+                  {lead.interest && (
+                    <p class="text-xs text-aspada-steel/70 mt-1">
+                      Interest: {lead.interest}
+                    </p>
+                  )}
+                </div>
+                <span
+                  class={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${getStatusColor(lead.status || "")}`}
+                >
+                  {lead.status}
+                </span>
+              </div>
+            ))
+          }
+          {
+            recentLeads.length === 0 && (
+              <p class="text-aspada-steel/50 text-center py-8">
+                No recent leads
+              </p>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Top Agents -->
+      <div class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-aspada-navy">
+            Top Performing Agents
+          </h3>
+          <a
+            href="/crm/agents"
+            class="text-aspada-gold hover:text-aspada-navy text-sm font-bold transition"
+          >
+            View All →
+          </a>
+        </div>
+        <div class="space-y-3">
+          {
+            agentLeadCounts.map(({ agent, leadCount }, index) => (
+              <div class="flex items-center justify-between p-4 bg-aspada-silver/20 rounded-xl">
+                <div class="flex items-center gap-3">
+                  <div
+                    class={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
+                      index === 0
+                        ? "bg-yellow-500"
+                        : index === 1
+                          ? "bg-gray-400"
+                          : index === 2
+                            ? "bg-orange-600"
+                            : "bg-aspada-steel"
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p class="font-bold text-aspada-navy">
+                      {agent.displayName || "Unnamed Agent"}
+                    </p>
+                    <p class="text-sm text-aspada-steel">{agent.role}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold text-aspada-navy">{leadCount}</p>
+                  <p class="text-xs text-aspada-steel">leads</p>
+                </div>
+              </div>
+            ))
+          }
+          {
+            agentLeadCounts.length === 0 && (
+              <p class="text-aspada-steel/50 text-center py-8">
+                No agents yet
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Activities -->
+    <div class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-aspada-navy">Upcoming Activities</h3>
+        <a
+          href="/crm/admin"
+          class="text-aspada-gold hover:text-aspada-navy text-sm font-bold transition"
+        >
+          View All →
+        </a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {
+          upcomingActivities.map((activity) => (
+            <div class="flex items-start gap-4 p-4 bg-aspada-silver/20 rounded-xl hover:bg-aspada-silver/40 transition">
+              <div class="bg-aspada-gold/20 p-3 rounded-lg">
+                <span class="text-2xl">
+                  {activity.contactType === "Call"
+                    ? "📞"
+                    : activity.contactType === "Email"
+                      ? "📧"
+                      : activity.contactType === "Whatsapp"
+                        ? "💬"
+                        : activity.contactType === "Site Visit"
+                          ? "🏢"
+                          : "📝"}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-aspada-navy">{activity.contactType}</p>
+                <p class="text-sm text-aspada-steel truncate">
+                  {activity.expand?.lead?.fullName || "Unknown Lead"}
+                </p>
+                <p class="text-xs text-aspada-steel/70 mt-1">
+                  {activity.scheduledAt
+                    ? new Date(activity.scheduledAt).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })
+                    : "No date"}
+                </p>
+              </div>
+            </div>
+          ))
+        }
+        {
+          upcomingActivities.length === 0 && (
+            <div class="col-span-full">
+              <p class="text-aspada-steel/50 text-center py-8">
+                No upcoming activities
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</AdminLayout>

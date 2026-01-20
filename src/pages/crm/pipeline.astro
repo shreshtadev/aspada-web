@@ -1,0 +1,331 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import pb from '../../lib/pb'
+import type { LeadsInfoExpand } from '../../types'
+import { Collections, LeadsStatusOptions, type LeadsResponse } from '../../types/pocketbase-types'
+
+// Load all leads with agent information
+const leads = await pb.collection(Collections.Leads).getFullList<LeadsResponse<LeadsInfoExpand>>({
+  expand: 'assignedAgent',
+  sort: '-created',
+})
+
+// Group leads by status
+const pipeline = {
+  [LeadsStatusOptions.New]: leads.filter((l) => l.status === LeadsStatusOptions.New),
+  [LeadsStatusOptions.Contacted]: leads.filter((l) => l.status === LeadsStatusOptions.Contacted),
+  [LeadsStatusOptions.Qualified]: leads.filter((l) => l.status === LeadsStatusOptions.Qualified),
+  [LeadsStatusOptions['Site Visit']]: leads.filter(
+    (l) => l.status === LeadsStatusOptions['Site Visit']
+  ),
+  [LeadsStatusOptions.Negotiation]: leads.filter(
+    (l) => l.status === LeadsStatusOptions.Negotiation
+  ),
+  [LeadsStatusOptions.Closed]: leads.filter((l) => l.status === LeadsStatusOptions.Closed),
+  [LeadsStatusOptions.Lost]: leads.filter((l) => l.status === LeadsStatusOptions.Lost),
+}
+
+const statusConfig = [
+  {
+    key: LeadsStatusOptions.New,
+    label: 'New',
+    icon: '🆕',
+    color: 'from-blue-500 to-blue-600',
+    borderColor: 'border-blue-200',
+    bgColor: 'bg-blue-50',
+  },
+  {
+    key: LeadsStatusOptions.Contacted,
+    label: 'Contacted',
+    icon: '📞',
+    color: 'from-purple-500 to-purple-600',
+    borderColor: 'border-purple-200',
+    bgColor: 'bg-purple-50',
+  },
+  {
+    key: LeadsStatusOptions.Qualified,
+    label: 'Qualified',
+    icon: '✅',
+    color: 'from-green-500 to-green-600',
+    borderColor: 'border-green-200',
+    bgColor: 'bg-green-50',
+  },
+  {
+    key: LeadsStatusOptions['Site Visit'],
+    label: 'Site Visit',
+    icon: '🏢',
+    color: 'from-cyan-500 to-cyan-600',
+    borderColor: 'border-cyan-200',
+    bgColor: 'bg-cyan-50',
+  },
+  {
+    key: LeadsStatusOptions.Negotiation,
+    label: 'Negotiation',
+    icon: '💬',
+    color: 'from-yellow-500 to-yellow-600',
+    borderColor: 'border-yellow-200',
+    bgColor: 'bg-yellow-50',
+  },
+  {
+    key: LeadsStatusOptions.Closed,
+    label: 'Closed',
+    icon: '🏆',
+    color: 'from-emerald-500 to-emerald-600',
+    borderColor: 'border-emerald-200',
+    bgColor: 'bg-emerald-50',
+  },
+  {
+    key: LeadsStatusOptions.Lost,
+    label: 'Lost',
+    icon: '❌',
+    color: 'from-red-500 to-red-600',
+    borderColor: 'border-red-200',
+    bgColor: 'bg-red-50',
+  },
+]
+
+function formatBudget(min: number, max: number) {
+  const formatNumber = (num: number) => {
+    if (num >= 10000000) return `${(num / 10000000).toFixed(1)}Cr`
+    if (num >= 100000) return `${(num / 100000).toFixed(1)}L`
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}K`
+    return num.toString()
+  }
+  return `₹${formatNumber(min)} - ${formatNumber(max)}`
+}
+---
+
+<AdminLayout>
+  <div class="space-y-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">Sales Pipeline</h1>
+        <p class="text-aspada-steel mt-2">Visualize and manage leads through your sales funnel</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- Search Bar -->
+        <div class="relative min-w-[300px]">
+          <input
+            id="pipeline-search"
+            type="text"
+            placeholder="Search leads by name, email, or interest..."
+            class="w-full pl-10 pr-4 py-3 bg-white border-2 border-aspada-steel/10 rounded-xl focus:border-aspada-gold focus:outline-none transition shadow-sm"
+          />
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl opacity-50"> 🔍 </span>
+        </div>
+
+        <div class="flex gap-3">
+          <a
+            href="/crm"
+            class="px-6 py-3 bg-white border-2 border-aspada-steel/20 text-aspada-navy font-bold rounded-xl hover:border-aspada-gold transition"
+          >
+            ← Dashboard
+          </a>
+          <a
+            href="/crm/admin"
+            class="px-6 py-3 bg-aspada-gold text-aspada-navy font-bold rounded-xl hover:bg-aspada-gold/90 transition shadow-lg"
+          >
+            Manage CRM
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <script>
+      const searchInput = document.getElementById('pipeline-search') as HTMLInputElement
+      const leadCards = document.querySelectorAll('.lead-card')
+
+      searchInput?.addEventListener('input', (e) => {
+        const term = (e.target as HTMLInputElement).value.toLowerCase()
+
+        leadCards.forEach((card) => {
+          const content = card.getAttribute('data-search-content')?.toLowerCase() || ''
+          const isVisible = content.includes(term)
+          ;(card as HTMLElement).style.display = isVisible ? 'block' : 'none'
+        })
+
+        // Update column counts visually if needed
+        updateColumnCounts()
+      })
+
+      function updateColumnCounts() {
+        const columns = document.querySelectorAll('.pipeline-column')
+        columns.forEach((col) => {
+          const visibleCards =
+            col.querySelectorAll('.lead-card[style*="display: block"]').length ||
+            col.querySelectorAll('.lead-card').length -
+              col.querySelectorAll('.lead-card[style*="display: none"]').length
+          const countBadge = col.querySelector('.column-count')
+          if (countBadge) countBadge.textContent = visibleCards.toString()
+        })
+      }
+    </script>
+
+    <!-- Pipeline Summary Stats -->
+    <div class="grid grid-cols-7 gap-4">
+      {
+        statusConfig.map((status) => (
+          <div class="bg-white rounded-xl p-4 border-2 border-aspada-steel/10 text-center">
+            <div class="text-2xl mb-2">{status.icon}</div>
+            <div class="text-2xl font-bold text-aspada-navy">{pipeline[status.key].length}</div>
+            <div class="text-xs text-aspada-steel mt-1">{status.label}</div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="flex gap-4 overflow-x-auto pb-4">
+      {
+        statusConfig.map((status) => (
+          <div class="flex-shrink-0 w-80 pipeline-column">
+            <div class={`bg-gradient-to-br ${status.color} rounded-t-2xl p-4 text-white`}>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">{status.icon}</span>
+                  <h3 class="font-bold text-lg">{status.label}</h3>
+                </div>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold column-count">
+                  {pipeline[status.key].length}
+                </span>
+              </div>
+            </div>
+
+            <div
+              class={`${status.bgColor} border-2 ${status.borderColor} rounded-b-2xl p-4 min-h-96 max-h-[calc(100vh-400px)] overflow-y-auto space-y-3`}
+            >
+              {pipeline[status.key].map((lead) => (
+                <div
+                  class="bg-white rounded-xl p-4 border-2 border-aspada-steel/10 hover:border-aspada-gold hover:shadow-lg transition cursor-pointer lead-card"
+                  data-search-content={`${lead.fullName} ${lead.contactEmail} ${lead.contactNo} ${lead.interest} ${lead.preferredLocation}`}
+                >
+                  <div class="flex items-start justify-between mb-2">
+                    <h4 class="font-bold text-aspada-navy text-sm">{lead.fullName}</h4>
+                    {lead.expand?.assignedAgent && (
+                      <div
+                        class="w-8 h-8 rounded-full bg-aspada-gold/20 flex items-center justify-center text-aspada-navy font-bold text-xs"
+                        title={lead.expand.assignedAgent.displayName || 'Assigned Agent'}
+                      >
+                        {(lead.expand.assignedAgent.displayName?.[0] || 'A').toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="space-y-2 text-xs text-aspada-steel">
+                    {lead.contactEmail && (
+                      <div class="flex items-center gap-2">
+                        <span>📧</span>
+                        <span class="truncate">{lead.contactEmail}</span>
+                      </div>
+                    )}
+                    {lead.contactNo && (
+                      <div class="flex items-center gap-2">
+                        <span>📱</span>
+                        <span>{lead.contactNo}</span>
+                      </div>
+                    )}
+                    {(lead.budgetMin || lead.budgetMax) && (
+                      <div class="flex items-center gap-2">
+                        <span>💰</span>
+                        <span class="font-bold text-aspada-navy">
+                          {formatBudget(lead.budgetMin, lead.budgetMax)}
+                        </span>
+                      </div>
+                    )}
+                    {lead.interest && (
+                      <div class="flex items-center gap-2">
+                        <span>🎯</span>
+                        <span class="truncate">{lead.interest}</span>
+                      </div>
+                    )}
+                    {lead.preferredLocation && (
+                      <div class="flex items-center gap-2">
+                        <span>📍</span>
+                        <span class="truncate">{lead.preferredLocation}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="mt-3 pt-3 border-t border-aspada-steel/10 flex items-center justify-between text-xs">
+                    <span class="text-aspada-steel/70">
+                      {lead.source && (
+                        <span class="px-2 py-1 bg-aspada-steel/10 rounded">{lead.source}</span>
+                      )}
+                    </span>
+                    <span class="text-aspada-steel/50">
+                      {new Date(lead.created).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+
+              {pipeline[status.key].length === 0 && (
+                <div class="text-center py-12 text-aspada-steel/50">
+                  <div class="text-4xl mb-2">📭</div>
+                  <p class="text-sm">No leads yet</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Quick Stats Footer -->
+    <div class="bg-white rounded-2xl p-6 border-2 border-aspada-steel/10">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+          <p class="text-sm text-aspada-steel mb-1">Total Value</p>
+          <p class="text-2xl font-bold text-aspada-navy">
+            ₹{(leads.reduce((sum, l) => sum + (l.budgetMax || 0), 0) / 10000000).toFixed(2)}Cr
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-aspada-steel mb-1">Conversion Rate</p>
+          <p class="text-2xl font-bold text-aspada-navy">
+            {
+              leads.length > 0
+                ? ((pipeline[LeadsStatusOptions.Closed].length / leads.length) * 100).toFixed(1)
+                : 0
+            }%
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-aspada-steel mb-1">Avg Deal Size</p>
+          <p class="text-2xl font-bold text-aspada-navy">
+            ₹{
+              leads.length > 0
+                ? (
+                    leads.reduce((sum, l) => sum + (l.budgetMax || 0), 0) /
+                    leads.length /
+                    100000
+                  ).toFixed(1)
+                : 0
+            }L
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-aspada-steel mb-1">Win Rate</p>
+          <p class="text-2xl font-bold text-aspada-navy">
+            {
+              pipeline[LeadsStatusOptions.Closed].length +
+                pipeline[LeadsStatusOptions.Lost].length >
+              0
+                ? (
+                    (pipeline[LeadsStatusOptions.Closed].length /
+                      (pipeline[LeadsStatusOptions.Closed].length +
+                        pipeline[LeadsStatusOptions.Lost].length)) *
+                    100
+                  ).toFixed(1)
+                : 0
+            }%
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
