@@ -2,7 +2,10 @@
   import { actions } from 'astro:actions'
 
   // Svelte 5 Props & State
-  let { projectTitle = 'General Inquiry' } = $props()
+  let { projectTitle = 'General Inquiry', isModal = false } = $props<{
+    projectTitle?: string
+    isModal?: boolean
+  }>()
 
   let fullName = $state('')
   let contactNo = $state('')
@@ -43,58 +46,85 @@
 
 <form
   onsubmit={handleSubmit}
-  class="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2rem] shadow-xl border border-slate-100 max-w-md w-full mx-auto"
+  class="w-full mx-auto font-sans {isModal
+    ? 'bg-transparent p-0 border-none shadow-none'
+    : 'bg-white p-6 sm:p-10 rounded-[2rem] shadow-2xl border border-slate-100 max-w-lg'}"
 >
-  <h3 class="text-xl sm:text-2xl font-bold text-aspada-navy mb-5 sm:mb-6">Enquire Now</h3>
+  {#if !isModal}
+    <div class="mb-8">
+      <h3
+        class="text-2xl sm:text-3xl font-display font-extrabold text-aspada-navy tracking-tight mb-2"
+      >
+        Enquire Now
+      </h3>
+      <p class="text-slate-500 text-sm font-medium">
+        Experience excellence with Aspada. Leave your details below.
+      </p>
+    </div>
+  {/if}
 
-  <div class="space-y-4">
-    <div class="space-y-1 w-full">
+  <div class="space-y-6">
+    <!-- Full Name -->
+    <div class="group space-y-2 w-full">
       <label
         for="name"
-        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-[10px] uppercase tracking-widest text-aspada-navy/60 font-bold ml-1 group-focus-within:text-aspada-gold transition-colors"
       >
         Full Name
       </label>
-      <input
-        id="name"
-        bind:value={fullName}
-        placeholder="Full Name"
-        required
-        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
-      />
+      <div class="relative">
+        <span
+          class="absolute left-4 top-1/2 -translate-y-1/2 i-lucide-user text-slate-400 group-focus-within:text-aspada-gold transition-colors"
+        ></span>
+        <input
+          id="name"
+          bind:value={fullName}
+          placeholder="e.g. John Doe"
+          required
+          class="w-full py-4 pl-11 pr-4 text-base bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all placeholder:text-slate-400 font-medium"
+        />
+      </div>
     </div>
 
-    <div class="space-y-1 w-full">
+    <!-- Email Address -->
+    <div class="group space-y-2 w-full">
       <label
         for="email"
-        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-[10px] uppercase tracking-widest text-aspada-navy/60 font-bold ml-1 group-focus-within:text-aspada-gold transition-colors"
       >
-        Email Address
+        Corporate Email
       </label>
-      <input
-        id="email"
-        type="email"
-        bind:value={contactEmail}
-        placeholder="Contact Email"
-        required
-        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
-      />
+      <div class="relative">
+        <span
+          class="absolute left-4 top-1/2 -translate-y-1/2 i-lucide-mail text-slate-400 group-focus-within:text-aspada-gold transition-colors"
+        ></span>
+        <input
+          id="email"
+          type="email"
+          bind:value={contactEmail}
+          placeholder="john@corporation.com"
+          required
+          class="w-full py-4 pl-11 pr-4 text-base bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all placeholder:text-slate-400 font-medium"
+        />
+      </div>
     </div>
 
-    <div class="space-y-1 w-full">
+    <!-- Phone Number -->
+    <div class="group space-y-2 w-full">
       <label
         for="phone"
-        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-[10px] uppercase tracking-widest text-aspada-navy/60 font-bold ml-1 group-focus-within:text-aspada-gold transition-colors"
       >
         Phone Number
       </label>
 
-      <div class="relative group">
-        <span
-          class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm border-r border-aspada-silver pr-3"
+      <div class="relative">
+        <div
+          class="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-slate-400 group-focus-within:text-aspada-gold transition-colors"
         >
-          +91
-        </span>
+          <span class="i-lucide-phone text-sm"></span>
+          <span class="text-sm font-bold border-r border-slate-200 pr-2"> +91 </span>
+        </div>
 
         <input
           id="phone"
@@ -103,10 +133,10 @@
           inputmode="numeric"
           placeholder="98765 43210"
           required
-          class="w-full p-3 sm:p-4 pl-16 text-base bg-slate-50 border rounded-xl outline-none transition-all duration-300
+          class="w-full py-4 pl-24 pr-12 text-base bg-slate-50/50 border rounded-2xl outline-none transition-all duration-300 font-medium
              {contactNo.length > 0 && !isValid
             ? 'border-rose-300 focus:ring-4 focus:ring-rose-500/10'
-            : 'border-aspada-gold/60 focus:border-aspada-gold focus:ring-4 focus:ring-aspada-gold/10'}"
+            : 'border-slate-200 focus:border-aspada-gold focus:ring-4 focus:ring-aspada-gold/10'}"
         />
 
         <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
@@ -119,40 +149,68 @@
       </div>
 
       {#if contactNo.length > 0 && !isValid}
-        <p class="text-xs text-rose-500 font-medium ml-1 animate-in slide-in-from-top-1">
+        <p class="text-[11px] text-rose-500 font-bold ml-1 animate-in slide-in-from-top-1">
           Please enter a valid 10-digit mobile number
         </p>
       {/if}
     </div>
 
-    <div class="space-y-1 w-full">
+    <!-- Message -->
+    <div class="group space-y-2 w-full">
       <label
         for="message"
-        class="text-xs sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1"
+        class="text-[10px] uppercase tracking-widest text-aspada-navy/60 font-bold ml-1 group-focus-within:text-aspada-gold transition-colors"
       >
-        Message
+        How can we help?
       </label>
-      <textarea
-        id="message"
-        bind:value={message}
-        placeholder="How can we help you?"
-        rows="3"
-        class="w-full p-3 sm:p-4 text-base bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-aspada-gold outline-none"
-      ></textarea>
+      <div class="relative">
+        <span
+          class="absolute left-4 top-4 i-lucide-message-square text-slate-400 group-focus-within:text-aspada-gold transition-colors"
+        ></span>
+        <textarea
+          id="message"
+          bind:value={message}
+          placeholder="Briefly describe your requirements..."
+          rows="3"
+          class="w-full py-4 pl-11 pr-4 text-base bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all resize-none placeholder:text-slate-400 font-medium"
+        ></textarea>
+      </div>
     </div>
 
+    <!-- Submit Button -->
     <button
       type="submit"
       disabled={status === 'sending'}
-      class="w-full bg-aspada-navy text-white font-bold py-3 sm:py-4 rounded-xl transition-all hover:bg-opacity-90 active:scale-95 disabled:opacity-50"
+      class="btn-primary w-full py-5 rounded-2xl !bg-aspada-navy !text-white flex items-center justify-center gap-3 group relative overflow-hidden transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
     >
-      {status === 'sending' ? 'Submitting...' : 'Send Message'}
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-aspada-steel/0 via-white/10 to-aspada-steel/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"
+      ></div>
+
+      {#if status === 'sending'}
+        <span class="i-lucide-loader-2 animate-spin text-xl"></span>
+        <span class="tracking-wide uppercase font-bold text-sm">Processing...</span>
+      {:else}
+        <span class="tracking-wide uppercase font-bold text-sm">Confirm Enquiry</span>
+        <span class="i-lucide-arrow-right text-lg transition-transform group-hover:translate-x-1"
+        ></span>
+      {/if}
     </button>
   </div>
 
   {#if status === 'success'}
-    <p class="mt-4 text-emerald-600 text-sm font-medium text-center animate-bounce">
-      ✓ Thank you! We will contact you shortly.
-    </p>
+    <div
+      class="mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-in zoom-in duration-300"
+    >
+      <div class="flex-center w-8 h-8 rounded-full bg-emerald-500 text-white shrink-0">
+        <span class="i-lucide-check text-sm"></span>
+      </div>
+      <div>
+        <p class="text-emerald-900 font-bold text-sm">Request Received</p>
+        <p class="text-emerald-700/80 text-[11px] font-medium">
+          Our consultant will reach out shortly.
+        </p>
+      </div>
+    </div>
   {/if}
 </form>

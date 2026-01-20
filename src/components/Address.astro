@@ -8,7 +8,7 @@ const { mapsUrl } = Astro.props
 
 <section id="contact" class="py-24 px-6 relative overflow-y">
   <div
-    class="absolute -bottom-10 -right-3 text-[15rem] font-black text-aspada-steel/50 select-none pointer-events-none blur-md"
+    class="absolute -bottom-10 -right-3 text-[12rem] md:text-[15rem] font-display font-extrabold text-aspada-steel/10 select-none pointer-events-none blur-sm"
   >
     SHIMOGA
   </div>
@@ -24,19 +24,29 @@ const { mapsUrl } = Astro.props
 
       <div class="grid grid-cols-1 lg:grid-cols-2">
         <div
-          class="relative min-h-[500px] lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10"
+          class="relative min-h-[400px] lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 bg-aspada-steel/40 p-10 lg:p-14 flex flex-col justify-end"
         >
-          <h2 class="text-3xl font-bold text-aspada-navy mb-2">Visit Us</h2>
-          <p class="text-slate-500 mb-8 text-sm">At out office</p>
-          <div
-            class="absolute inset-0 z-10 pointer-events-none group-hover:bg-transparent transition-all duration-700"
-          >
+          <div class="relative z-20">
+            <h2 class="text-3xl lg:text-4xl font-display font-extrabold text-white mb-3">
+              Visit Our Headquarters
+            </h2>
+            <p class="text-white/60 mb-8 text-sm lg:text-base font-medium max-w-sm">
+              Experience our craftsmanship first-hand at our flagship office in Shivamogga.
+            </p>
+
+            <a
+              href={mapsUrl}
+              target="_blank"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-bold transition-all hover:gap-3 mb-4"
+            >
+              Get Directions
+              <span class="i-lucide-arrow-up-right text-xs"></span>
+            </a>
           </div>
 
           <div
-            class="absolute top-30 left-6 z-20 p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
+            class="absolute inset-0 z-10 bg-gradient-to-t from-aspada-navy via-aspada-navy/40 to-transparent pointer-events-none"
           >
-            <span class="i-lucide-map-pin text-3xl text-aspada-gold"></span>
           </div>
 
           <StaticMap
@@ -47,16 +57,30 @@ const { mapsUrl } = Astro.props
           />
         </div>
 
-        <div class="p-8 lg:p-12 flex flex-col justify-center relative bg-white/5">
-          <div class="absolute top-6 right-6 opacity-5 group-hover:opacity-20 transition-opacity">
-            <span class="i-lucide-contact-2 text-7xl text-aspada-gold"></span>
+        <div class="p-10 lg:p-14 flex flex-col justify-center relative bg-white">
+          <div
+            class="absolute top-10 right-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity"
+          >
+            <span class="i-lucide-contact-2 text-9xl text-aspada-navy"></span>
           </div>
 
           <div class="relative z-10">
-            <h2 class="text-3xl font-bold text-aspada-navy mb-2">Get in Touch</h2>
-            <p class="text-slate-500 mb-8 text-sm">Drop us a message below.</p>
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-10 h-10 rounded-full bg-aspada-gold/10 flex items-center justify-center text-aspada-gold"
+              >
+                <span class="i-lucide-message-circle text-lg"></span>
+              </div>
+              <h2 class="text-3xl lg:text-4xl font-display font-extrabold text-aspada-navy">
+                Get in Touch
+              </h2>
+            </div>
+            <p class="text-slate-500 mb-10 text-sm lg:text-base font-medium">
+              Have a question or looking to start a project? <br class="hidden lg:block" /> Our team is
+              here to help you.
+            </p>
 
-            <AspadaForm client:visible />
+            <AspadaForm client:visible isModal={true} />
           </div>
         </div>
       </div>

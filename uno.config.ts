@@ -16,7 +16,7 @@ export default defineConfig({
       'btn-primary',
       'px-8 py-3 rounded-full bg-aspada-gold text-aspada-navy font-bold transition-all hover:scale-105 hover:bg-aspada-silver active:scale-95 shadow-lg',
     ],
-    ['glass-card', 'bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6'],
+    ['glass-card', 'backdrop-blur-md border border-white/10 rounded-2xl'],
     [
       'section-title',
       'text-4xl md:text-5xl font-display font-bold text-aspada-cream tracking-tight mb-8',

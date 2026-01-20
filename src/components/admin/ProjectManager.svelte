@@ -40,6 +40,8 @@
   let formState = $state('')
   let formPinCode = $state('')
   let formDistrict = $state('')
+  let formLat = $state(0)
+  let formLon = $state(0)
   let formSocials = $state<string[]>([]) // IDs
   let formAmenities = $state<string[]>([]) // IDs
   let formSpecs = $state<string[]>([]) // IDs
@@ -145,6 +147,8 @@
     formState = p.state
     formPinCode = p.pincode ?? ''
     formDistrict = p.district
+    formLat = p.location?.lat ?? 0
+    formLon = p.location?.lon ?? 0
     // Relation IDs are strings in the 'projects' record (if not expanded)
     currentCoverIds = p?.coverImage ? [p.coverImage] : []
     currentCoverVideoIds = p?.coverVideo ? [p.coverVideo] : []
@@ -168,6 +172,8 @@
     formState = ''
     formPinCode = ''
     formDistrict = ''
+    formLat = 13.9299
+    formLon = 75.5681
     formSocials = []
     formAmenities = []
     formSpecs = []
@@ -272,6 +278,7 @@
     formData.append('district', formDistrict)
     formData.append('state', formState)
     formData.append('pincode', formPinCode)
+    formData.append('location', JSON.stringify({ lat: formLat, lon: formLon }))
 
     // Append relations
     for (const id of formSocials) formData.append('socials', id)
@@ -633,6 +640,34 @@
             bind:value={formPinCode}
             class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-aspada-gold/50 outline-none transition-all font-bold text-aspada-navy"
             placeholder="e.g. 577201"
+          />
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-6 pb-6 border-b border-slate-100">
+        <label class="block">
+          <span
+            class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1 mb-2 block"
+            >Latitude</span
+          >
+          <input
+            type="number"
+            step="0.000001"
+            bind:value={formLat}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. 13.9299"
+          />
+        </label>
+        <label class="block">
+          <span
+            class="text-[10px] uppercase tracking-widest text-slate-400 font-bold ml-1 mb-2 block"
+            >Longitude</span
+          >
+          <input
+            type="number"
+            step="0.000001"
+            bind:value={formLon}
+            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all font-bold text-aspada-navy"
+            placeholder="e.g. 75.5681"
           />
         </label>
       </div>
