@@ -1,23 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import Navbar from '../components/Navbar.astro'
-import Hero from '../components/Hero.astro'
-import Amenities from '../components/Amenities.astro'
+import Hero from '../components/Hero.svelte'
 import ActionDock from '../components/ActionDock.astro'
 import Address from '../components/Address.astro'
 import Testimonials from '../components/Testimonials.astro'
 import Footer from '../components/Footer.astro'
-import ProjectGallery from '../components/ProjectGallery.astro'
+import ProjectGallery from '../components/ProjectGallery.svelte'
 import LoadingSection from '../components/LoadingSection.astro'
 import pb from '../lib/pb'
 import ProjectCategory from '../components/ProjectCategory.astro'
 import {
   Collections,
+  MetadataCategoryTypeOptions,
   ProjectsStatusOptions,
   type ProjectsResponse,
+  type MetadataResponse,
 } from '../types/pocketbase-types'
 import type { ProjectExpand } from '../types'
-// import AspadaChat from "../components/AspadaChat.svelte";
+import StatsSection from '../components/StatsSection.svelte'
 
 const projects = await pb
   .collection(Collections.Projects)
@@ -25,6 +26,10 @@ const projects = await pb
     limit: 10,
     expand: 'coverImage,projectDetails',
   })
+
+const stats = await pb.collection(Collections.Metadata).getFullList<MetadataResponse>({
+  filter: `categoryType = "${MetadataCategoryTypeOptions.statsSettings}"`,
+})
 
 const ongoingProjects = projects.filter(
   (project) => project.status === ProjectsStatusOptions.ongoing
@@ -40,17 +45,18 @@ const mapsUrl = 'https://maps.app.goo.gl/ByMKK3ayuos1PQQt8'
   <Navbar companyProfile={companyProfile} />
 
   <main>
-    <Hero projects={projects} />
+    <Hero client:load projects={ongoingProjects} />
+    <StatsSection client:load stats={stats} />
     <LoadingSection
       sectionId="portfolio"
       skeletonCount={3}
       minHeight="600px"
       class="py-16 px-4 sm:py-24 sm:px-6"
     >
-      <ProjectGallery projects={ongoingProjects} />
+      <ProjectGallery client:load projects={ongoingProjects} />
       <ProjectCategory />
     </LoadingSection>
-    <Amenities />
+
     <LoadingSection
       sectionId="testimonials"
       skeletonCount={1}

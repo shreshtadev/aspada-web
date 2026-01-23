@@ -1,10 +1,14 @@
 ---
+import { Image } from 'astro:assets'
+import layout from '../assets/layout.png'
+import commercial from '../assets/commercial.png'
+import residential from '../assets/residential.png'
+
 type Category = {
   title: string
   description: string
   href: string
-  icon: 'map' | 'home' | 'building-2'
-  image?: string // optional background image
+  image?: ImageMetadata // optional background image
 }
 
 const categories: Category[] = [
@@ -12,19 +16,19 @@ const categories: Category[] = [
     title: 'Layouts',
     description: 'Residential layouts & plotted developments',
     href: '/projects/plots',
-    icon: 'map',
+    image: layout,
   },
   {
     title: 'Residential',
     description: 'Apartments, villas & gated communities',
     href: '/projects/residential',
-    icon: 'home',
+    image: residential,
   },
   {
     title: 'Commercial',
     description: 'Retail, office & mixed-use projects',
     href: '/projects/commercial',
-    icon: 'building-2',
+    image: commercial,
   },
 ]
 ---
@@ -36,39 +40,32 @@ const categories: Category[] = [
         categories.map((item) => (
           <a
             href={item.href}
-            class="group relative flex min-h-[550px] overflow-hidden rounded-[2.5rem]
-                 border border-aspada-steel/10 bg-aspada-navy
+            class="group relative flex min-h-[550px]
+                 border border-aspada-steel/10 rounded rounded-md
+                 bg-white
                  transition-all duration-500
                  hover:shadow-2xl hover:-translate-y-2"
           >
             <div
-              class="absolute inset-0 bg-gradient-to-t
-                   from-aspada-navy via-aspada-navy/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity"
-            />
-
-            <div
               class="relative z-10 flex h-full w-full flex-col
-                   justify-between p-10 text-white"
+                   justify-between p-2 text-aspada-steel"
             >
-              <div class="flex flex-1 items-center justify-center">
-                <div
-                  class="inline-flex h-48 w-48 items-center justify-center
-                       rounded-[2rem] bg-white/10 backdrop-blur-xl
-                       border border-white/20 transition-all duration-700
-                       group-hover:bg-transparent group-hover:border-aspada-silver/20 group-hover:rotate-[10deg] text-3xl"
-                >
-                  <span class={`i-lucide-${item.icon}`} />
-                </div>
-              </div>
+              <Image
+                src={item.image}
+                alt={item.title ?? 'Feature image'}
+                class="w-full h-full object-contain"
+                loading="lazy"
+                decode="async"
+              />
 
-              <div class="space-y-4">
-                <span class="text-aspada-gold text-xs font-black uppercase tracking-[0.3em] opacity-0 -translate-x-4 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0">
+              <div class="space-y-8">
+                <span class="text-aspada-gold text-md font-black uppercase tracking-tighter opacity-0 -translate-x-4 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0 ">
                   Premium Collection
                 </span>
                 <h3 class="text-4xl font-black uppercase tracking-tighter leading-[0.9]">
                   {item.title}
                 </h3>
-                <p class="text-lg text-white/70 max-w-sm font-light leading-relaxed transition-all duration-500 group-hover:text-white">
+                <p class="text-lg text-aspada-steel/70 max-w-sm font-light leading-relaxed transition-all duration-500 group-hover:text-aspada-navy">
                   {item.description}
                 </p>
 

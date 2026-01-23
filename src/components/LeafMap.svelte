@@ -13,7 +13,7 @@
     await import('leaflet/dist/leaflet.css')
 
     const map = L.map(mapContainer!).setView([latitude, longitude], 13)
-
+    delete L.Icon.Default.prototype._getIconUrl
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
       iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,

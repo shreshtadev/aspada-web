@@ -1,14 +1,14 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro'
-import StatsSettingsManager from '../../components/admin/StatsSettingsManager.svelte'
+import GalleryManager from '../../components/admin/GalleryManager.svelte'
 ---
 
 <AdminLayout>
   <header class="flex justify-between items-center mb-8">
     <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tight">
-      Manage <span class="text-aspada-gold">Project Details</span>
+      Manage <span class="text-aspada-gold">Gallery</span>
     </h1>
   </header>
 
-  <StatsSettingsManager client:load />
+  <GalleryManager client:load />
 </AdminLayout>

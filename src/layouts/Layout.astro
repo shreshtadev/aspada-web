@@ -1,4 +1,6 @@
 ---
+import MouseHighlight from '../components/MouseHighlight.svelte'
+import MouseTracker from '../components/MouseTracker.svelte'
 import '../styles/global.css'
 interface Props {
   title: string
@@ -42,6 +44,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
   <body
     class="bg-white text-aspada-navy font-sans selection:bg-aspada-gold selection:text-aspada-steel w-full"
   >
-    <slot />
+    <MouseTracker client:load>
+      <slot />
+    </MouseTracker>
   </body>
 </html>

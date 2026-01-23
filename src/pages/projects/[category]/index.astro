@@ -3,12 +3,11 @@ import Layout from "../../../layouts/Layout.astro";
 import Navbar from "../../../components/Navbar.astro";
 import Footer from "../../../components/Footer.astro";
 import ActionDock from "../../../components/ActionDock.astro";
-import ProjectList from "../../../components/projects/ProjectList.astro";
+import ProjectList from "../../../components/projects/ProjectList.svelte";
 import pb from "../../../lib/pb";
 import toast from "svelte-french-toast";
 import {
   Collections,
-  ProjectsCategoryOptions,
   ProjectsStatusOptions,
   type CompaniesResponse,
   type ProjectsResponse,
@@ -24,49 +23,26 @@ let completedProjects: any[] = [];
 let projects: any[] = [];
 const { category } = Astro.params;
 let companyProfile: CompaniesResponse;
+let projectsList: ProjectsResponse<ProjectExpand>[] = [];
 try {
-  const records = await pb
+  projectsList = await pb
     .collection(Collections.Projects)
     .getFullList<ProjectsResponse<ProjectExpand>>({
       sort: "-created",
       expand: "coverImage,projectDetails",
       filter: `category = "${category}"`,
     });
-
-  projects = records.map((record) => {
-    const coverImageUrl = pb.files.getURL(
-      record.expand?.coverImage,
-      record.expand?.coverImage?.attachment,
-      {
-        thumb: "800x600",
-        quality: 80,
-      }
-    );
-
-    return {
-      id: record.id,
-      title: record.title,
-      slug: record.slug,
-      category: record.category || ProjectsCategoryOptions.residential,
-      coverImage: coverImageUrl,
-      description: record.description,
-      city: record.city,
-      district: record.district,
-      status: record.status,
-      projectDetails: record.expand?.projectDetails,
-    };
-  });
 } catch (e) {
   console.error(e);
   toast.error("Error fetching projects");
 }
-ongoingProjects = projects.filter(
+ongoingProjects = projectsList.filter(
   (p) => p.status === ProjectsStatusOptions.ongoing
 );
-upcomingProjects = projects.filter(
+upcomingProjects = projectsList.filter(
   (p) => p.status === ProjectsStatusOptions.upcoming
 );
-completedProjects = projects.filter(
+completedProjects = projectsList.filter(
   (p) => p.status === ProjectsStatusOptions.completed
 );
 
@@ -75,6 +51,14 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 
 <Layout title="Our Projects | Aspada Developers">
   <Navbar companyProfile={companyProfile} />
+  <div class="relative w-full h-[60vh] overflow-hidden">
+    <img
+      src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=fill&q=80&w=2070"
+      alt="Projects Hero"
+      class="w-full h-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent"></div>
+  </div>
 
   <main class="pt-24 pb-12 px-4 sm:pt-32 sm:pb-20 sm:px-6 min-h-screen">
     <div class="max-w-7xl mx-auto">
@@ -98,14 +82,14 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 
       {
         ongoingProjects.length > 0 ? (
-          <ProjectList projects={ongoingProjects} />
+          <ProjectList client:load projects={ongoingProjects} layout="masonry"/>
         ) : (
           <div class="text-center py-20 bg-aspada-silver/5 rounded-3xl border border-white/10">
-            <p class="text-aspada-steel/50 text-xl">
-              No projects found at the moment.
+            <p class="text-aspada-steel/50 text-2xl">
+              Projects are currently being lined up.
             </p>
-            <p class="text-sm mt-2 text-aspada-steel/40">
-              Please check back soon.
+            <p class="text-lg mt-2 text-aspada-steel/40">
+              More will be available soon.
             </p>
           </div>
         )
@@ -123,7 +107,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
         </h1>
       </div>
       <div>
-          <ProjectList projects={completedProjects} />
+          <ProjectList client:visible projects={completedProjects} />
       </div>
         )
       }
@@ -139,7 +123,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
         </h1>
       </div>
       <div>
-          <ProjectList projects={upcomingProjects} />
+          <ProjectList client:visible projects={upcomingProjects} />
       </div>
         )
       }

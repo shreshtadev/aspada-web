@@ -20,7 +20,7 @@ import type { ProjectInfoExpand } from '../../../types'
 import ProjectAddress from '../../../components/ProjectAddress.astro'
 import ProjectEnquiryModal from '../../../components/ProjectEnquiryModal.svelte'
 import GalleryLightbox from '../../../components/projects/GalleryLightbox.svelte'
-import HorizontalScroller from '../../../components/HorizontalScroller.astro'
+import AmenitiesCarousel from '../../../components/projects/AmenitiesCarousel.svelte'
 
 const { category, id } = Astro.params
 if (!id || !category) {
@@ -158,7 +158,6 @@ companyProfile = await pb
 
 <Layout title={`${project.title} | Aspada Developers`}>
   <Navbar companyProfile={companyProfile} />
-
   <main class="min-h-screen bg-aspada-cream/10">
     {/* Hero Section */}
     <div class="relative h-[60vh] sm:h-[70vh] w-full overflow-hidden">
@@ -243,7 +242,7 @@ companyProfile = await pb
             )
           }
           {
-            specifications.length > 0 && (
+            specifications.length > 0 && specifications.every((item) => item.showInTiles) && (
               <a href="#specifications" class="hover:text-aspada-gold transition-colors">
                 Specifications
               </a>
@@ -327,26 +326,7 @@ companyProfile = await pb
                   <span class="w-8 h-1 bg-aspada-steel" />
                   Premium Amenities
                 </h2>
-                <HorizontalScroller>
-                  {amenities.map((item) => (
-                    <div class="group p-6 rounded-3xl bg-white transition-all shrink-0 w-[200px] snap-start flex flex-col items-center text-center">
-                      <div class="w-24 h-24 rounded-2xl bg-aspada-cream/30 flex items-center justify-center text-aspada-steel mb-4 group-hover:scale-110 transition-transform">
-                        {item.attachments[0] ? (
-                          <img
-                            src={item.attachments[0]}
-                            alt={item.title}
-                            class="w-20 h-20 object-contain"
-                          />
-                        ) : (
-                          <span class="i-lucide-check text-2xl" />
-                        )}
-                      </div>
-                      <h3 class="font-bold text-aspada-navy group-hover:text-aspada-gold transition-colors text-sm">
-                        {item.title}
-                      </h3>
-                    </div>
-                  ))}
-                </HorizontalScroller>
+                <AmenitiesCarousel client:load amenities={amenities} />
               </section>
             )
           }
