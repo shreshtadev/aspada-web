@@ -1,18 +1,29 @@
 <script lang="ts">
   import useEmblaCarousel from 'embla-carousel-svelte'
+  import Autoplay from 'embla-carousel-autoplay'
   import type { MetadataResponse } from '../../types/pocketbase-types'
 
-  const props = $props<{
+  const { amenities } = $props<{
     amenities: MetadataResponse[]
-    canScrollPrev?: boolean
-    canScrollNext?: boolean
   }>()
+
+  let canScrollPrev = $state(false)
+  let canScrollNext = $state(false)
 
   const options = {
     align: 'start',
     dragFree: true,
     containScroll: 'trimSnaps',
+    loop: true,
   }
+
+  const plugins = [
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: false,
+      playOnInit: true,
+    }),
+  ]
 
   let emblaApi: any
 
@@ -25,8 +36,8 @@
 
   function updateButtons() {
     if (!emblaApi) return
-    props.canScrollPrev = emblaApi.canScrollPrev()
-    props.canScrollNext = emblaApi.canScrollNext()
+    canScrollPrev = emblaApi.canScrollPrev()
+    canScrollNext = emblaApi.canScrollNext()
   }
 
   function scrollPrev() {
@@ -40,7 +51,7 @@
 
 <div class="relative group/carousel">
   <!-- Left Navigation Button -->
-  {#if props.canScrollPrev}
+  {#if canScrollPrev}
     <button
       onclick={scrollPrev}
       class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-xl border border-slate-200 flex items-center justify-center text-aspada-navy opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 hover:scale-110 cursor-pointer"
@@ -51,7 +62,7 @@
   {/if}
 
   <!-- Right Navigation Button -->
-  {#if props.canScrollNext}
+  {#if canScrollNext}
     <button
       onclick={scrollNext}
       class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-xl border border-slate-200 flex items-center justify-center text-aspada-navy opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-aspada-gold hover:text-white active:scale-95 hover:scale-110 cursor-pointer"
@@ -64,13 +75,13 @@
   <div class="embla overflow-hidden -mx-4 px-4 sm:mx-0 sm:px-0 cursor-grab">
     <div
       class="embla__viewport overflow-hidden"
-      use:useEmblaCarousel={{ options }}
+      use:useEmblaCarousel={{ options, plugins }}
       onemblainit={onInit}
     >
       <div class="embla__container flex gap-6">
-        {#each props.amenities as item}
+        {#each amenities as item}
           <div
-            class="embla__slide flex-shrink-0 w-[200px] group p-6 bg-transparent transition-all snap-start flex flex-col items-center text-center"
+            class="embla__slide flex-none w-[200px] group p-6 bg-transparent transition-all snap-start flex flex-col items-center text-center"
           >
             <div
               class="w-24 h-24 rounded-2xl flex items-center justify-center text-aspada-steel mb-4 group-hover:scale-110 transition-transform active:cursor-grabbing"

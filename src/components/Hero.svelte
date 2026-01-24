@@ -20,7 +20,7 @@
     props.projects.map((project) => {
       const cover = project.expand?.coverImage
       const coverImageUrl = cover?.attachment
-        ? pb.files.getURL(cover, cover.attachment, { thumb: '1200', quality: 90 })
+        ? pb.files.getURL(cover, cover.attachment, { thumb: '1200', quality: 50 })
         : null
 
       return {
@@ -77,9 +77,8 @@
       <div class="embla__container flex h-full">
         {#each projects as project, index}
           <div
-            class={`embla__slide flex-[0_0_100%] relative ${
-              index === activeIndex ? 'is-active' : ''
-            }`}
+            class="embla__slide flex-none w-full relative"
+            class:is-active={index === activeIndex}
           >
             {#if project.coverImageUrl}
               <img
@@ -102,9 +101,9 @@
     </div>
     <!-- PREVIOUS -->
     <button
-      class="embla__prev absolute left-10 top-1/2 left-1/2 -translate-y-1/2 z-20
+      class="embla__prev absolute left-10 top-1/2 -translate-y-1/2 z-20
             hover:text-4xl text-aspada-cream
-           rounded-full w-20 h-20 flex items-center justify-center cursor-pointer text-3xl"
+           rounded-full w-30 h-30 flex items-center justify-center cursor-pointer text-5xl"
       onclick={goToPrev}
       aria-label="Previous slide"
     >
@@ -115,7 +114,7 @@
     <button
       class="embla__next absolute right-10 top-1/2 -translate-y-1/2 z-20
             hover:text-4xl text-aspada-cream
-           rounded-full w-20 h-20 flex items-center justify-center cursor-pointer text-3xl"
+           rounded-full w-30 h-30 flex items-center justify-center cursor-pointer text-5xl"
       onclick={goToNext}
       aria-label="Next slide"
     >
@@ -124,7 +123,7 @@
   </div>
 
   <!-- Progress Indicators -->
-  <div class="absolute bottom-6 left-10 -translate-x-1/2 z-20 flex gap-3">
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
     {#each projects as _, i}
       <div class="h-[2px] w-12 bg-white/30 overflow-hidden rounded">
         {#if i === activeIndex}

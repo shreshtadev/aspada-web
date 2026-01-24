@@ -20,7 +20,7 @@
   <div class="embla overflow-hidden" use:useEmblaCarousel>
     <div class="flex gap-6">
       {#each projects as project (project.id)}
-        <div class="flex-shrink-0 w-[85vw] sm:w-[45vw] lg:w-[30vw]">
+        <div class="flex-none w-[85vw] sm:w-[45vw] lg:w-[30vw]">
           <ProjectCard {project} {variant} />
         </div>
       {/each}
