@@ -5,6 +5,7 @@
     Collections,
     MetadataCategoryTypeOptions,
     type MetadataResponse,
+    type ProjectsResponse,
   } from '../../types/pocketbase-types'
   import FileUploadTracker from './FileUploadTracker.svelte'
   import { uploadAttachment } from '../../lib/utils'
@@ -100,6 +101,26 @@
           record = await pb
             .collection(Collections.Metadata)
             .update<MetadataResponse>(record.id, { title: record.id })
+        }
+
+        // Update the selected project's projectDetails with the new metadata record ID
+        if (formProject) {
+          try {
+            const project = await pb
+              .collection(Collections.Projects)
+              .getOne<ProjectsResponse>(formProject)
+            const existingDetails = project.projectDetails || []
+
+            // Add the new record ID to projectDetails if not already present
+            if (!existingDetails.includes(record.id)) {
+              await pb.collection(Collections.Projects).update<ProjectsResponse>(formProject, {
+                projectDetails: [...existingDetails, record.id],
+              })
+            }
+          } catch (err) {
+            console.error('Failed to update project details:', err)
+            toast.error('Gallery created but failed to link to project')
+          }
         }
 
         galleryItems = [record, ...galleryItems]
