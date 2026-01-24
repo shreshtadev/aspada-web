@@ -16,7 +16,7 @@
   }
 </script>
 
-<section class="bg-white py-30">
+<section class="bg-transparent py-30">
   <div class="max-w-7xl mx-auto px-6 overflow-x-visible">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-6">
