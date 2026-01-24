@@ -61,7 +61,7 @@
     </button>
   {/if}
 
-  <div class="embla overflow-hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+  <div class="embla overflow-hidden -mx-4 px-4 sm:mx-0 sm:px-0 cursor-grab">
     <div
       class="embla__viewport overflow-hidden"
       use:useEmblaCarousel={{ options }}
@@ -70,10 +70,10 @@
       <div class="embla__container flex gap-6">
         {#each props.amenities as item}
           <div
-            class="embla__slide flex-shrink-0 w-[200px] group p-6 rounded-3xl bg-transparent transition-all snap-start flex flex-col items-center text-center shadow-sm hover:shadow-xl"
+            class="embla__slide flex-shrink-0 w-[200px] group p-6 bg-transparent transition-all snap-start flex flex-col items-center text-center"
           >
             <div
-              class="w-24 h-24 rounded-2xl flex items-center justify-center text-aspada-steel mb-4 group-hover:scale-110 transition-transform"
+              class="w-24 h-24 rounded-2xl flex items-center justify-center text-aspada-steel mb-4 group-hover:scale-110 transition-transform active:cursor-grabbing"
             >
               {#if item.attachments && item.attachments[0]}
                 <img src={item.attachments[0]} alt={item.title} class="w-20 h-20 object-contain" />

@@ -45,7 +45,14 @@ const mapsUrl = 'https://maps.app.goo.gl/ByMKK3ayuos1PQQt8'
   <Navbar companyProfile={companyProfile} />
 
   <main>
-    <Hero client:load projects={ongoingProjects} />
+    <LoadingSection
+      sectionId="hero"
+      skeletonCount={3}
+      minHeight="600px"
+      class="py-16 px-4 sm:py-24 sm:px-6"
+    >
+      <Hero client:load projects={ongoingProjects} />
+    </LoadingSection>
     <StatsSection client:load stats={stats} />
     <LoadingSection
       sectionId="portfolio"
