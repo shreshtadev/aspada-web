@@ -52,10 +52,10 @@ const categories: Category[] = [
             >
               <Image
                 src={item.image}
-                alt={item.title ?? 'Feature image'}
-                class="w-full h-full object-contain"
+                alt={item.title ?? `${item.title} Feature image`}
+                class="w-full h-full object-cover rounded-md"
                 loading="lazy"
-                decode="async"
+                decoding="async"
               />
 
               <div class="space-y-8">

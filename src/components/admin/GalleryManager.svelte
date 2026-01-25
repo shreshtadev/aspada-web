@@ -43,6 +43,7 @@
   function selectItem(item: MetadataResponse | null) {
     selectedId = item?.id ?? null
     formTitle = item?.title ?? ''
+    formProject = item?.summary ?? ''
     attachmentIds = item?.attachments ?? []
     if (fileTracker) fileTracker.clearFiles()
   }
@@ -79,6 +80,7 @@
         title: formTitle || 'Temp Title', // Placeholder if empty
         attachments: finalAttachmentIds,
         categoryType: MetadataCategoryTypeOptions.gallery,
+        summary: formProject,
       }
 
       let record: MetadataResponse

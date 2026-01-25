@@ -27,6 +27,18 @@ if (!id || !category) {
   return Astro.redirect(`/projects/${category}`)
 }
 
+const iconForProjectCategory = {
+  plots: 'i-lucide-map',
+  commercial: 'i-lucide-building-2',
+  residential: 'i-lucide-home',
+}
+
+const colorForProjectStatus = {
+  ongoing: 'bg-yellow-500',
+  upcoming: 'bg-aspada-steel/80',
+  completed: 'bg-green-500',
+}
+
 let project: ProjectsResponse<ProjectInfoExpand>
 let galleryImages: any[] = []
 let amenities: MetadataResponse[] = []
@@ -363,7 +375,7 @@ companyProfile = await pb
                 <div
                   class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
                 >
-                  <span class="i-lucide-home"></span>
+                  <span class={iconForProjectCategory[project.category]}></span>
                 </div>
                 <div>
                   <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Type</p>
@@ -375,9 +387,10 @@ companyProfile = await pb
 
               <div class="flex items-center gap-4">
                 <div
-                  class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
+                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                  class:list={colorForProjectStatus[project.status]}
                 >
-                  <span class="i-lucide-activity"></span>
+                  <span class="i-lucide-activity text-white"></span>
                 </div>
                 <div>
                   <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</p>

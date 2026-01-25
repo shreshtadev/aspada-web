@@ -13,6 +13,11 @@ import {
   type ProjectsResponse,
 } from "../../../types/pocketbase-types";
 import type { ProjectExpand } from "../../../types";
+import layout from '../../../assets/layout.webp'
+import commercial from '../../../assets/commercial.webp'
+import residential from '../../../assets/residential.webp'
+import { Image } from "astro:assets";
+import LoadingSection from "../../../components/LoadingSection.astro";
 
 // Fetch projects
 // Using fullList to get all projects for the index page.
@@ -20,10 +25,10 @@ import type { ProjectExpand } from "../../../types";
 let upcomingProjects: any[] = [];
 let ongoingProjects: any[] = [];
 let completedProjects: any[] = [];
-let projects: any[] = [];
 const { category } = Astro.params;
 let companyProfile: CompaniesResponse;
 let projectsList: ProjectsResponse<ProjectExpand>[] = [];
+const imageToLoad = category === 'plots' ? layout : category === 'commercial' ? commercial : residential;
 try {
   projectsList = await pb
     .collection(Collections.Projects)
@@ -51,9 +56,17 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 
 <Layout title="Our Projects | Aspada Developers">
   <Navbar companyProfile={companyProfile} />
-  <div class="relative w-full h-[60vh] overflow-hidden">
-    <img
-      src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=fill&q=80&w=2070"
+      <LoadingSection
+      sectionId="mainSection"
+      skeletonCount={5}
+      minHeight="600px"
+      class="py-16 px-4 sm:py-24 sm:px-6"
+    >
+  <div class="relative w-full h-full overflow-hidden">
+    <Image
+      src={imageToLoad}
+      loading="lazy"
+      decoding="async"
       alt="Projects Hero"
       class="w-full h-full object-cover"
     />
@@ -129,7 +142,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
       }
     </div>
   </main>
-
+</LoadingSection>
   <Footer companyProfile={companyProfile} />
   <ActionDock companyProfile={companyProfile} />
 </Layout>
