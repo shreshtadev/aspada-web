@@ -18,6 +18,7 @@
   let formTitle = $state('')
   let attachmentIds = $state<string[]>([])
   let formProject = $state<string>('')
+  let initialProject = $state<string>('')
   let formLoading = $state(false)
   let fileTracker = $state<ReturnType<typeof FileUploadTracker>>()
 
@@ -44,6 +45,7 @@
     selectedId = item?.id ?? null
     formTitle = item?.title ?? ''
     formProject = item?.summary ?? ''
+    initialProject = item?.summary ?? ''
     attachmentIds = item?.attachments ?? []
     if (fileTracker) fileTracker.clearFiles()
   }
@@ -52,6 +54,7 @@
     selectedId = null
     formTitle = ''
     formProject = ''
+    initialProject = ''
     attachmentIds = []
     if (fileTracker) fileTracker.clearFiles()
   }
@@ -105,28 +108,56 @@
             .update<MetadataResponse>(record.id, { title: record.id })
         }
 
-        // Update the selected project's projectDetails with the new metadata record ID
-        if (formProject) {
-          try {
-            const project = await pb
-              .collection(Collections.Projects)
-              .getOne<ProjectsResponse>(formProject)
-            const existingDetails = project.projectDetails || []
-
-            // Add the new record ID to projectDetails if not already present
-            if (!existingDetails.includes(record.id)) {
-              await pb.collection(Collections.Projects).update<ProjectsResponse>(formProject, {
-                projectDetails: [...existingDetails, record.id],
-              })
-            }
-          } catch (err) {
-            console.error('Failed to update project details:', err)
-            toast.error('Gallery created but failed to link to project')
-          }
-        }
+        // Project linking is handled after this block
 
         galleryItems = [record, ...galleryItems]
         toast.success('Gallery item created successfully')
+      }
+
+      // Handle Project Relationship Sync (moved outside to handle both Create and Update)
+      const oldProjectId = initialProject
+      const newProjectId = formProject
+      const galleryId = record.id
+
+      // Only proceed if the project selection has changed
+      if (oldProjectId !== newProjectId) {
+        // 1. Unlink from Old Project if it existed
+        if (oldProjectId) {
+          try {
+            const oldProject = await pb
+              .collection(Collections.Projects)
+              .getOne<ProjectsResponse>(oldProjectId)
+            const existingDetails = oldProject.projectDetails || []
+            if (existingDetails.includes(galleryId)) {
+              const updatedDetails = existingDetails.filter((id) => id !== galleryId)
+              await pb.collection(Collections.Projects).update(oldProjectId, {
+                projectDetails: updatedDetails,
+              })
+            }
+          } catch (err) {
+            console.error('Failed to unlink from old project:', err)
+          }
+        }
+
+        // 2. Link to New Project if one is selected
+        if (newProjectId) {
+          try {
+            const newProject = await pb
+              .collection(Collections.Projects)
+              .getOne<ProjectsResponse>(newProjectId)
+            const existingDetails = newProject.projectDetails || []
+            if (!existingDetails.includes(galleryId)) {
+              existingDetails.push(galleryId)
+              await pb.collection(Collections.Projects).update(newProjectId, {
+                projectDetails: existingDetails,
+              })
+            }
+            toast.success('Gallery linked to project successfully')
+          } catch (err) {
+            console.error('Failed to link to new project:', err)
+            toast.error('Gallery saved, but failed to link to project')
+          }
+        }
       }
 
       selectItem(record)
