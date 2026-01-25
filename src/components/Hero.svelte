@@ -10,8 +10,6 @@
     durationPerImage?: number
   }>()
 
-  const durationPerImage = $derived(props.durationPerImage ?? 5000)
-
   let emblaApi: any
   let activeIndex = $state(0)
 
@@ -31,7 +29,7 @@
   )
 
   const autoplay = Autoplay({
-    delay: durationPerImage,
+    delay: props.durationPerImage ?? 5000,
     stopOnInteraction: false,
     stopOnMouseEnter: false,
   })
@@ -77,17 +75,33 @@
       <div class="embla__container flex h-full">
         {#each projects as project, index}
           <div
-            class="embla__slide flex-none w-full relative"
+            class="embla__slide flex-none w-full relative h-full cursor-pointer"
             class:is-active={index === activeIndex}
           >
             {#if project.coverImageUrl}
               <img
                 src={project.coverImageUrl}
-                alt={project.slug || project.title || `Project ${index + 1}`}
+                alt={project.title}
                 loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
                 class="absolute inset-0 w-full h-full object-cover"
               />
+
+              <a
+                href={`/projects/${project.category}/${project.id}`}
+                class="absolute inset-0 group block z-10"
+              >
+                <p
+                  class="embla__caption
+                           absolute bottom-20 right-10 /* Mobile alignment */
+                           md:bottom-30 md:right-10 /* Desktop alignment */
+                           bg-aspada-navy/60 p-4 md:p-5 /* Responsive padding */
+                           text-aspada-cream text-xl md:text-3xl font-bold
+                           transition-transform duration-300
+                           group-hover:-translate-x-2"
+                >
+                  {project.title}
+                </p>
+              </a>
             {:else}
               <div
                 class="absolute inset-0 w-full h-full bg-aspada-navy flex items-center justify-center text-white"
@@ -129,7 +143,7 @@
         {#if i === activeIndex}
           <div
             class="progress-bar h-full bg-white origin-left"
-            style={`animation-duration: ${durationPerImage}ms`}
+            style={`animation-duration: ${props.durationPerImage}ms`}
           ></div>
         {/if}
       </div>
@@ -170,5 +184,26 @@
     .progress-bar {
       animation: none;
     }
+  }
+
+  /* The starting state: hidden and 20px below its final position */
+  .embla__caption {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+  }
+
+  /* The active state: slide up and fade in */
+  /* .is-active is the class applied to the current embla__slide */
+  .is-active .embla__caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Optional: Slight delay so the image appears first */
+  .is-active .embla__caption {
+    transition-delay: 0.2s;
   }
 </style>

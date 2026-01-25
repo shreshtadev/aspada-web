@@ -51,7 +51,7 @@ const mapsUrl = 'https://maps.app.goo.gl/ByMKK3ayuos1PQQt8'
       minHeight="600px"
       class="py-16 px-4 sm:py-24 sm:px-6"
     >
-      <Hero client:load projects={ongoingProjects} />
+      <Hero client:load projects={ongoingProjects} durationPerImage={5000} />
     </LoadingSection>
     <StatsSection client:load stats={stats} />
     <LoadingSection
