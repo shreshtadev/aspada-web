@@ -54,7 +54,7 @@
 
     // Check if we're creating a new stat and already have 4
     if (!selectedId && stats.length >= MAX_STATS) {
-      toast.error(`Maximum of ${MAX_STATS} stats allowed. Please delete one first.`)
+      toast.error(`Maximum of ${MAX_STATS} stats allowed.`)
       return
     }
 
@@ -127,7 +127,7 @@
       {#if !canAddNew}
         <div class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
           <p class="text-xs text-amber-800">
-            Maximum of {MAX_STATS} stats reached. Delete one to add a new stat.
+            Maximum of {MAX_STATS} stats reached.
           </p>
         </div>
       {/if}
@@ -159,7 +159,7 @@
                 </div>
               </div>
             </div>
-            <button
+            <!-- <button
               onclick={(e) => {
                 e.stopPropagation()
                 deleteStat(stat.id)
@@ -167,7 +167,7 @@
               class="text-red-500 text-xs mt-2 hover:underline"
             >
               Delete
-            </button>
+            </button> -->
           </div>
         {:else}
           <div class="text-center py-8 text-slate-400">
@@ -233,14 +233,14 @@
           {formLoading ? 'Saving...' : selectedId ? 'Update Stat' : 'Create Stat'}
         </button>
 
-        {#if selectedId}
+        <!-- {#if selectedId}
           <button
             onclick={() => deleteStat(selectedId!)}
             class="bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 cursor-pointer"
           >
             Delete
           </button>
-        {/if}
+        {/if} -->
 
         <button
           onclick={newStat}

@@ -103,7 +103,6 @@
           type="email"
           bind:value={contactEmail}
           placeholder="john@corporation.com"
-          required
           class="w-full py-4 pl-11 pr-4 text-base bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold outline-none transition-all placeholder:text-slate-400 font-medium"
         />
       </div>
@@ -131,7 +130,7 @@
           bind:value={contactNo}
           type="tel"
           inputmode="numeric"
-          placeholder="98765 43210"
+          placeholder="9876543210"
           required
           class="w-full py-4 pl-24 pr-12 text-base bg-slate-50/50 border rounded-2xl outline-none transition-all duration-300 font-medium
              {contactNo.length > 0 && !isValid

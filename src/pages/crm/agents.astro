@@ -1,62 +1,53 @@
 ---
-import AdminLayout from "../../layouts/AdminLayout.astro";
-import pb from "../../lib/pb";
-import { Collections, LeadsStatusOptions } from "../../types/pocketbase-types";
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import pb from '../../lib/pb'
+import { Collections, LeadsStatusOptions } from '../../types/pocketbase-types'
 
 // Load agents and leads
 const agents = await pb.collection(Collections.Agents).getFullList({
-  sort: "-created",
-});
+  sort: '-created',
+})
 
-const leads = await pb.collection(Collections.Leads).getFullList();
+const leads = await pb.collection(Collections.Leads).getFullList()
 
 const activities = await pb.collection(Collections.LeadActivities).getFullList({
-  expand: "createdBy",
-});
+  expand: 'createdBy',
+})
 
 // Calculate performance metrics for each agent
 const agentPerformance = agents.map((agent) => {
-  const agentLeads = leads.filter((l) => l.assignedAgent === agent.id);
-  const agentActivities = activities.filter(
-    (a) => a.createdBy === agent.id,
-  );
+  const agentLeads = leads.filter((l) => l.assignedAgent === agent.id)
+  const agentActivities = activities.filter((a) => a.createdBy === agent.id)
 
   return {
     ...agent,
     totalLeads: agentLeads.length,
-    newLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.New)
-      .length,
-    qualifiedLeads: agentLeads.filter(
-      (l) => l.status === LeadsStatusOptions.Qualified,
-    ).length,
-    closedLeads: agentLeads.filter(
-      (l) => l.status === LeadsStatusOptions.Closed,
-    ).length,
-    lostLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.Lost)
-      .length,
+    newLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.New).length,
+    qualifiedLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.Qualified).length,
+    closedLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.Closed).length,
+    lostLeads: agentLeads.filter((l) => l.status === LeadsStatusOptions.Lost).length,
     totalActivities: agentActivities.length,
     completedActivities: agentActivities.filter((a) => a.completedAt).length,
     conversionRate:
       agentLeads.length > 0
         ? (
-            (agentLeads.filter((l) => l.status === LeadsStatusOptions.Closed)
-              .length /
+            (agentLeads.filter((l) => l.status === LeadsStatusOptions.Closed).length /
               agentLeads.length) *
             100
           ).toFixed(1)
         : 0,
     totalValue: agentLeads.reduce((sum, l) => sum + (l.budgetMax || 0), 0),
-  };
-});
+  }
+})
 
 // Sort by total leads
-const sortedAgents = agentPerformance.sort((a, b) => b.totalLeads - a.totalLeads);
+const sortedAgents = agentPerformance.sort((a, b) => b.totalLeads - a.totalLeads)
 
 function formatCurrency(value: number) {
-  if (value >= 10000000) return `₹${(value / 10000000).toFixed(2)}Cr`;
-  if (value >= 100000) return `₹${(value / 100000).toFixed(2)}L`;
-  if (value >= 1000) return `₹${(value / 1000).toFixed(0)}K`;
-  return `₹${value}`;
+  if (value >= 10000000) return `₹${(value / 10000000).toFixed(2)}Cr`
+  if (value >= 100000) return `₹${(value / 100000).toFixed(2)}L`
+  if (value >= 1000) return `₹${(value / 1000).toFixed(0)}K`
+  return `₹${value}`
 }
 ---
 
@@ -65,12 +56,8 @@ function formatCurrency(value: number) {
     <!-- Header -->
     <header class="flex items-center justify-between">
       <div>
-        <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">
-          Team Performance
-        </h1>
-        <p class="text-aspada-steel mt-2">
-          View and analyze agent performance metrics
-        </p>
+        <h1 class="text-4xl font-extrabold text-aspada-navy tracking-tight">Team Performance</h1>
+        <p class="text-aspada-steel mt-2">View and analyze agent performance metrics</p>
       </div>
       <div class="flex gap-3">
         <a
@@ -95,15 +82,15 @@ function formatCurrency(value: number) {
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-aspada-cream/70 text-sm font-medium">
-              Total Agents
-            </p>
+            <p class="text-aspada-cream/70 text-sm font-medium">Total Agents</p>
             <p class="text-4xl font-bold mt-2">{agents.length}</p>
             <p class="text-aspada-cream/50 text-xs mt-2">
               {agents.filter((a) => a.isActive).length} active
             </p>
           </div>
-          <div class="text-aspada-gold text-5xl opacity-20">👥</div>
+          <div class="text-aspada-gold text-5xl opacity-20">
+            <span class="i-lucide-users-round"></span>
+          </div>
         </div>
       </div>
 
@@ -116,7 +103,9 @@ function formatCurrency(value: number) {
             <p class="text-4xl font-bold mt-2">{leads.length}</p>
             <p class="text-white/50 text-xs mt-2">Across all agents</p>
           </div>
-          <div class="text-white text-5xl opacity-20">📊</div>
+          <div class="text-white text-5xl opacity-20">
+            <span class="i-lucide-chart-area"></span>
+          </div>
         </div>
       </div>
 
@@ -127,14 +116,13 @@ function formatCurrency(value: number) {
           <div>
             <p class="text-white/70 text-sm font-medium">Closed Deals</p>
             <p class="text-4xl font-bold mt-2">
-              {
-                leads.filter((l) => l.status === LeadsStatusOptions.Closed)
-                  .length
-              }
+              {leads.filter((l) => l.status === LeadsStatusOptions.Closed).length}
             </p>
             <p class="text-white/50 text-xs mt-2">Successfully converted</p>
           </div>
-          <div class="text-white text-5xl opacity-20">🏆</div>
+          <div class="text-white text-5xl opacity-20">
+            <span class="i-lucide-trophy"></span>
+          </div>
         </div>
       </div>
 
@@ -147,7 +135,9 @@ function formatCurrency(value: number) {
             <p class="text-4xl font-bold mt-2">{activities.length}</p>
             <p class="text-white/50 text-xs mt-2">Team engagement</p>
           </div>
-          <div class="text-white text-5xl opacity-20">📅</div>
+          <div class="text-white text-5xl opacity-20">
+            <span class="i-lucide-calendar-range"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -161,39 +151,31 @@ function formatCurrency(value: number) {
               <div class="flex items-center gap-4">
                 <div
                   class={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white ${
-                    agent.isActive ? "bg-aspada-gold" : "bg-gray-400"
+                    agent.isActive ? 'bg-aspada-gold' : 'bg-gray-400'
                   }`}
                 >
-                  {(agent.displayName?.[0] || "A").toUpperCase()}
+                  {(agent.displayName?.[0] || 'A').toUpperCase()}
                 </div>
                 <div>
                   <h3 class="text-xl font-bold text-aspada-navy">
-                    {agent.displayName || "Unnamed Agent"}
+                    {agent.displayName || 'Unnamed Agent'}
                   </h3>
                   <p class="text-sm text-aspada-steel">{agent.role}</p>
-                  <p class="text-xs text-aspada-steel/70 mt-1">
-                    {agent.contactPhone}
-                  </p>
+                  <p class="text-xs text-aspada-steel/70 mt-1">{agent.contactPhone}</p>
                 </div>
               </div>
               <div class="flex flex-col items-end gap-2">
                 <span
                   class={`px-3 py-1 rounded-full text-xs font-bold ${
-                    agent.isActive
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-700"
+                    agent.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                   }`}
                 >
-                  {agent.isActive ? "Active" : "Inactive"}
+                  {agent.isActive ? 'Active' : 'Inactive'}
                 </span>
                 {index < 3 && (
                   <div
                     class={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
-                      index === 0
-                        ? "bg-yellow-500"
-                        : index === 1
-                          ? "bg-gray-400"
-                          : "bg-orange-600"
+                      index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-600'
                     }`}
                   >
                     #{index + 1}
@@ -205,15 +187,11 @@ function formatCurrency(value: number) {
             {/* Performance Metrics Grid */}
             <div class="grid grid-cols-4 gap-4 mb-4">
               <div class="text-center p-3 bg-aspada-silver/20 rounded-xl">
-                <p class="text-2xl font-bold text-aspada-navy">
-                  {agent.totalLeads}
-                </p>
+                <p class="text-2xl font-bold text-aspada-navy">{agent.totalLeads}</p>
                 <p class="text-xs text-aspada-steel mt-1">Total Leads</p>
               </div>
               <div class="text-center p-3 bg-green-50 rounded-xl">
-                <p class="text-2xl font-bold text-green-700">
-                  {agent.closedLeads}
-                </p>
+                <p class="text-2xl font-bold text-green-700">{agent.closedLeads}</p>
                 <p class="text-xs text-green-600 mt-1">Closed</p>
               </div>
               <div class="text-center p-3 bg-blue-50 rounded-xl">
@@ -221,9 +199,7 @@ function formatCurrency(value: number) {
                 <p class="text-xs text-blue-600 mt-1">New</p>
               </div>
               <div class="text-center p-3 bg-purple-50 rounded-xl">
-                <p class="text-2xl font-bold text-purple-700">
-                  {agent.totalActivities}
-                </p>
+                <p class="text-2xl font-bold text-purple-700">{agent.totalActivities}</p>
                 <p class="text-xs text-purple-600 mt-1">Activities</p>
               </div>
             </div>
@@ -232,9 +208,7 @@ function formatCurrency(value: number) {
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-aspada-steel/10">
               <div>
                 <p class="text-sm text-aspada-steel mb-1">Conversion Rate</p>
-                <p class="text-2xl font-bold text-aspada-navy">
-                  {agent.conversionRate}%
-                </p>
+                <p class="text-2xl font-bold text-aspada-navy">{agent.conversionRate}%</p>
               </div>
               <div>
                 <p class="text-sm text-aspada-steel mb-1">Pipeline Value</p>
@@ -253,8 +227,7 @@ function formatCurrency(value: number) {
                     <span>
                       {agent.closedLeads + agent.lostLeads > 0
                         ? (
-                            (agent.closedLeads /
-                              (agent.closedLeads + agent.lostLeads)) *
+                            (agent.closedLeads / (agent.closedLeads + agent.lostLeads)) *
                             100
                           ).toFixed(0)
                         : 0}
@@ -273,10 +246,7 @@ function formatCurrency(value: number) {
                     <span>Activity Completion</span>
                     <span>
                       {agent.totalActivities > 0
-                        ? (
-                            (agent.completedActivities / agent.totalActivities) *
-                            100
-                          ).toFixed(0)
+                        ? ((agent.completedActivities / agent.totalActivities) * 100).toFixed(0)
                         : 0}
                       %
                     </span>
@@ -299,12 +269,8 @@ function formatCurrency(value: number) {
       agents.length === 0 && (
         <div class="bg-white rounded-2xl p-12 border-2 border-aspada-steel/10 text-center">
           <div class="text-6xl mb-4">👔</div>
-          <h3 class="text-2xl font-bold text-aspada-navy mb-2">
-            No Agents Yet
-          </h3>
-          <p class="text-aspada-steel mb-6">
-            Get started by adding your first agent to the team
-          </p>
+          <h3 class="text-2xl font-bold text-aspada-navy mb-2">No Agents Yet</h3>
+          <p class="text-aspada-steel mb-6">Get started by adding your first agent to the team</p>
           <a
             href="/crm/admin"
             class="inline-block px-8 py-3 bg-aspada-gold text-aspada-navy font-bold rounded-xl hover:bg-aspada-gold/90 transition shadow-lg"

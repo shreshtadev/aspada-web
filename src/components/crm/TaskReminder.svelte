@@ -76,15 +76,15 @@
   function getIcon(type: string) {
     switch (type) {
       case 'Call':
-        return '📞'
+        return 'i-lucide-phone'
       case 'Email':
-        return '📧'
+        return 'i-lucide-mails'
       case 'Whatsapp':
-        return '💬'
+        return 'i-lucide-message-square-text'
       case 'Site Visit':
-        return '🏢'
+        return 'i-lucide-locate-fixed'
       default:
-        return '📝'
+        return 'i-lucide-pencil'
     }
   }
 
@@ -96,7 +96,7 @@
 <div class="bg-white rounded-2xl border-2 border-aspada-steel/10 overflow-hidden">
   <div class="px-6 py-4 bg-aspada-navy flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <span class="text-xl">🔔</span>
+      <span class="text-xl i-lucide-bell-ring"></span>
       <h3 class="font-bold text-white uppercase tracking-wider text-sm">Action Required</h3>
     </div>
     {#if activities.length > 0}
@@ -129,7 +129,7 @@
             <div
               class={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition shadow-sm ${isOverdue(activity.scheduledAt) ? 'bg-red-50' : 'bg-aspada-gold/10'}`}
             >
-              {getIcon(activity.contactType)}
+              <span class={getIcon(activity.contactType)}></span>
             </div>
 
             <div class="flex-1 min-w-0">

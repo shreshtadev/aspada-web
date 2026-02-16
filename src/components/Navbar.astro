@@ -7,10 +7,6 @@ const { companyProfile } = Astro.props
 ---
 
 <style>
-  .logo-shield {
-    clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
-  }
-
   /* NAVBAR SCROLL STATES */
   html[data-scrolled] #navbar-container {
     background: rgba(255, 255, 255, 0.95);
@@ -81,8 +77,9 @@ const { companyProfile } = Astro.props
 
   /* Default state (Large) */
   .logo-shield {
-    width: 6rem; /* w-24 */
-    height: 8rem; /* h-32 */
+    clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+    width: 7rem;
+    height: 9rem;
     padding: 1rem;
   }
 
@@ -95,7 +92,7 @@ const { companyProfile } = Astro.props
 
   /* Scale the actual image inside */
   html[data-scrolled] .logo-shield img {
-    height: 3rem !important; /* Reduced image height */
+    height: 5rem !important; /* Reduced image height */
   }
 
   /* Adjust the spacer so the navbar doesn't feel empty */
@@ -114,10 +111,9 @@ const { companyProfile } = Astro.props
     <div class="flex items-center gap-8 justify-center shrink-0">
       <a href="/" class="group relative flex items-start">
         <div
-          class="logo-shield absolute top-0 left-1/2 -translate-x-1/2 z-[110]
+          class="logo-shield absolute top-0 -translate-x-[200%] z-[110]
            bg-aspada-navy shadow-xl flex items-center justify-center
            transition-all duration-500 ease-in-out
-           w-24 h-32
            html-scrolled:w-20 html-scrolled:h-24"
           id="logo-shield-box"
         >

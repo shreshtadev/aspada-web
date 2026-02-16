@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
 import netlify from '@astrojs/netlify'
+import node from '@astrojs/node'
 import { loadEnv } from 'vite'
 
 import svelte from '@astrojs/svelte'
@@ -12,13 +13,14 @@ const { PUBLIC_PB_URL, PUBLIC_SITE_URL } = loadEnv(
   process.cwd(),
   ''
 )
-
 // https://astro.build/config
 export default defineConfig({
   site: PUBLIC_SITE_URL,
   output: 'server',
   integrations: [UnoCSS(), svelte({ extensions: ['.svelte'] }), sitemap()],
-  adapter: netlify(),
+  adapter: process.env.NODE_ENV === 'production' ? netlify() : node({
+    mode: 'standalone'
+  }),
   image: {
     domains: [
       'images.unsplash.com',

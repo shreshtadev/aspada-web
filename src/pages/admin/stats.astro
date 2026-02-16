@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import StatsSettingsManager from '../../components/admin/StatsSettingsManager.svelte'
+---
+
+<AdminLayout>
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-aspada-steel uppercase tracking-tight">
+      Our <span class="text-aspada-gold">Statistics</span>
+    </h1>
+  </div>
+
+  <StatsSettingsManager client:load />
+</AdminLayout>
