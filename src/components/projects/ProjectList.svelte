@@ -29,12 +29,7 @@
 {:else if layout === 'masonry'}
   <!-- MASONRY MODE -->
   <section
-    class="
-      columns-1
-      sm:columns-2
-      lg:columns-3
-      gap-8
-    "
+    class={`columns-1 sm:columns-2 ${projects.length > 2 ? 'lg:columns-3 gap-8' : 'lg:columns-2 gap-6'}`}
   >
     {#each projects as project (project.id)}
       <div class="mb-8 break-inside-avoid">
@@ -45,13 +40,7 @@
 {:else}
   <!-- GRID MODE (AUTO VARIANT BY BREAKPOINT) -->
   <section
-    class="
-      grid
-      grid-cols-1
-      md:grid-cols-2
-      lg:grid-cols-3
-      gap-8
-    "
+    class={`grid grid-cols-1 md:grid-cols-2 ${projects.length > 2 ? 'lg:grid-cols-3 gap-8' : 'lg:grid-cols-2 gap-6'}`}
   >
     {#each projects as project (project.id)}
       <ProjectCard {project} {variant} />
