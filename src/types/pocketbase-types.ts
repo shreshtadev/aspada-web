@@ -16,14 +16,17 @@ export enum Collections {
 	ChatCache = "chat_cache",
 	ChatLogs = "chat_logs",
 	Companies = "companies",
+	Documents = "documents",
 	LeadActivities = "leadActivities",
 	Leads = "leads",
 	Metadata = "metadata",
 	Posts = "posts",
+	Processes = "processes",
 	Projects = "projects",
 	Socials = "socials",
 	Testimonials = "testimonials",
 	Users = "users",
+	Ventures = "ventures",
 }
 
 // Alias types for improved usability
@@ -178,6 +181,16 @@ export type CompaniesRecord = {
 	updated: IsoAutoDateString
 }
 
+export type DocumentsRecord = {
+	attachments?: FileNameString[]
+	created: IsoAutoDateString
+	id: string
+	slug: string
+	step?: RecordIdString
+	title: string
+	updated: IsoAutoDateString
+}
+
 export enum LeadActivitiesContactTypeOptions {
 	"Call" = "Call",
 	"Whatsapp" = "Whatsapp",
@@ -262,6 +275,23 @@ export type PostsRecord = {
 	id: string
 	isPublished?: PostsIsPublishedOptions
 	title: string
+	updated: IsoAutoDateString
+}
+
+export enum ProcessesStatusOptions {
+	"todo" = "todo",
+	"in_progress" = "in_progress",
+	"review" = "review",
+	"done" = "done",
+}
+export type ProcessesRecord = {
+	created: IsoAutoDateString
+	description?: string
+	id: string
+	project?: RecordIdString
+	sequence?: number
+	status?: ProcessesStatusOptions
+	title?: string
 	updated: IsoAutoDateString
 }
 
@@ -350,6 +380,14 @@ export type UsersRecord = {
 	verified?: boolean
 }
 
+export type VenturesRecord = {
+	created: IsoAutoDateString
+	id: string
+	slug: string
+	title: string
+	updated: IsoAutoDateString
+}
+
 // Response types include system fields and match responses from the PocketBase API
 export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
 export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
@@ -361,14 +399,17 @@ export type AttachmentsResponse<Texpand = unknown> = Required<AttachmentsRecord>
 export type ChatCacheResponse<Tembedding = unknown, Texpand = unknown> = Required<ChatCacheRecord<Tembedding>> & BaseSystemFields<Texpand>
 export type ChatLogsResponse<Tmetadata = unknown, Texpand = unknown> = Required<ChatLogsRecord<Tmetadata>> & BaseSystemFields<Texpand>
 export type CompaniesResponse<Texpand = unknown> = Required<CompaniesRecord> & BaseSystemFields<Texpand>
+export type DocumentsResponse<Texpand = unknown> = Required<DocumentsRecord> & BaseSystemFields<Texpand>
 export type LeadActivitiesResponse<Texpand = unknown> = Required<LeadActivitiesRecord> & BaseSystemFields<Texpand>
 export type LeadsResponse<Texpand = unknown> = Required<LeadsRecord> & BaseSystemFields<Texpand>
 export type MetadataResponse<Texpand = unknown> = Required<MetadataRecord> & BaseSystemFields<Texpand>
 export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
+export type ProcessesResponse<Texpand = unknown> = Required<ProcessesRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type SocialsResponse<Texpand = unknown> = Required<SocialsRecord> & BaseSystemFields<Texpand>
 export type TestimonialsResponse<Texpand = unknown> = Required<TestimonialsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type VenturesResponse<Texpand = unknown> = Required<VenturesRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -383,14 +424,17 @@ export type CollectionRecords = {
 	chat_cache: ChatCacheRecord
 	chat_logs: ChatLogsRecord
 	companies: CompaniesRecord
+	documents: DocumentsRecord
 	leadActivities: LeadActivitiesRecord
 	leads: LeadsRecord
 	metadata: MetadataRecord
 	posts: PostsRecord
+	processes: ProcessesRecord
 	projects: ProjectsRecord
 	socials: SocialsRecord
 	testimonials: TestimonialsRecord
 	users: UsersRecord
+	ventures: VenturesRecord
 }
 
 export type CollectionResponses = {
@@ -404,14 +448,17 @@ export type CollectionResponses = {
 	chat_cache: ChatCacheResponse
 	chat_logs: ChatLogsResponse
 	companies: CompaniesResponse
+	documents: DocumentsResponse
 	leadActivities: LeadActivitiesResponse
 	leads: LeadsResponse
 	metadata: MetadataResponse
 	posts: PostsResponse
+	processes: ProcessesResponse
 	projects: ProjectsResponse
 	socials: SocialsResponse
 	testimonials: TestimonialsResponse
 	users: UsersResponse
+	ventures: VenturesResponse
 }
 
 // Utility types for create/update operations

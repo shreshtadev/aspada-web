@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import DMSDashboard from '../../components/admin/DMSDashboard.svelte'
+---
+
+<AdminLayout>
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-slate-900 uppercase tracking-tight">
+      <span class="text-aspada-gold">Document Manager</span>
+    </h1>
+  </header>
+
+  <DMSDashboard client:load />
+</AdminLayout>

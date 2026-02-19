@@ -229,10 +229,9 @@
       {#if selectedProjectFilter}
         <div class="space-y-3 max-h-[70vh] overflow-auto pr-2">
           {#each galleryItems as item}
-            <div
-              role="button"
-              tabindex="0"
-              class="p-4 rounded-2xl border-2 cursor-pointer transition-all"
+            <button
+              type="button"
+              class="w-full text-left p-4 rounded-2xl border-2 cursor-pointer transition-all"
               class:bg-slate-50={selectedId === item.id}
               class:border-[#d4af37]={selectedId === item.id}
               class:border-transparent={selectedId !== item.id}
@@ -245,7 +244,7 @@
               <div class="text-[10px] mt-2 text-[#d4af37] font-bold uppercase">
                 {item.attachments?.length || 0} Assets
               </div>
-            </div>
+            </button>
           {:else}
             <div class="text-center py-12 text-sm text-slate-400">
               No galleries for this project

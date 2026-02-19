@@ -14,8 +14,16 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
-    "types": ["svelte", "vite/client"]
+    "types": ["svelte", "vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "$components/*": ["src/components/*"],
+      "$lib/*": ["src/lib/*"],
+      "$types/*": ["src/types/*"],
+      "$layouts/*": ["src/layouts/*"]
+    }
   },
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [".astro/types.d.ts", "src/*"],
   "exclude": ["dist", "node_modules"]
 }

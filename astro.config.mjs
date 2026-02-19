@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
 import netlify from '@astrojs/netlify'
 import node from '@astrojs/node'
+import path from 'node:path'
 import { loadEnv } from 'vite'
 
 import svelte from '@astrojs/svelte'
@@ -18,9 +19,12 @@ export default defineConfig({
   site: PUBLIC_SITE_URL,
   output: 'server',
   integrations: [UnoCSS(), svelte({ extensions: ['.svelte'] }), sitemap()],
-  adapter: process.env.NODE_ENV === 'production' ? netlify() : node({
-    mode: 'standalone'
-  }),
+  adapter:
+    process.env.NODE_ENV === 'production'
+      ? netlify()
+      : node({
+          mode: 'standalone',
+        }),
   image: {
     domains: [
       'images.unsplash.com',
@@ -33,6 +37,14 @@ export default defineConfig({
     ].filter(Boolean),
   },
   vite: {
+    resolve: {
+      alias: {
+        $components: path.resolve('./src/components'),
+        $lib: path.resolve('./src/lib'),
+        $types: path.resolve('./src/types'),
+        $layouts: path.resolve('./src/layouts'),
+      },
+    },
     build: {
       rollupOptions: {
         output: {
