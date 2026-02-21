@@ -2,10 +2,13 @@
   import VentureManager from './VentureManager.svelte'
   import ProcessManager from './ProcessManager.svelte'
   import DocumentManager from './DocumentManager.svelte'
+  import ProcessFlow from './ProcessFlow.svelte'
+  import Modal from './Modal.svelte'
 
   // Core navigation state using Runes
   let selectedVentureId = $state<string | null>(null)
   let selectedStepId = $state<string | null>(null)
+  let showFlowModal = $state(false)
 
   // Reset the step view whenever the active Venture changes
   $effect(() => {
@@ -23,7 +26,17 @@
   <div class="col-span-4">
     {#if selectedVentureId}
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 text-slate-800">Steps</h2>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-800">Steps</h2>
+          <button
+            onclick={() => (showFlowModal = true)}
+            class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-bold hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+          >
+            <span class="i-lucide-git-graph text-sm"></span>
+            Flow Map
+          </button>
+        </div>
+
         <ProcessManager
           ventureId={selectedVentureId}
           onStepSelect={(id) => (selectedStepId = id)}
@@ -52,3 +65,22 @@
     {/if}
   </div>
 </div>
+
+{#if selectedVentureId}
+  <Modal
+    show={showFlowModal}
+    title="Process Flow Visualization"
+    onClose={() => (showFlowModal = false)}
+  >
+    <div class="max-h-[80vh] overflow-y-auto">
+      <ProcessFlow
+        ventureId={selectedVentureId}
+        onStepSelect={(id) => {
+          selectedStepId = id
+          showFlowModal = false
+        }}
+        activeStepId={selectedStepId}
+      />
+    </div>
+  </Modal>
+{/if}

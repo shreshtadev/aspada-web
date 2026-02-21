@@ -286,8 +286,8 @@ export enum ProcessesStatusOptions {
 }
 export type ProcessesRecord = {
 	created: IsoAutoDateString
-	description?: string
 	id: string
+	parent?: RecordIdString
 	project?: RecordIdString
 	sequence?: number
 	status?: ProcessesStatusOptions

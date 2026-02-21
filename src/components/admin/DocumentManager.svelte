@@ -11,6 +11,10 @@
   let formTitle = $state('')
   let uploading = $state(false)
   let progress = $state(0)
+  let currentPage = $state(1)
+  let totalPages = $state(1)
+  let perPage = $state(5)
+  let loading = $state(false)
 
   // Files already saved on the selected document (their filenames)
   let existingFileNames = $state<string[]>([])
@@ -21,11 +25,21 @@
   let isNew = $derived(selectedId === null)
 
   // ─── Load ─────────────────────────────────────────────────────────────────
-  async function load() {
-    docs = await pb.collection(Collections.Documents).getFullList<DocumentsResponse>({
-      filter: `step = "${stepId}"`,
-      sort: '-created',
-    })
+  async function load(page = currentPage) {
+    loading = true
+    try {
+      const res = await pb
+        .collection(Collections.Documents)
+        .getList<DocumentsResponse>(page, perPage, {
+          filter: `step = "${stepId}"`,
+          sort: '-created',
+        })
+      docs = res.items
+      currentPage = res.page
+      totalPages = res.totalPages
+    } finally {
+      loading = false
+    }
   }
 
   // ─── Selection ────────────────────────────────────────────────────────────
@@ -57,7 +71,7 @@
       existingFileNames = [...(updated.attachments ?? [])]
 
       // Refresh list (attachment count badge)
-      await load()
+      await load(currentPage)
     } catch (err) {
       console.error('Remove file failed:', err)
     } finally {
@@ -113,7 +127,7 @@
         selectedId = null
       }
 
-      await load()
+      await load(isNew ? 1 : currentPage)
 
       // Re-select the saved doc so the UI reflects latest state
       if (!isNew && selectedId) {
@@ -137,7 +151,11 @@
     try {
       await pb.collection(Collections.Documents).delete(selectedId)
       newDoc()
-      await load()
+      if (docs.length === 1 && currentPage > 1) {
+        await load(currentPage - 1)
+      } else {
+        await load(currentPage)
+      }
     } catch (err) {
       console.error('Delete failed:', err)
     } finally {
@@ -147,7 +165,7 @@
 
   // ─── Effect ────────────────────────────────────────────────────────────────
   $effect(() => {
-    if (stepId) load()
+    if (stepId) load(currentPage)
   })
 </script>
 
@@ -164,7 +182,11 @@
   </div>
 
   <!-- ── Existing Documents List ──────────────────────────────── -->
-  {#if docs.length > 0}
+  {#if loading && docs.length === 0}
+    <div class="flex items-center justify-center py-8 text-slate-400">
+      <span class="animate-pulse">Loading documents...</span>
+    </div>
+  {:else if docs.length > 0}
     <div class="space-y-2 pb-4 border-b border-slate-100">
       <p class="text-xs font-bold text-slate-500 uppercase mb-2">Existing Documents</p>
       {#each docs as doc}
@@ -201,6 +223,32 @@
           </svg>
         </button>
       {/each}
+
+      {#if totalPages > 1}
+        <div class="mt-4 flex items-center justify-center gap-2 pt-2">
+          <button
+            type="button"
+            onclick={() => (currentPage -= 1)}
+            disabled={currentPage === 1 || loading}
+            class="p-1.5 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Previous page"
+          >
+            <span class="i-lucide-chevron-left text-base"></span>
+          </button>
+          <span class="text-[11px] text-slate-600 font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type="button"
+            onclick={() => (currentPage += 1)}
+            disabled={currentPage === totalPages || loading}
+            class="p-1.5 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Next page"
+          >
+            <span class="i-lucide-chevron-right text-base"></span>
+          </button>
+        </div>
+      {/if}
     </div>
   {:else}
     <div class="text-center py-6 text-sm text-slate-400 bg-slate-50 rounded-lg">

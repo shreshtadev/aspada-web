@@ -208,7 +208,7 @@
       <!-- PROJECT FILTER -->
       <div class="mb-6">
         <label for="select-project" class="block text-xs font-bold text-slate-500 uppercase mb-2">
-          Select Project First
+          Select Project
         </label>
 
         <select
