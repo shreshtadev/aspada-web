@@ -1,5 +1,4 @@
 <script>
-  import { deleteAttachment } from '../../lib/utils'
   import toast from 'svelte-french-toast'
   let {
     label = 'Files',
@@ -11,9 +10,7 @@
 
   let fileInput = $state(null)
   let selectedFiles = $state([])
-  let uploading = $state(false)
 
-  // Derived: how many slots are available
   let slotsAvailable = $derived(maxFiles - attachmentIds.length)
   let canUpload = $derived(slotsAvailable > 0)
 
@@ -23,19 +20,14 @@
 
     const filesArray = Array.from(files)
 
-    // Check limit
     if (filesArray.length > slotsAvailable) {
-      toast.info(`You can only upload ${slotsAvailable} more file(s). Maximum is ${maxFiles}.`)
+      toast.info(`You can only upload ${slotsAvailable} more file(s).`)
       if (fileInput) fileInput.value = ''
       return
     }
 
     selectedFiles = filesArray
-
-    // Notify parent if callback provided
-    if (onFileSelect) {
-      onFileSelect(filesArray)
-    }
+    if (onFileSelect) onFileSelect(filesArray)
   }
 
   function clearSelection() {
@@ -43,18 +35,6 @@
     if (fileInput) fileInput.value = ''
   }
 
-  async function removeAttachment(id) {
-    if (!confirm('Delete this file?')) return
-
-    uploading = true
-    const success = await deleteAttachment(id)
-    if (success) {
-      attachmentIds = attachmentIds.filter((aid) => aid !== id)
-    }
-    uploading = false
-  }
-
-  // Expose methods for parent to call
   export function getSelectedFiles() {
     return selectedFiles
   }
@@ -64,61 +44,17 @@
   }
 </script>
 
-<div class="block">
-  <div class="flex justify-between items-center mb-2">
-    <span class="text-sm font-bold text-slate-700">{label}</span>
-    <span class="text-xs text-slate-500">{attachmentIds.length} / {maxFiles} files</span>
+<div class="space-y-3">
+  <div class="flex justify-between items-center px-1">
+    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+    <span class="text-[10px] font-black text-aspada-navy/40 uppercase tracking-widest"
+      >{attachmentIds.length} / {maxFiles} Capacity</span
+    >
   </div>
 
-  <!-- Current Attachments -->
-  {#if attachmentIds.length > 0}
-    <div class="mb-3 space-y-2">
-      {#each attachmentIds as id, idx}
-        <div
-          class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-        >
-          <div class="flex items-center gap-2">
-            <span class="text-slate-400">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline
-                  points="14 2 14 8 20 8"
-                /><line x1="16" y1="13" x2="8" y2="13" /><line
-                  x1="16"
-                  y1="17"
-                  x2="8"
-                  y2="17"
-                /><polyline points="10 9 9 9 8 9" /></svg
-              >
-            </span>
-            <span class="text-sm text-slate-700 font-medium">Attachment {idx + 1}</span>
-            <span class="text-xs text-slate-400 font-mono">{id.slice(0, 8)}...</span>
-          </div>
-          <button
-            type="button"
-            onclick={() => removeAttachment(id)}
-            disabled={uploading}
-            class="text-red-500 hover:text-red-700 disabled:opacity-50 text-xs font-bold"
-          >
-            Remove
-          </button>
-        </div>
-      {/each}
-    </div>
-  {/if}
-
-  <!-- File Input -->
   {#if canUpload}
     <div
-      class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors relative"
+      class="border-4 border-dashed border-slate-100 rounded-3xl p-8 text-center hover:bg-slate-50 hover:border-aspada-gold/20 transition-all relative group"
     >
       <input
         type="file"
@@ -126,35 +62,45 @@
         onchange={handleFileChange}
         {accept}
         multiple
-        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
       />
-      <div class="pointer-events-none">
+
+      <div class="pointer-events-none relative z-0">
         {#if selectedFiles.length > 0}
-          <div class="space-y-1">
-            {#each selectedFiles as file}
-              <div class="text-sm text-slate-900 font-medium">
-                {file.name}
-              </div>
-            {/each}
+          <div class="space-y-2">
+            <div
+              class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-500 mx-auto mb-3 shadow-sm shadow-green-200"
+            >
+              <span class="i-lucide-check-circle text-2xl"></span>
+            </div>
+            <p class="text-xs font-black text-aspada-navy uppercase tracking-widest">
+              {selectedFiles.length} file(s) staged
+            </p>
+            <div class="flex flex-wrap justify-center gap-1.5 mt-2">
+              {#each selectedFiles as file}
+                <div
+                  class="px-3 py-1 bg-white border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 shadow-sm max-w-[150px] truncate"
+                >
+                  {file.name}
+                </div>
+              {/each}
+            </div>
           </div>
         {:else}
-          <div class="text-slate-500 text-sm">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="mx-auto mb-2 text-slate-400"
-              ><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline
-                points="17 8 12 3 7 8"
-              /><line x1="12" y1="3" x2="12" y2="15" /></svg
+          <div class="text-slate-400">
+            <div
+              class="w-16 h-16 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-white group-hover:shadow-xl transition-all duration-500 border-2 border-transparent group-hover:border-aspada-gold/20"
             >
-            Click to select files ({slotsAvailable} remaining)
+              <span
+                class="i-lucide-upload-cloud text-3xl group-hover:text-aspada-gold transition-colors"
+              ></span>
+            </div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+              Tap to browse or drop here
+            </p>
+            <p class="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">
+              Support for multiple file uploads
+            </p>
           </div>
         {/if}
       </div>
@@ -164,16 +110,22 @@
       <button
         type="button"
         onclick={clearSelection}
-        class="mt-2 text-xs text-red-600 hover:underline"
+        class="flex items-center gap-2 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest pl-1 transition-colors"
       >
-        Clear selection
+        <span class="i-lucide-trash-2"></span>
+        Reset Selection
       </button>
     {/if}
   {:else}
     <div
-      class="border border-slate-200 rounded-xl p-4 text-center bg-slate-50 text-slate-500 text-sm"
+      class="border-2 border-slate-100 rounded-3xl p-6 text-center bg-slate-50/50 text-slate-400"
     >
-      Maximum files reached ({maxFiles})
+      <div
+        class="w-10 h-10 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm"
+      >
+        <span class="i-lucide-info text-slate-300"></span>
+      </div>
+      <p class="text-[10px] font-black uppercase tracking-widest">Maximum file capacity reached</p>
     </div>
   {/if}
 </div>

@@ -4,7 +4,7 @@
 
   let { ventureId, onStepSelect, activeStepId } = $props<{
     ventureId: string
-    onStepSelect: (id: string) => void
+    onStepSelect: (id: string, title: string) => void
     activeStepId: string | null
   }>()
 
@@ -49,7 +49,6 @@
     })
     stepTitle = ''
     stepParent = null
-    // Load last page to show the new step
     await loadSteps(totalPages)
   }
 
@@ -78,10 +77,8 @@
       const [draggedItem] = newSteps.splice(draggingIndex, 1)
       newSteps.splice(index, 0, draggedItem)
 
-      // Calculate the starting sequence for this page
       const startSequence = (currentPage - 1) * perPage + 1
 
-      // Update all items in the current view to have correct sequences
       await Promise.all(
         newSteps.map((step, idx) =>
           pb.collection('processes').update(step.id, {
@@ -111,39 +108,54 @@
   $effect(() => {
     if (ventureId) loadSteps(currentPage)
   })
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'done':
+        return 'bg-green-500'
+      case 'in_progress':
+        return 'bg-aspada-gold'
+      case 'review':
+        return 'bg-amber-500'
+      default:
+        return 'bg-slate-300'
+    }
+  }
 </script>
 
-<div class="space-y-4">
+<div class="space-y-6">
   <div class="flex gap-2">
     <input
       bind:value={stepTitle}
       placeholder="New step..."
-      class="flex-1 border p-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+      class="flex-1 bg-slate-50 border border-slate-200 p-3 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all placeholder:text-slate-400"
     />
-
     <button
       type="button"
       onclick={addStep}
-      class="bg-blue-600 text-white px-4 py-1 rounded-lg text-sm font-bold hover:bg-blue-700"
+      class="bg-aspada-navy text-white px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all active:scale-95 shadow-lg shadow-aspada-navy/10"
     >
       Add
     </button>
   </div>
 
-  <div class="space-y-2" role="list">
+  <div class="space-y-3" role="list">
     {#if loading && steps.length === 0}
-      <div class="flex items-center justify-center py-8 text-slate-400">
-        <span class="animate-pulse">Loading steps...</span>
+      <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+        <span class="i-lucide-loader-2 text-2xl animate-spin mb-2"></span>
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono">
+          Loading Processes...
+        </p>
       </div>
     {:else}
       {#each steps as step, i (step.id)}
         <div
-          class="flex items-center gap-3 p-3 rounded-lg border transition-all cursor-move
+          class="flex flex-col p-4 rounded-3xl border-2 transition-all duration-300 group
           {activeStepId === step.id
-            ? 'border-blue-500 bg-blue-50 shadow-sm'
-            : 'border-slate-100 hover:border-slate-300'}
-          {hoverIndex === i ? 'border-t-4 border-t-blue-500 !mt-[-4px]' : ''}
-          {draggingIndex === i ? 'opacity-50' : ''}"
+            ? 'border-aspada-gold bg-aspada-gold/5 shadow-lg'
+            : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 hover:bg-white'}
+          {hoverIndex === i ? 'border-t-4 border-t-aspada-gold' : ''}
+          {draggingIndex === i ? 'opacity-30 scale-95' : ''}"
           role="listitem"
           draggable="true"
           ondragstart={() => handleDragStart(i)}
@@ -157,40 +169,53 @@
             hoverIndex = null
           }}
         >
-          <div class="flex flex-col items-center justify-center text-slate-300">
-            <span class="i-lucide-grip-vertical text-lg"></span>
-          </div>
-
-          <button
-            type="button"
-            onclick={() => onStepSelect(step.id)}
-            class="flex-1 text-left overflow-hidden focus:outline-none"
-          >
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-[10px] font-mono text-slate-400 uppercase"
-                >Sequence {step.sequence}</span
-              >
+          <div class="flex items-start gap-4">
+            <div
+              class="flex flex-col items-center justify-center text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-500 transition-colors pt-1"
+            >
+              <span class="i-lucide-grip-vertical text-xl"></span>
             </div>
-            <div class="space-y-2">
-              <span class="text-md font-semibold text-slate-700 block truncate">{step.title}</span>
-              <section class="flex flex-row items-center gap-4">
+
+            <button
+              type="button"
+              onclick={() => onStepSelect(step.id, step.title)}
+              class="flex-1 text-left focus:outline-none"
+            >
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest"
+                  >Sequence {step.sequence}</span
+                >
+                <div
+                  class="flex items-center gap-1.5 bg-white border border-slate-100 rounded-full px-2 py-0.5 shadow-sm"
+                >
+                  <div class="w-1.5 h-1.5 rounded-full {getStatusColor(step.status)}"></div>
+                  <span class="text-[9px] font-black uppercase text-slate-500"
+                    >{step.status.replace('_', ' ')}</span
+                  >
+                </div>
+              </div>
+
+              <span
+                class="text-base font-black text-aspada-navy block mb-4 group-hover:text-aspada-gold transition-colors"
+                >{step.title}</span
+              >
+
+              <div class="grid grid-cols-2 gap-2" onclick={(e) => e.stopPropagation()}>
                 <select
                   value={step.status}
                   onchange={(e) =>
                     updateStatus(step.id, e.currentTarget.value as ProcessesStatusOptions)}
-                  onclick={(e) => e.stopPropagation()}
-                  class="text-sm border rounded bg-white px-2 py-1 font-bold text-slate-600 cursor-pointer hover:border-slate-400 outline-none"
+                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider"
                 >
                   {#each Object.values(ProcessesStatusOptions) as opt}
-                    <option value={opt}>{opt.toUpperCase()}</option>
+                    <option value={opt}>{opt.replace('_', ' ')}</option>
                   {/each}
                 </select>
 
                 <select
                   value={step.parent}
                   onchange={(e) => updateParent(step.id, e.currentTarget.value)}
-                  onclick={(e) => e.stopPropagation()}
-                  class="text-sm border rounded bg-white px-2 py-1 font-bold text-slate-600 cursor-pointer hover:border-slate-400 outline-none"
+                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider"
                 >
                   <option value={null}>No Parent</option>
                   {#each allSteps as parentStep}
@@ -199,31 +224,40 @@
                     {/if}
                   {/each}
                 </select>
-              </section>
-            </div>
-          </button>
+              </div>
+            </button>
+          </div>
         </div>
       {/each}
     {/if}
   </div>
 
   {#if totalPages > 1}
-    <div class="mt-6 flex items-center justify-center gap-2 border-t pt-4">
+    <div class="mt-8 flex items-center justify-between px-2 pt-4 border-t border-slate-100">
       <button
         onclick={() => (currentPage -= 1)}
         disabled={currentPage === 1 || loading}
-        class="p-2 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        class="p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
         aria-label="Previous page"
       >
         <span class="i-lucide-chevron-left text-lg"></span>
       </button>
-      <span class="text-sm text-slate-600 font-medium">
-        Page {currentPage} of {totalPages}
-      </span>
+
+      <div class="flex items-center gap-1.5">
+        {#each Array(totalPages) as _, i}
+          <button
+            onclick={() => (currentPage = i + 1)}
+            class="w-1.5 h-1.5 rounded-full transition-all {currentPage === i + 1
+              ? 'bg-aspada-navy w-4'
+              : 'bg-slate-200 hover:bg-slate-400'}"
+          ></button>
+        {/each}
+      </div>
+
       <button
         onclick={() => (currentPage += 1)}
         disabled={currentPage === totalPages || loading}
-        class="p-2 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        class="p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
         aria-label="Next page"
       >
         <span class="i-lucide-chevron-right text-lg"></span>

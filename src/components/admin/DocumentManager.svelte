@@ -16,9 +16,7 @@
   let perPage = $state(5)
   let loading = $state(false)
 
-  // Files already saved on the selected document (their filenames)
   let existingFileNames = $state<string[]>([])
-
   let trackerComponent = $state<ReturnType<typeof FileUploadTracker>>()
 
   // ─── Derived ──────────────────────────────────────────────────────────────
@@ -57,10 +55,10 @@
     trackerComponent?.clearFiles()
   }
 
-  // ─── Remove an already-saved file from the document ───────────────────────
+  // ─── Remove file ───────────────────────
   async function removeExistingFile(filename: string) {
     if (!selectedId) return
-    if (!confirm(`Remove "${filename}" from this document?`)) return
+    if (!confirm(`Permanently remove "${filename}"?`)) return
 
     uploading = true
     try {
@@ -69,24 +67,18 @@
         .update<DocumentsResponse>(selectedId, { 'attachments-': [filename] })
 
       existingFileNames = [...(updated.attachments ?? [])]
-
-      // Refresh list (attachment count badge)
       await load(currentPage)
-    } catch (err) {
-      console.error('Remove file failed:', err)
     } finally {
       uploading = false
     }
   }
 
-  // ─── Save (create or update) ───────────────────────────────────────────────
+  // ─── Save ───────────────────────────────────────────────
   async function handleSave(e: SubmitEvent) {
     e.preventDefault()
     if (!formTitle) return
 
     const newFiles = trackerComponent?.getSelectedFiles() ?? []
-
-    // For a new doc, we require at least one file
     if (isNew && newFiles.length === 0) return
 
     uploading = true
@@ -116,7 +108,6 @@
           .update<DocumentsResponse>(selectedId!, data, {
             onProgress: progressHandler,
           })
-
         existingFileNames = [...(updated.attachments ?? [])]
       }
 
@@ -126,236 +117,217 @@
         existingFileNames = []
         selectedId = null
       }
-
       await load(isNew ? 1 : currentPage)
-
-      // Re-select the saved doc so the UI reflects latest state
-      if (!isNew && selectedId) {
-        const refreshed = docs.find((d) => d.id === selectedId)
-        if (refreshed) selectDoc(refreshed)
-      }
-    } catch (err) {
-      console.error('Save failed:', err)
     } finally {
       uploading = false
       setTimeout(() => (progress = 0), 500)
     }
   }
 
-  // ─── Delete entire document ────────────────────────────────────────────────
+  // ─── Delete ────────────────────────────────────────────────
   async function deleteDoc() {
     if (!selectedId) return
-    if (!confirm('Delete this document and all its files permanently?')) return
+    if (!confirm('Delete this document and all files?')) return
 
     uploading = true
     try {
       await pb.collection(Collections.Documents).delete(selectedId)
       newDoc()
-      if (docs.length === 1 && currentPage > 1) {
-        await load(currentPage - 1)
-      } else {
-        await load(currentPage)
-      }
-    } catch (err) {
-      console.error('Delete failed:', err)
+      await load(docs.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage)
     } finally {
       uploading = false
     }
   }
 
-  // ─── Effect ────────────────────────────────────────────────────────────────
   $effect(() => {
     if (stepId) load(currentPage)
   })
 </script>
 
-<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
-  <div class="flex items-center justify-between">
-    <h2 class="text-xl font-bold text-slate-800">Step Documents</h2>
+<div class="space-y-8">
+  <div class="flex items-center justify-between gap-4">
+    <div class="flex-1">
+      <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Step Assets</h3>
+      <p class="text-sm font-bold text-slate-500">Manage required documentation</p>
+    </div>
     <button
       type="button"
       onclick={newDoc}
-      class="text-xs bg-slate-900 text-white px-4 py-2 rounded-full font-bold hover:bg-slate-700 transition-colors"
+      class="bg-aspada-navy text-white px-4 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2"
     >
-      + New Document
+      <span class="i-lucide-plus-circle text-base"></span>
+      New
     </button>
   </div>
 
   <!-- ── Existing Documents List ──────────────────────────────── -->
-  {#if loading && docs.length === 0}
-    <div class="flex items-center justify-center py-8 text-slate-400">
-      <span class="animate-pulse">Loading documents...</span>
-    </div>
-  {:else if docs.length > 0}
-    <div class="space-y-2 pb-4 border-b border-slate-100">
-      <p class="text-xs font-bold text-slate-500 uppercase mb-2">Existing Documents</p>
-      {#each docs as doc}
-        <button
-          type="button"
-          onclick={() => selectDoc(doc)}
-          class="w-full flex items-center justify-between text-left px-4 py-3 rounded-lg border-2 transition-all
-            {selectedId === doc.id
-            ? 'border-indigo-500 bg-indigo-50'
-            : 'border-slate-100 hover:border-slate-300 bg-slate-50'}"
-        >
-          <div>
-            <div class="text-sm font-bold text-slate-800">{doc.title}</div>
-            <div class="text-xs text-slate-400 mt-0.5">
-              {doc.attachments?.length ?? 0} file{(doc.attachments?.length ?? 0) !== 1 ? 's' : ''}
-            </div>
-          </div>
-          <!-- paperclip icon -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-slate-400 shrink-0"
+  <div class="space-y-3">
+    {#if loading && docs.length === 0}
+      <div
+        class="flex flex-col items-center justify-center py-12 text-slate-400 border-2 border-dashed rounded-3xl border-slate-100"
+      >
+        <span class="i-lucide-loader-2 text-2xl animate-spin mb-2"></span>
+        <p class="text-[10px] font-bold uppercase tracking-widest">Querying Vault...</p>
+      </div>
+    {:else if docs.length > 0}
+      <div class="grid grid-cols-1 gap-3">
+        {#each docs as doc}
+          <button
+            type="button"
+            onclick={() => selectDoc(doc)}
+            class="group w-full flex items-center justify-between p-4 rounded-[1.5rem] border-2 transition-all duration-300
+              {selectedId === doc.id
+              ? 'border-aspada-gold bg-aspada-gold/5 shadow-md'
+              : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 hover:bg-white'}"
           >
-            <path
-              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
-            />
-          </svg>
-        </button>
-      {/each}
+            <div class="flex items-center gap-4 truncate">
+              <div
+                class="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-aspada-gold transition-colors shrink-0"
+              >
+                <span class="i-lucide-folder text-xl"></span>
+              </div>
+              <div class="truncate">
+                <div
+                  class="text-[13px] font-black text-slate-800 truncate group-hover:text-aspada-navy transition-colors"
+                >
+                  {doc.title}
+                </div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                  {doc.attachments?.length ?? 0} Item{(doc.attachments?.length ?? 0) !== 1
+                    ? 's'
+                    : ''}
+                </div>
+              </div>
+            </div>
+            <span
+              class="i-lucide-chevron-right text-slate-300 group-hover:text-aspada-gold transition-colors"
+            ></span>
+          </button>
+        {/each}
+      </div>
 
       {#if totalPages > 1}
-        <div class="mt-4 flex items-center justify-center gap-2 pt-2">
+        <div class="flex items-center justify-between px-2 pt-4">
           <button
             type="button"
             onclick={() => (currentPage -= 1)}
             disabled={currentPage === 1 || loading}
-            class="p-1.5 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="Previous page"
+            class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
           >
-            <span class="i-lucide-chevron-left text-base"></span>
+            <span class="i-lucide-arrow-left text-sm"></span>
           </button>
-          <span class="text-[11px] text-slate-600 font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
+          <span class="text-[10px] font-black uppercase text-slate-400"
+            >Page {currentPage} / {totalPages}</span
+          >
           <button
             type="button"
             onclick={() => (currentPage += 1)}
             disabled={currentPage === totalPages || loading}
-            class="p-1.5 rounded-lg border hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="Next page"
+            class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
           >
-            <span class="i-lucide-chevron-right text-base"></span>
+            <span class="i-lucide-arrow-right text-sm"></span>
           </button>
         </div>
       {/if}
-    </div>
-  {:else}
-    <div class="text-center py-6 text-sm text-slate-400 bg-slate-50 rounded-lg">
-      No documents yet for this step.
-    </div>
-  {/if}
+    {:else}
+      <div
+        class="flex flex-col items-center justify-center py-12 text-slate-300 border-2 border-dashed rounded-3xl border-slate-100"
+      >
+        <span class="i-lucide-file-warning text-3xl mb-2 opacity-50"></span>
+        <p class="text-[10px] font-bold uppercase tracking-widest italic">No assets registered</p>
+      </div>
+    {/if}
+  </div>
 
   <!-- ── Form ──────────────────────────────────────────────────── -->
-  <form onsubmit={handleSave} class="space-y-4">
-    <p class="text-xs font-bold text-slate-500 uppercase">
-      {isNew ? 'New Document' : 'Edit Document'}
-    </p>
+  <form
+    onsubmit={handleSave}
+    class="bg-slate-50/50 p-6 rounded-[2rem] border-2 border-slate-100 space-y-6"
+  >
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-1.5 h-6 bg-aspada-gold rounded-full"></div>
+      <p class="text-[11px] font-black text-aspada-navy uppercase tracking-widest">
+        {isNew ? 'Register New Entry' : 'Modify Asset Entry'}
+      </p>
+    </div>
 
-    <!-- Title -->
-    <div>
-      <label for="doc-title" class="block text-sm font-bold text-slate-700 mb-1"
-        >Document Title</label
+    <div class="space-y-2">
+      <label
+        for="doc-title"
+        class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Label</label
       >
       <input
         id="doc-title"
         bind:value={formTitle}
-        placeholder="Document name"
+        placeholder="e.g. KYC Documents, Site Photos..."
         required
-        class="w-full border p-2 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+        class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all"
       />
     </div>
 
-    <!-- Existing files on a saved document -->
     {#if !isNew && existingFileNames.length > 0}
-      <div class="space-y-1">
-        <p class="text-xs font-bold text-slate-500 uppercase mb-1">Saved Files</p>
-        {#each existingFileNames as filename}
-          <div
-            class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-          >
-            <div class="flex items-center gap-2 min-w-0">
-              <!-- file icon -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="text-slate-400 shrink-0"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              <span class="text-xs text-slate-700 truncate font-mono">{filename}</span>
-            </div>
-            <button
-              type="button"
-              onclick={() => removeExistingFile(filename)}
-              disabled={uploading}
-              class="text-red-500 hover:text-red-700 disabled:opacity-40 text-xs font-bold shrink-0 ml-2"
+      <div class="space-y-2">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+          Synchronized Files
+        </p>
+        <div class="grid grid-cols-1 gap-2">
+          {#each existingFileNames as filename}
+            <div
+              class="flex items-center justify-between bg-white border border-slate-100 rounded-2xl px-4 py-3 shadow-sm group"
             >
-              Remove
-            </button>
-          </div>
-        {/each}
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="i-lucide-file-text text-slate-400 group-hover:text-aspada-gold"></span>
+                <span class="text-xs text-slate-600 truncate font-bold">{filename}</span>
+              </div>
+              <button
+                type="button"
+                onclick={() => removeExistingFile(filename)}
+                disabled={uploading}
+                class="text-red-400 hover:text-red-600 disabled:opacity-40 transition-colors p-1"
+              >
+                <span class="i-lucide-x-circle text-lg"></span>
+              </button>
+            </div>
+          {/each}
+        </div>
       </div>
     {/if}
 
-    <!-- File picker for new files (shows only slot count based on existing) -->
-    <FileUploadTracker
-      bind:this={trackerComponent}
-      label={isNew ? 'Attachments' : 'Add More Files'}
-      maxFiles={10 - existingFileNames.length}
-      accept="*/*"
-    />
+    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+      <FileUploadTracker
+        bind:this={trackerComponent}
+        label={isNew ? 'Initial Attachments' : 'Append New Files'}
+        maxFiles={10 - existingFileNames.length}
+        accept="*/*"
+      />
+    </div>
 
-    <!-- Progress bar -->
     {#if uploading}
-      <div class="space-y-1">
-        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+      <div class="space-y-2">
+        <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
           <div
-            class="bg-indigo-600 h-full transition-all duration-200"
+            class="bg-aspada-navy h-full transition-all duration-300"
             style="width: {progress}%"
           ></div>
         </div>
-        <div class="flex justify-between text-[10px] font-bold text-indigo-600 uppercase">
-          <span>Uploading...</span>
-          <span>{progress}%</span>
+        <div
+          class="flex justify-between text-[10px] font-black text-aspada-navy uppercase tracking-widest"
+        >
+          <span>{progress}% Uploaded</span>
+          <span class="animate-pulse">Transferring...</span>
         </div>
       </div>
     {/if}
 
-    <!-- Actions -->
-    <div class="flex gap-3 pt-1">
+    <div class="flex gap-3 pt-2">
       <button
         type="submit"
         disabled={uploading ||
           !formTitle ||
           (isNew && (trackerComponent?.getSelectedFiles()?.length ?? 0) === 0)}
-        class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 transition-colors text-sm"
+        class="flex-1 bg-aspada-navy text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50"
       >
-        {#if uploading}
-          Saving…
-        {:else if isNew}
-          Save Document
-        {:else}
-          Save Changes
-        {/if}
+        {uploading ? 'Processing…' : isNew ? 'Submit Entry' : 'Sync Changes'}
       </button>
 
       {#if !isNew}
@@ -363,9 +335,10 @@
           type="button"
           onclick={deleteDoc}
           disabled={uploading}
-          class="px-4 py-2 text-sm font-bold text-red-500 hover:text-red-700 disabled:opacity-40 transition-colors"
+          class="px-6 py-4 rounded-2xl border-2 border-red-50/50 text-red-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
+          aria-label="Delete Entry"
         >
-          Delete
+          <span class="i-lucide-trash-2 text-lg"></span>
         </button>
       {/if}
     </div>
