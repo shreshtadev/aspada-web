@@ -51,15 +51,16 @@
     scale = newScale
   }
 
-  function handleMouseDown(e: MouseEvent) {
-    if (e.button !== 0) return // Only middle or primary? Actually let's use primary but ignore if clicking buttons
+  function handlePointerDown(e: PointerEvent) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return // Only primary
     if ((e.target as HTMLElement).closest('button')) return
 
     isDragging = true
     lastMousePos = { x: e.clientX, y: e.clientY }
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
   }
 
-  function handleMouseMove(e: MouseEvent) {
+  function handlePointerMove(e: PointerEvent) {
     if (!isDragging) return
     const dx = e.clientX - lastMousePos.x
     const dy = e.clientY - lastMousePos.y
@@ -68,8 +69,15 @@
     lastMousePos = { x: e.clientX, y: e.clientY }
   }
 
-  function handleMouseUp() {
+  function handlePointerUp(e: PointerEvent) {
     isDragging = false
+    try {
+      if ((e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId)) {
+        ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+      }
+    } catch (err) {
+      // Ignore capture release errors
+    }
   }
 
   function resetView() {
@@ -182,13 +190,14 @@
 </script>
 
 <div
-  class="relative w-full h-[70vh] min-h-[600px] overflow-hidden bg-slate-50/50 rounded-[3rem] border-2 border-slate-100 shadow-inner group"
+  class="relative w-full h-[70vh] min-h-[600px] overflow-hidden bg-slate-50/50 rounded-[3rem] border-2 border-slate-100 shadow-inner group touch-none"
   bind:clientWidth={containerWidth}
   onwheel={handleWheel}
-  onmousedown={handleMouseDown}
-  onmousemove={handleMouseMove}
-  onmouseup={handleMouseUp}
-  onmouseleave={handleMouseUp}
+  onpointerdown={handlePointerDown}
+  onpointermove={handlePointerMove}
+  onpointerup={handlePointerUp}
+  onpointercancel={handlePointerUp}
+  onpointerleave={handlePointerUp}
   role="presentation"
 >
   <!-- UI Controls -->

@@ -13,6 +13,8 @@
   let totalPages = $state(1)
   let perPage = $state(5)
   let loading = $state(false)
+  let editingId = $state<string | null>(null)
+  let editingTitle = $state('')
 
   async function load(page = currentPage) {
     loading = true
@@ -52,6 +54,28 @@
     }
   }
 
+  async function startEditing(v: VenturesResponse, e: MouseEvent) {
+    e.stopPropagation()
+    editingId = v.id
+    editingTitle = v.title
+  }
+
+  async function saveEdit(e?: MouseEvent | KeyboardEvent) {
+    if (e) e.stopPropagation()
+    if (!editingId || !editingTitle) {
+      editingId = null
+      return
+    }
+    await pb.collection('ventures').update(editingId, { title: editingTitle })
+    editingId = null
+    load(currentPage)
+  }
+
+  function handleEditKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter') saveEdit()
+    if (e.key === 'Escape') editingId = null
+  }
+
   $effect(() => {
     load(currentPage)
     $inspect(ventures)
@@ -82,36 +106,79 @@
     {:else}
       <div class="grid grid-cols-1 gap-3">
         {#each ventures as v (v.id)}
-          <button
-            onclick={() => onSelect(v.id, v.title)}
-            class="group w-full flex justify-between items-center p-4 rounded-[1.25rem] border-2 transition-all duration-300 text-left
+          <div
+            class="group w-full flex justify-between items-center p-4 rounded-[1.25rem] border-2 transition-all duration-300
             {activeId === v.id
               ? 'border-aspada-gold bg-aspada-gold/5 shadow-md scale-[1.02]'
               : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 hover:bg-white'}"
           >
-            <div class="flex items-center gap-3">
+            <div
+              class="flex items-center gap-3 flex-1 cursor-pointer"
+              onclick={() => onSelect(v.id, v.title)}
+              role="button"
+              tabindex="0"
+              onkeydown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onSelect(v.id, v.title)
+              }}
+            >
               <div
                 class="w-1.5 h-1.5 rounded-full transition-all {activeId === v.id
                   ? 'bg-aspada-gold scale-[2]'
                   : 'bg-slate-300 group-hover:bg-slate-400'}"
               ></div>
-              <span
-                class="font-bold text-slate-700 transition-colors {activeId === v.id
-                  ? 'text-aspada-navy'
-                  : 'group-hover:text-slate-900'}">{v.title}</span
-              >
+              {#if editingId === v.id}
+                <input
+                  bind:value={editingTitle}
+                  onclick={(e) => e.stopPropagation()}
+                  onkeydown={handleEditKeyDown}
+                  class="bg-white border-2 border-aspada-gold/30 px-2 py-1 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-aspada-gold/20"
+                />
+                <button
+                  type="button"
+                  onclick={saveEdit}
+                  class="text-green-600 hover:text-green-700 p-1 rounded-md hover:bg-green-50 transition-all cursor-pointer"
+                  title="Save Name"
+                >
+                  <span class="i-lucide-check text-base"></span>
+                </button>
+                <button
+                  type="button"
+                  onclick={() => (editingId = null)}
+                  class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                  title="Cancel"
+                >
+                  <span class="i-lucide-x text-lg"></span>
+                </button>
+              {:else}
+                <span
+                  class="font-bold text-slate-700 transition-colors {activeId === v.id
+                    ? 'text-aspada-navy'
+                    : 'group-hover:text-slate-900'}">{v.title}</span
+                >
+              {/if}
             </div>
-            <span
-              role="button"
-              tabindex="0"
-              onclick={(e) => deleteVenture(v.id, e)}
-              onkeydown={(e) => handleKeyDown(e, v.id)}
-              class="text-slate-300 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
-              aria-label="Delete Venture"
-            >
-              <span class="i-lucide-trash-2 text-lg"></span>
-            </span>
-          </button>
+            <div class="flex items-center gap-1">
+              {#if editingId !== v.id}
+                <button
+                  onclick={(e) => startEditing(v, e)}
+                  class="text-slate-300 hover:text-aspada-gold p-1.5 rounded-lg hover:bg-aspada-gold/5 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+                  title="Edit Venture"
+                >
+                  <span class="i-lucide-edit-2 text-base"></span>
+                </button>
+              {/if}
+              <span
+                role="button"
+                tabindex="0"
+                onclick={(e) => deleteVenture(v.id, e)}
+                onkeydown={(e) => handleKeyDown(e, v.id)}
+                class="text-slate-300 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+                aria-label="Delete Venture"
+              >
+                <span class="i-lucide-trash-2 text-lg"></span>
+              </span>
+            </div>
+          </div>
         {/each}
       </div>
     {/if}

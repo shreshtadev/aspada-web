@@ -17,6 +17,8 @@
   let totalPages = $state(1)
   let perPage = $state(5)
   let loading = $state(false)
+  let editingId = $state<string | null>(null)
+  let editingTitle = $state('')
 
   async function loadSteps(page = currentPage) {
     loading = true
@@ -105,6 +107,32 @@
     await loadSteps(currentPage)
   }
 
+  function startEditing(step: ProcessesResponse, e: MouseEvent) {
+    e.stopPropagation()
+    editingId = step.id
+    editingTitle = step.title
+  }
+
+  async function saveEdit() {
+    if (!editingId || !editingTitle) {
+      editingId = null
+      return
+    }
+    processing = true
+    try {
+      await pb.collection('processes').update(editingId, { title: editingTitle })
+      editingId = null
+      await loadSteps(currentPage)
+    } finally {
+      processing = false
+    }
+  }
+
+  function handleEditKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter') saveEdit()
+    if (e.key === 'Escape') editingId = null
+  }
+
   $effect(() => {
     if (ventureId) loadSteps(currentPage)
   })
@@ -176,12 +204,16 @@
               <span class="i-lucide-grip-vertical text-xl"></span>
             </div>
 
-            <button
-              type="button"
-              onclick={() => onStepSelect(step.id, step.title)}
-              class="flex-1 text-left focus:outline-none"
-            >
-              <div class="flex justify-between items-center mb-1">
+            <div class="flex-1 text-left">
+              <div
+                class="flex justify-between items-center mb-1 cursor-pointer"
+                onclick={() => onStepSelect(step.id, step.title)}
+                role="button"
+                tabindex="0"
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') onStepSelect(step.id, step.title)
+                }}
+              >
                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest"
                   >Sequence {step.sequence}</span
                 >
@@ -195,12 +227,59 @@
                 </div>
               </div>
 
-              <span
-                class="text-base font-black text-aspada-navy block mb-4 group-hover:text-aspada-gold transition-colors"
-                >{step.title}</span
+              {#if editingId === step.id}
+                <div
+                  class="flex items-center gap-2 mb-4"
+                  onclick={(e) => e.stopPropagation()}
+                  role="presentation"
+                >
+                  <input
+                    bind:value={editingTitle}
+                    onkeydown={handleEditKeyDown}
+                    class="flex-1 bg-white border-2 border-aspada-gold/30 px-3 py-1.5 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-aspada-gold/10"
+                  />
+                  <button
+                    onclick={saveEdit}
+                    class="text-green-600 hover:text-green-700 p-1.5 rounded-lg hover:bg-green-50 transition-all cursor-pointer"
+                    title="Save Title"
+                  >
+                    <span class="i-lucide-check text-lg"></span>
+                  </button>
+                  <button
+                    onclick={() => (editingId = null)}
+                    class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                    title="Cancel"
+                  >
+                    <span class="i-lucide-x text-lg"></span>
+                  </button>
+                </div>
+              {:else}
+                <div class="flex items-center justify-between mb-4 group/title">
+                  <span
+                    class="text-base font-black text-aspada-navy group-hover:text-aspada-gold transition-colors cursor-pointer"
+                    onclick={() => onStepSelect(step.id, step.title)}
+                    role="button"
+                    tabindex="0"
+                    onkeydown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') onStepSelect(step.id, step.title)
+                    }}
+                  >
+                    {step.title}
+                  </span>
+                  <button
+                    onclick={(e) => startEditing(step, e)}
+                    class="text-slate-300 hover:text-aspada-gold p-1 rounded-lg hover:bg-aspada-gold/5 transition-all cursor-pointer opacity-0 group-hover/title:opacity-100"
+                    title="Edit Title"
+                  >
+                    <span class="i-lucide-edit-2 text-sm"></span>
+                  </button>
+                </div>
+              {/if}
+              <div
+                class="grid grid-cols-2 gap-2"
+                onclick={(e) => e.stopPropagation()}
+                role="presentation"
               >
-
-              <div class="grid grid-cols-2 gap-2" onclick={(e) => e.stopPropagation()}>
                 <select
                   value={step.status}
                   onchange={(e) =>
@@ -225,7 +304,7 @@
                   {/each}
                 </select>
               </div>
-            </button>
+            </div>
           </div>
         </div>
       {/each}
@@ -247,6 +326,7 @@
         {#each Array(totalPages) as _, i}
           <button
             onclick={() => (currentPage = i + 1)}
+            title={`Page ${i + 1}`}
             class="w-1.5 h-1.5 rounded-full transition-all {currentPage === i + 1
               ? 'bg-aspada-navy w-4'
               : 'bg-slate-200 hover:bg-slate-400'}"

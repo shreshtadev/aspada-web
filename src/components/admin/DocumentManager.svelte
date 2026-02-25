@@ -1,5 +1,6 @@
 <script lang="ts">
   import pb from '$lib/pb'
+  import { downloadFile } from '$lib/utils'
   import { Collections, type DocumentsResponse } from '$types/pocketbase-types'
   import FileUploadTracker from './FileUploadTracker.svelte'
 
@@ -210,6 +211,7 @@
         <div class="flex items-center justify-between px-2 pt-4">
           <button
             type="button"
+            title="move-left"
             onclick={() => (currentPage -= 1)}
             disabled={currentPage === 1 || loading}
             class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
@@ -221,6 +223,7 @@
           >
           <button
             type="button"
+            title="move-right"
             onclick={() => (currentPage += 1)}
             disabled={currentPage === totalPages || loading}
             class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
@@ -279,14 +282,28 @@
                 <span class="i-lucide-file-text text-slate-400 group-hover:text-aspada-gold"></span>
                 <span class="text-xs text-slate-600 truncate font-bold">{filename}</span>
               </div>
-              <button
-                type="button"
-                onclick={() => removeExistingFile(filename)}
-                disabled={uploading}
-                class="text-red-400 hover:text-red-600 disabled:opacity-40 transition-colors p-1"
-              >
-                <span class="i-lucide-x-circle text-lg"></span>
-              </button>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  title="download-file"
+                  onclick={() => {
+                    const doc = docs.find((d) => d.id === selectedId)
+                    if (doc) downloadFile(doc, filename)
+                  }}
+                  class="text-slate-400 hover:text-aspada-gold transition-colors p-1 cursor-pointer"
+                >
+                  <span class="i-lucide-download text-lg"></span>
+                </button>
+                <button
+                  type="button"
+                  title="close-x"
+                  onclick={() => removeExistingFile(filename)}
+                  disabled={uploading}
+                  class="text-red-400 hover:text-red-600 disabled:opacity-40 transition-colors p-1 cursor-pointer"
+                >
+                  <span class="i-lucide-x-circle text-lg"></span>
+                </button>
+              </div>
             </div>
           {/each}
         </div>
@@ -325,7 +342,7 @@
         disabled={uploading ||
           !formTitle ||
           (isNew && (trackerComponent?.getSelectedFiles()?.length ?? 0) === 0)}
-        class="flex-1 bg-aspada-navy text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50"
+        class="flex-1 bg-aspada-navy text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50 cursor-pointer"
       >
         {uploading ? 'Processing…' : isNew ? 'Submit Entry' : 'Sync Changes'}
       </button>
@@ -335,7 +352,7 @@
           type="button"
           onclick={deleteDoc}
           disabled={uploading}
-          class="px-6 py-4 rounded-2xl border-2 border-red-50/50 text-red-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
+          class="px-6 py-4 rounded-2xl border-2 border-red-50/50 text-red-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95 cursor-pointer"
           aria-label="Delete Entry"
         >
           <span class="i-lucide-trash-2 text-lg"></span>

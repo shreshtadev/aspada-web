@@ -129,3 +129,7 @@ export const uploadAttachment = async (title: string, files: File[]) => {
 export const encodeForQuery = (str: string): string => {
   return encodeURIComponent(str).replace(/%20/g, '+')
 }
+export const downloadFile = (record: any, filename: string) => {
+  const url = pb.files.getURL(record, filename, { download: true })
+  window.open(url, '_blank')
+}
