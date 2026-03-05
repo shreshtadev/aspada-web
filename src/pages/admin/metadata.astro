@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import StatsSettingsManager from '../../components/admin/StatsSettingsManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import StatsSettingsManager from '../../components/admin/StatsSettingsManager.sv
     </h1>
   </header>
 
-  <StatsSettingsManager client:load />
+  <StatsSettingsManager client:idle />
 </AdminLayout>

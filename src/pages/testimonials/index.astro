@@ -1,10 +1,10 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import Navbar from '../../components/Navbar.astro'
-import Footer from '../../components/Footer.astro'
+const Layout = await import('../../layouts/Layout.astro')
+const Navbar = await import('../../components/Navbar.astro')
+const Footer = await import('../../components/Footer.astro')
+import toast from 'svelte-french-toast'
 import TestimonialList from '../../components/testimonials/TestimonialList.svelte'
 import pb from '../../lib/pb'
-import toast from 'svelte-french-toast'
 import type { TestimonialInfoExpand } from '../../types'
 import { Collections, type TestimonialsResponse } from '../../types/pocketbase-types'
 
@@ -25,8 +25,8 @@ try {
 }
 ---
 
-<Layout title="Testimonials | Aspada Developers">
-  <Navbar />
+<Layout.default title="Testimonials | Aspada Developers">
+  <Navbar.default />
 
   <main class="min-h-screen bg-slate-50">
     <!-- Header Section -->
@@ -55,9 +55,9 @@ try {
 
     <!-- Content Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 -mt-16 sm:-mt-20 relative z-30">
-      <TestimonialList {testimonials} client:load />
+      <TestimonialList {testimonials} client:idle />
     </div>
   </main>
 
-  <Footer companyProfile={companyProfile} />
-</Layout>
+  <Footer.default companyProfile={companyProfile} />
+</Layout.default>

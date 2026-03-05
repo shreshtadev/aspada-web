@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../../layouts/AdminLayout.astro'
 import CRMManager from '../../../components/crm/admin/CRMManager.svelte'
+import AdminLayout from '../../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -13,7 +13,7 @@ import CRMManager from '../../../components/crm/admin/CRMManager.svelte'
     </header>
 
     <div class="flex-1 min-h-0">
-      <CRMManager client:load />
+      <CRMManager client:idle />
     </div>
   </section>
 </AdminLayout>

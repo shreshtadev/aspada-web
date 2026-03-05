@@ -1,17 +1,17 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import Navbar from '../../components/Navbar.astro'
-import Footer from '../../components/Footer.astro'
-import pb from '../../lib/pb'
 import { marked } from 'marked'
 import toast from 'svelte-french-toast'
+import pb from '../../lib/pb'
 import type { PostInfoExpand } from '../../types'
 import {
   Collections,
   type CompaniesResponse,
   type PostsResponse,
 } from '../../types/pocketbase-types'
-import ActionDock from '../../components/ActionDock.astro'
+const Layout = await import('../../layouts/Layout.astro')
+const Navbar = await import('../../components/Navbar.astro')
+const Footer = await import('../../components/Footer.astro')
+const ActionDock = await import('../../components/ActionDock.astro')
 
 const { id } = Astro.params
 
@@ -58,8 +58,8 @@ companyProfile = await pb
   .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
-<Layout title={`${post.title} - Aspada Blog`} description={description} image={fileURL}>
-  <Navbar companyProfile={companyProfile} />
+<Layout.default title={`${post.title} - Aspada Blog`} description={description} image={fileURL}>
+  <Navbar.default companyProfile={companyProfile} />
 
   <main class="min-h-screen bg-slate-50 pt-24 pb-12 sm:pt-32 sm:pb-16">
     <!-- Hero Image (if exists) or Title Section -->
@@ -124,6 +124,6 @@ companyProfile = await pb
     </div>
   </main>
 
-  <Footer companyProfile={companyProfile} />
-  <ActionDock companyProfile={companyProfile} />
-</Layout>
+  <Footer.default companyProfile={companyProfile} />
+  <ActionDock.default companyProfile={companyProfile} />
+</Layout.default>

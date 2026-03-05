@@ -1,9 +1,10 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import Navbar from '../../components/Navbar.astro'
-import Footer from '../../components/Footer.astro'
-import pb from '../../lib/pb'
+const Layout = await import('../../layouts/Layout.astro')
+const Navbar = await import('../../components/Navbar.astro')
+const Footer = await import('../../components/Footer.astro')
+import { marked } from 'marked'
 import toast from 'svelte-french-toast'
+import pb from '../../lib/pb'
 import type { TestimonialInfoExpand } from '../../types'
 import {
   Collections,
@@ -11,7 +12,6 @@ import {
   type ProjectsResponse,
   type TestimonialsResponse,
 } from '../../types/pocketbase-types'
-import { marked } from 'marked'
 
 const { id } = Astro.params
 const companyProfile = await pb
@@ -44,8 +44,8 @@ const avatarUrl = testimonial.authorAvatar
 const testimonialContent = await marked.parse(testimonial.content)
 ---
 
-<Layout title={`${testimonial.authorName} - Testimonial | Aspada Developers`}>
-  <Navbar />
+<Layout.default title={`${testimonial.authorName} - Testimonial | Aspada Developers`}>
+  <Navbar.default />
 
   <main class="min-h-screen bg-slate-50 flex flex-col">
     <!-- Breadcrumb / Header -->
@@ -154,5 +154,5 @@ const testimonialContent = await marked.parse(testimonial.content)
     </div>
   </main>
 
-  <Footer companyProfile={companyProfile} />
-</Layout>
+  <Footer.default companyProfile={companyProfile} />
+</Layout.default>

@@ -1,11 +1,17 @@
 <script lang="ts">
-  import pb from '$lib/pb'
-  import { Collections, type ProcessesResponse } from '$types/pocketbase-types'
+  import pb from '../../lib/pb'
+  import { Collections, type ProcessesResponse } from '../../types/pocketbase-types'
 
-  let { ventureId, onStepSelect, activeStepId } = $props<{
+  let {
+    ventureId,
+    onStepSelect,
+    activeStepId,
+    baseProcessId = null,
+  } = $props<{
     ventureId: string
     onStepSelect: (id: string, title: string) => void
     activeStepId: string | null
+    baseProcessId?: string | null
   }>()
 
   let steps = $state<ProcessesResponse[]>([])
@@ -107,16 +113,41 @@
       nodeMap.set(s.id, { ...s, children: [], level: 0, x: 0, y: 0 })
     })
 
+    let maxLevel = 0
     const roots: TreeNode[] = []
+
     nodeMap.forEach((node) => {
       if (node.parent && nodeMap.has(node.parent)) {
         nodeMap.get(node.parent)!.children.push(node)
-      } else {
-        roots.push(node)
       }
     })
 
-    let maxLevel = 0
+    // Determine the roots based on the baseProcessId.
+    // Logic:
+    // 1. If baseProcessId has children, show them.
+    // 2. If it has no children but has a parent, show siblings (parent's children).
+    // 3. Otherwise show top-level parent processes.
+    if (baseProcessId && nodeMap.has(baseProcessId)) {
+      const targetNode = nodeMap.get(baseProcessId)!
+      if (targetNode.children.length > 0) {
+        targetNode.children.forEach((child) => roots.push(child))
+      } else if (targetNode.parent && nodeMap.has(targetNode.parent)) {
+        nodeMap.get(targetNode.parent)!.children.forEach((sibling) => roots.push(sibling))
+      } else {
+        // Fallback to top-level if it's a root with no children
+        nodeMap.forEach((node) => {
+          if (!node.parent || node.parent === '') roots.push(node)
+        })
+      }
+    } else {
+      // No baseProcessId, show top-level parents
+      nodeMap.forEach((node) => {
+        if (!node.parent || node.parent === '') {
+          roots.push(node)
+        }
+      })
+    }
+
     const levelCounts: number[] = []
 
     function traverse(node: TreeNode, level: number) {
@@ -190,7 +221,7 @@
 </script>
 
 <div
-  class="relative w-full h-[70vh] min-h-[600px] overflow-hidden bg-slate-50/50 rounded-[3rem] border-2 border-slate-100 shadow-inner group touch-none"
+  class="relative w-full h-full min-h-[600px] overflow-hidden bg-slate-50/50 rounded-[3rem] border-2 border-slate-100 shadow-inner group touch-none"
   bind:clientWidth={containerWidth}
   onwheel={handleWheel}
   onpointerdown={handlePointerDown}

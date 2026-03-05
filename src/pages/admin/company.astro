@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import CompanyProfileManager from '../../components/admin/CompanyProfileManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import CompanyProfileManager from '../../components/admin/CompanyProfileManager.
     </h1>
   </header>
 
-  <CompanyProfileManager client:load />
+  <CompanyProfileManager client:idle />
 </AdminLayout>

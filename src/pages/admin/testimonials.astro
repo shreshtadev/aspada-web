@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import TestimonialManager from '../../components/admin/TestimonialManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -13,5 +13,5 @@ import TestimonialManager from '../../components/admin/TestimonialManager.svelte
     </p>
   </div>
 
-  <TestimonialManager client:load />
+  <TestimonialManager client:idle />
 </AdminLayout>

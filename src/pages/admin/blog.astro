@@ -1,9 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import ContentManager from '../../components/admin/ContentManager.svelte'
-
-// Protect this page - simple check for now, real auth handled by middleware usually
-// But since this is a client-side heavy component, most logic is there.
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout title="Admin Content Manager">
@@ -16,7 +13,7 @@ import ContentManager from '../../components/admin/ContentManager.svelte'
         </p>
       </header>
 
-      <ContentManager client:load />
+      <ContentManager client:idle />
     </div>
   </main>
 </AdminLayout>

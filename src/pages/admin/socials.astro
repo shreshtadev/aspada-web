@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import SocialsManager from '../../components/admin/SocialsManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import SocialsManager from '../../components/admin/SocialsManager.svelte'
     </h1>
   </header>
 
-  <SocialsManager client:load />
+  <SocialsManager client:idle />
 </AdminLayout>

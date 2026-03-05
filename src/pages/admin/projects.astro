@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import ProjectManager from '../../components/admin/ProjectManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import ProjectManager from '../../components/admin/ProjectManager.svelte'
     </h1>
   </div>
 
-  <ProjectManager client:load />
+  <ProjectManager client:idle />
 </AdminLayout>

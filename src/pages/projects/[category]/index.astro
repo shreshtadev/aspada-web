@@ -1,9 +1,9 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import Navbar from "../../../components/Navbar.astro";
-import Footer from "../../../components/Footer.astro";
-import ActionDock from "../../../components/ActionDock.astro";
-import ProjectList from "../../../components/projects/ProjectList.svelte";
+const Navbar = await import("../../../components/Navbar.astro");
+const Footer = await import("../../../components/Footer.astro");
+const ActionDock = await import("../../../components/ActionDock.astro");
+import ProjectList from '../../../components/projects/ProjectList.svelte'
 import pb from "../../../lib/pb";
 import toast from "svelte-french-toast";
 import {
@@ -17,7 +17,7 @@ import layout from '../../../assets/layout.webp'
 import commercial from '../../../assets/commercial.webp'
 import residential from '../../../assets/residential.webp'
 import { Image } from "astro:assets";
-import LoadingSection from "../../../components/LoadingSection.astro";
+const LoadingSection = await import("../../../components/LoadingSection.astro");
 
 // Fetch projects
 // Using fullList to get all projects for the index page.
@@ -55,8 +55,8 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 ---
 
 <Layout title="Our Projects | Aspada Developers">
-  <Navbar companyProfile={companyProfile} />
-      <LoadingSection
+  <Navbar.default companyProfile={companyProfile} />
+      <LoadingSection.default
       sectionId="mainSection"
       skeletonCount={5}
       minHeight="600px"
@@ -95,7 +95,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 
       {
         ongoingProjects.length > 0 ? (
-          <ProjectList client:load projects={ongoingProjects} layout="masonry"/>
+          <ProjectList client:idle projects={ongoingProjects} layout="masonry"/>
         ) : (
           <div class="text-center py-20 bg-aspada-silver/5 rounded-3xl border border-white/10">
             <p class="text-aspada-steel/50 text-2xl">
@@ -142,7 +142,7 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
       }
     </div>
   </main>
-</LoadingSection>
-  <Footer companyProfile={companyProfile} />
-  <ActionDock companyProfile={companyProfile} />
+</LoadingSection.default>
+  <Footer.default companyProfile={companyProfile} />
+  <ActionDock.default companyProfile={companyProfile} />
 </Layout>

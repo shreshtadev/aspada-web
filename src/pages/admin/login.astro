@@ -1,6 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro' // Your main site layout
 import LoginForm from '../../components/admin/LoginForm.svelte'
+import Layout from '../../layouts/Layout.astro' // Your main site layout
 ---
 
 <Layout title="Admin Login | Aspada Developers">
@@ -22,7 +22,7 @@ import LoginForm from '../../components/admin/LoginForm.svelte'
         <p class="text-aspada-steel text-sm mt-2">Internal Management System</p>
       </div>
 
-      <LoginForm client:load />
+      <LoginForm client:idle />
 
       <div class="mt-8 text-center">
         <a href="/" class="text-xs text-aspada-steel hover:text-aspada-gold transition-colors">

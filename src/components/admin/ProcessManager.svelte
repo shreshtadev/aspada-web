@@ -1,11 +1,19 @@
 <script lang="ts">
-  import pb from '$lib/pb'
-  import { ProcessesStatusOptions, type ProcessesResponse } from '$types/pocketbase-types'
+  import pb from '../../lib/pb'
+  import { ProcessesStatusOptions, type ProcessesResponse } from '../../types/pocketbase-types'
 
-  let { ventureId, onStepSelect, activeStepId } = $props<{
+  let {
+    ventureId,
+    onStepSelect,
+    activeStepId,
+    mode = 'all',
+    parentProcessId = null,
+  } = $props<{
     ventureId: string
     onStepSelect: (id: string, title: string) => void
     activeStepId: string | null
+    mode?: 'all' | 'parents' | 'children'
+    parentProcessId?: string | null
   }>()
 
   let steps = $state<ProcessesResponse[]>([])
@@ -23,13 +31,22 @@
   async function loadSteps(page = currentPage) {
     loading = true
     try {
+      let filterStr = `project = "${ventureId}"`
+      if (mode === 'parents') {
+        filterStr += ` && (parent = "" || parent = null)`
+      } else if (mode === 'children' && parentProcessId) {
+        filterStr += ` && parent = "${parentProcessId}"`
+      } else if (mode === 'children' && !parentProcessId) {
+        filterStr += ` && id = "INVALID_ID"`
+      }
+
       const allRes = await pb.collection('processes').getList(1, 1000, {
         filter: `project = "${ventureId}"`,
         sort: 'sequence',
       })
       allSteps = allRes.items
       const res = await pb.collection('processes').getList(page, perPage, {
-        filter: `project = "${ventureId}"`,
+        filter: filterStr,
         sort: 'sequence',
       })
       steps = res.items
@@ -47,7 +64,7 @@
       project: ventureId,
       sequence: steps.length + 1,
       status: ProcessesStatusOptions.todo,
-      parent: stepParent,
+      parent: mode === 'children' && parentProcessId ? parentProcessId : stepParent,
     })
     stepTitle = ''
     stepParent = null
@@ -134,7 +151,9 @@
   }
 
   $effect(() => {
-    if (ventureId) loadSteps(currentPage)
+    if (ventureId || mode || parentProcessId) {
+      loadSteps(1)
+    }
   })
 
   const getStatusColor = (status: string) => {
@@ -293,6 +312,7 @@
 
                 <select
                   value={step.parent}
+                  disabled={!step.parent}
                   onchange={(e) => updateParent(step.id, e.currentTarget.value)}
                   class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider"
                 >

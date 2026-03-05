@@ -1,6 +1,6 @@
 ---
-import Layout from '../layouts/Layout.astro'
-import Navbar from '../components/Navbar.astro'
+const Layout = await import('../layouts/Layout.astro')
+const Navbar = await import('../components/Navbar.astro')
 import pb from '../lib/pb'
 import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
 const companyProfile: CompaniesResponse = await pb
@@ -8,8 +8,8 @@ const companyProfile: CompaniesResponse = await pb
   .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
-<Layout title={`Terms | ${companyProfile.companyName}`}>
-  <Navbar companyProfile={companyProfile} />
+<Layout.default title={`Terms | ${companyProfile.companyName}`}>
+  <Navbar.default companyProfile={companyProfile} />
 
   <main>
     <section class="bg-aspada-cream/50 min-h-screen py-12 px-4 sm:py-20 sm:px-10">
@@ -130,4 +130,4 @@ const companyProfile: CompaniesResponse = await pb
       </div>
     </section>
   </main>
-</Layout>
+</Layout.default>

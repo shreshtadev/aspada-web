@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import DMSDashboard from '../../components/admin/DMSDashboard.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import DMSDashboard from '../../components/admin/DMSDashboard.svelte'
     </h1>
   </header>
 
-  <DMSDashboard client:load />
+  <DMSDashboard client:idle />
 </AdminLayout>

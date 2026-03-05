@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
 import netlify from '@astrojs/netlify'
 import node from '@astrojs/node'
-import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { loadEnv } from 'vite'
 
 import svelte from '@astrojs/svelte'
@@ -39,10 +39,11 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        $components: path.resolve('./src/components'),
-        $lib: path.resolve('./src/lib'),
-        $types: path.resolve('./src/types'),
-        $layouts: path.resolve('./src/layouts'),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '$components': fileURLToPath(new URL('./src/components', import.meta.url)),
+        '$lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
+        '$types': fileURLToPath(new URL('./src/types', import.meta.url)),
+        '$layouts': fileURLToPath(new URL('./src/layouts', import.meta.url)),
       },
     },
     build: {

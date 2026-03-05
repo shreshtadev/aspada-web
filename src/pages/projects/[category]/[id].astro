@@ -1,13 +1,17 @@
 ---
-import Layout from '../../../layouts/Layout.astro'
-import Navbar from '../../../components/Navbar.astro'
-import Footer from '../../../components/Footer.astro'
-import ActionDock from '../../../components/ActionDock.astro'
 import SocialEmbed from '../../../components/SocialEmbed.svelte'
+import Layout from '../../../layouts/Layout.astro'
 import pb from '../../../lib/pb'
+const Navbar = await import('../../../components/Navbar.astro')
+const Footer = await import('../../../components/Footer.astro')
+const ActionDock = await import('../../../components/ActionDock.astro')
 // import { getLocationName } from "../../../lib/utils";
 import { marked } from 'marked'
 import toast from 'svelte-french-toast'
+import ProjectEnquiryModal from '../../../components/ProjectEnquiryModal.svelte'
+import AmenitiesCarousel from '../../../components/projects/AmenitiesCarousel.svelte'
+import GalleryLightbox from '../../../components/projects/GalleryLightbox.svelte'
+import type { ProjectInfoExpand } from '../../../types'
 import {
   Collections,
   MetadataCategoryTypeOptions,
@@ -16,11 +20,7 @@ import {
   type MetadataResponse,
   type ProjectsResponse,
 } from '../../../types/pocketbase-types'
-import type { ProjectInfoExpand } from '../../../types'
-import ProjectAddress from '../../../components/ProjectAddress.astro'
-import ProjectEnquiryModal from '../../../components/ProjectEnquiryModal.svelte'
-import GalleryLightbox from '../../../components/projects/GalleryLightbox.svelte'
-import AmenitiesCarousel from '../../../components/projects/AmenitiesCarousel.svelte'
+const ProjectAddress = await import('../../../components/ProjectAddress.astro')
 
 const { category, id } = Astro.params
 if (!id || !category) {
@@ -169,7 +169,7 @@ companyProfile = await pb
 ---
 
 <Layout title={`${project.title} | Aspada Developers`}>
-  <Navbar companyProfile={companyProfile} />
+  <Navbar.default companyProfile={companyProfile} />
   <main class="min-h-screen bg-aspada-cream/10">
     {/* Hero Section */}
     <div class="relative h-[60vh] sm:h-[70vh] w-full overflow-hidden">
@@ -338,7 +338,7 @@ companyProfile = await pb
                   <span class="w-8 h-1 bg-aspada-steel" />
                   Premium Amenities
                 </h2>
-                <AmenitiesCarousel client:load amenities={amenities} />
+                <AmenitiesCarousel client:idle amenities={amenities} />
               </section>
             )
           }
@@ -352,7 +352,7 @@ companyProfile = await pb
                   Gallery
                 </h2>
                 <GalleryLightbox
-                  client:load
+                  client:idle
                   images={galleryImages}
                   projectTitle={project.title}
                   layout="scroll"
@@ -401,7 +401,7 @@ companyProfile = await pb
               </div>
             </div>
             <ProjectEnquiryModal
-              client:load
+              client:idle
               projectTitle={project.title}
               latitude={project.location?.lat}
               longitude={project.location?.lon}
@@ -434,6 +434,6 @@ companyProfile = await pb
     </div>
   </main>
 
-  <Footer companyProfile={companyProfile} />
-  <ActionDock companyProfile={companyProfile} />
+  <Footer.default companyProfile={companyProfile} />
+  <ActionDock.default companyProfile={companyProfile} />
 </Layout>

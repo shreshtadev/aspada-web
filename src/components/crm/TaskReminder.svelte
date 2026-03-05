@@ -1,9 +1,9 @@
 <script lang="ts">
-  import pb from '../../lib/pb'
   import { onMount } from 'svelte'
-  import { Collections, type LeadActivitiesResponse } from '../../types/pocketbase-types'
   import toast from 'svelte-french-toast'
   import { fade, slide } from 'svelte/transition'
+  import pb from '../../lib/pb'
+  import { Collections, type LeadActivitiesResponse } from '../../types/pocketbase-types'
 
   let activities = $state<LeadActivitiesResponse[]>([])
   let loading = $state(true)
@@ -160,16 +160,18 @@
                 {#if activity.expand?.lead?.contactNo}
                   <a
                     href={`tel:${activity.expand.lead.contactNo}`}
+                    aria-labelledby="calls"
                     class="px-3 bg-white border border-aspada-steel/20 rounded-lg flex items-center justify-center text-sm hover:border-aspada-gold transition"
                   >
-                    📞
+                    <span class="i-lucide-phone text-lg"></span>
                   </a>
                   <a
                     href={`https://wa.me/${activity.expand.lead.contactNo.replace(/\D/g, '')}`}
                     target="_blank"
+                    aria-labelledby="messages"
                     class="px-3 bg-white border border-aspada-steel/20 rounded-lg flex items-center justify-center text-sm hover:border-aspada-gold transition text-green-600"
                   >
-                    💬
+                    <span class="i-lucide-message-square text-lg"></span>
                   </a>
                 {/if}
               </div>

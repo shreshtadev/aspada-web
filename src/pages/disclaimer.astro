@@ -1,15 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro'
-import Navbar from '../components/Navbar.astro'
-import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
+const Layout = await import('../layouts/Layout.astro')
+const Navbar = await import('../components/Navbar.astro')
 import pb from '../lib/pb'
+import { Collections, type CompaniesResponse } from '../types/pocketbase-types'
 const companyProfile: CompaniesResponse = await pb
   .collection(Collections.Companies)
   .getFirstListItem("companyName = '" + import.meta.env.PUBLIC_COMPANY_NAME + "'")
 ---
 
-<Layout title="Official Disclaimer | Aspada Developers">
-  <Navbar companyProfile={companyProfile} />
+<Layout.default title="Official Disclaimer | Aspada Developers">
+  <Navbar.default companyProfile={companyProfile} />
 
   <main>
     <section
@@ -133,4 +133,4 @@ const companyProfile: CompaniesResponse = await pb
       </div>
     </section>
   </main>
-</Layout>
+</Layout.default>

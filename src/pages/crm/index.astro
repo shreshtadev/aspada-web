@@ -1,8 +1,8 @@
 ---
+import TaskReminder from '../../components/crm/TaskReminder.svelte'
 import AdminLayout from '../../layouts/AdminLayout.astro'
 import pb from '../../lib/pb'
 import { Collections, LeadsStatusOptions } from '../../types/pocketbase-types'
-import TaskReminder from '../../components/crm/TaskReminder.svelte'
 
 // Load all data server-side
 const leads = await pb.collection(Collections.Leads).getFullList({
@@ -252,7 +252,7 @@ function getStatusColor(status: string) {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Task Reminders (New) -->
       <div class="lg:col-span-1">
-        <TaskReminder client:load />
+        <TaskReminder client:idle />
       </div>
 
       <!-- Recent Leads -->

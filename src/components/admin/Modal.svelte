@@ -1,5 +1,5 @@
 <script>
-  let { show, title, onClose, children } = $props()
+  let { show, title, onClose, maxWidth = 'max-w-lg md:max-w-5xl lg:max-w-6xl', children } = $props()
 </script>
 
 {#if show}
@@ -17,7 +17,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
       <!-- Panel -->
       <div
-        class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-lg md:max-w-5xl lg:max-w-6xl animate-in fade-in zoom-in-95 duration-200"
+        class="relative z-10 bg-white rounded-2xl shadow-2xl w-full {maxWidth} animate-in fade-in zoom-in-95 duration-200"
       >
         <div
           class="px-6 py-4 border-b flex justify-between items-center bg-aspada-gold/80 rounded-t-2xl"

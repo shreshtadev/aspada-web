@@ -1,6 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro'
 import GalleryManager from '../../components/admin/GalleryManager.svelte'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 ---
 
 <AdminLayout>
@@ -10,5 +10,5 @@ import GalleryManager from '../../components/admin/GalleryManager.svelte'
     </h1>
   </header>
 
-  <GalleryManager client:load />
+  <GalleryManager client:idle />
 </AdminLayout>
