@@ -36,7 +36,7 @@ export type PostInfoExpand = {
 
 export type TestimonialInfoExpand = {
   project: ProjectsResponse
-  authorAvatar: AttachmentsResponse
+  attachments?: AttachmentsResponse[]
 }
 
 export type LeadsInfoExpand = {

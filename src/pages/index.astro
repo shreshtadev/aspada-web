@@ -1,9 +1,15 @@
 ---
-const Layout = await import('../layouts/Layout.astro')
-const Navbar = await import('../components/Navbar.astro')
+import ActionDock from '../components/ActionDock.astro'
+import Address from '../components/Address.astro'
+import Footer from '../components/Footer.astro'
 import Hero from '../components/Hero.svelte'
+import LoadingSection from '../components/LoadingSection.astro'
+import Navbar from '../components/Navbar.astro'
+import ProjectCategory from '../components/ProjectCategory.astro'
 import ProjectGallery from '../components/ProjectGallery.svelte'
 import StatsSection from '../components/StatsSection.svelte'
+import Testimonials from '../components/Testimonials.astro'
+import Layout from '../layouts/Layout.astro'
 import pb from '../lib/pb'
 import type { ProjectExpand } from '../types'
 import {
@@ -13,12 +19,6 @@ import {
   type MetadataResponse,
   type ProjectsResponse,
 } from '../types/pocketbase-types'
-const ActionDock = await import('../components/ActionDock.astro')
-const Address = await import('../components/Address.astro')
-const Testimonials = await import('../components/Testimonials.astro')
-const Footer = await import('../components/Footer.astro')
-const LoadingSection = await import('../components/LoadingSection.astro')
-const ProjectCategory = await import('../components/ProjectCategory.astro')
 
 const projects = await pb
   .collection(Collections.Projects)
@@ -41,40 +41,40 @@ const companyProfile = await pb
 const mapsUrl = 'https://maps.app.goo.gl/ByMKK3ayuos1PQQt8'
 ---
 
-<Layout.default title="Aspada Developers | Shivamogga's Finest">
-  <Navbar.default companyProfile={companyProfile} />
+<Layout title="Aspada Developers | Shivamogga's Finest">
+  <Navbar companyProfile={companyProfile} />
 
   <main>
-    <LoadingSection.default
+    <LoadingSection
       sectionId="hero"
       skeletonCount={1}
       minHeight="600px"
       class="py-16 px-4 sm:py-24 sm:px-6"
     >
-      <Hero client:idle projects={ongoingProjects} durationPerImage={5000} />
-    </LoadingSection.default>
+      <Hero client:visible projects={ongoingProjects} durationPerImage={5000} />
+    </LoadingSection>
     <StatsSection client:idle stats={stats} />
-    <LoadingSection.default
+    <LoadingSection
       sectionId="portfolio"
       skeletonCount={3}
       minHeight="600px"
       class="py-16 px-4 sm:py-24 sm:px-6"
     >
       <ProjectGallery client:idle projects={ongoingProjects} />
-      <ProjectCategory.default />
-    </LoadingSection.default>
+      <ProjectCategory />
+    </LoadingSection>
 
-    <LoadingSection.default
+    <LoadingSection
       sectionId="testimonials"
       skeletonCount={1}
       minHeight="400px"
       class="py-6 px-4 sm:py-8 sm:px-6"
     >
-      <Testimonials.default />
-    </LoadingSection.default>
-    <Address.default mapsUrl={mapsUrl} />
+      <Testimonials />
+    </LoadingSection>
+    <Address mapsUrl={mapsUrl} />
   </main>
-  <Footer.default companyProfile={companyProfile} />
-  <ActionDock.default companyProfile={companyProfile} />
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
   <!-- <AspadaChat client:idle /> -->
-</Layout.default>
+</Layout>

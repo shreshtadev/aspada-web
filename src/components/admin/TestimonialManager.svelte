@@ -1,8 +1,8 @@
-<script>
-  import pb from '../../lib/pb'
-  import { uploadAttachment, deleteAttachment } from '../../lib/utils'
-  import MilkdownEditor from '../MilkdownEditor.svelte'
+<script lang="ts">
   import toast from 'svelte-french-toast'
+  import pb from '../../lib/pb'
+  import MilkdownEditor from '../MilkdownEditor.svelte'
+  import FileUploadTracker from './FileUploadTracker.svelte'
 
   const authorRoles = ['property-owner', 'contractor', 'investor', 'agent', 'buyer', 'seller']
 
@@ -21,24 +21,22 @@
 
   // Detail form state
   let selectedId = $state(null)
+  let formTitle = $state('Mr')
   let formName = $state('')
   let formContent = $state('')
   let formRating = $state(5)
   let formProject = $state('')
-  let avatarFile = $state(null)
   let authorRole = $state('')
   let formLoading = $state(false)
-  let deleteAvatar = $state(false)
-  let fileInputEl = $state(null)
-  let currentAvatarId = $state('')
-  let currentAvatarUrl = $state('')
+  let formAttachments = $state([])
+  let trackerEl = $state<ReturnType<typeof FileUploadTracker>>()
 
   async function loadData() {
     try {
       const [projectsList, testimonialsList] = await Promise.all([
         pb.collection('projects').getFullList({ sort: 'title' }),
         pb.collection('testimonials').getFullList({
-          expand: 'project,authorAvatar',
+          expand: 'project',
         }),
       ])
       projects = projectsList
@@ -55,36 +53,26 @@
 
   function selectTestimonial(t) {
     selectedId = t?.id ?? null
-    formName = t?.name ?? t?.authorName ?? ''
+    formTitle = t?.title || 'Mr'
+    formName = t?.authorName ?? t?.name ?? ''
     formContent = t?.content ?? ''
     formRating = t?.rating ?? 5
     formProject = t?.project && typeof t.project === 'object' ? t.project.id : t?.project || ''
-    avatarFile = undefined
     authorRole = t?.authorRole || ''
-    const attachment = t.expand.authorAvatar
-    currentAvatarId = attachment?.id || ''
-    currentAvatarUrl = pb.files.getURL(attachment, attachment.attachment)
-  }
-
-  function clearAvatarSelection() {
-    avatarFile = null
-    deleteAvatar = true // mark for backend delete
-
-    if (fileInputEl) {
-      fileInputEl.value = '' // required
-    }
+    formAttachments = t.attachments || []
+    trackerEl?.clearFiles()
   }
 
   function newTestimonial() {
     selectedId = null
+    formTitle = 'Mr'
     formName = ''
     formContent = ''
     formRating = 5
     formProject = ''
-    avatarFile = null
     authorRole = ''
-    currentAvatarId = ''
-    currentAvatarUrl = ''
+    formAttachments = []
+    trackerEl?.clearFiles()
   }
 
   async function saveTestimonial() {
@@ -97,6 +85,7 @@
     formLoading = true
 
     const formData = new FormData()
+    formData.append('title', formTitle)
     formData.append('authorName', formName)
     formData.append('content', formContent)
     formData.append('rating', String(formRating))
@@ -108,62 +97,61 @@
     }
 
     try {
-      // Handle Avatar Logic
+      const newFiles = trackerEl?.getSelectedFiles() ?? []
 
-      // 1. Upload new avatar if selected
-      if (avatarFile && avatarFile.length > 0) {
-        const urls = await uploadAttachment(
-          `Testimonials - ${formName}` || 'Testimonial Avatar',
-          Array.from(avatarFile)
-        )
-        if (urls.length > 0) {
-          formData.append('authorAvatar', urls[0])
-
-          // Cleanup old avatar if it existed (replace logic)
-          if (currentAvatarId) {
-            await deleteAttachment(currentAvatarId)
-          }
-        }
+      const fileKey = selectedId ? 'attachments+' : 'attachments'
+      for (const file of newFiles) {
+        formData.append(fileKey, file)
       }
-      // 2. Clear avatar if requested
-      else if (deleteAvatar) {
-        formData.append('authorAvatar', '')
-
-        // Cleanup old avatar
-        if (currentAvatarId) {
-          await deleteAttachment(currentAvatarId)
-        }
-      }
-      // 3. Otherwise leave authorAvatar as is (don't append anything regarding it)
 
       let record
       if (selectedId) {
         record = await pb.collection('testimonials').update(selectedId, formData)
+        // Ensure we expand for the next select
+        record = await pb.collection('testimonials').getOne(record.id, {
+          expand: 'project',
+        })
         testimonials = testimonials.map((t) => (t.id === record.id ? record : t))
       } else {
         record = await pb.collection('testimonials').create(formData)
+        // Ensure we expand
+        record = await pb.collection('testimonials').getOne(record.id, {
+          expand: 'project',
+        })
         testimonials = [record, ...testimonials]
       }
+      trackerEl?.clearFiles()
       selectTestimonial(record)
     } catch (err) {
       console.error('PocketBase error:', err?.response?.data || err)
       toast.error(err?.message ?? 'Upload failed')
     } finally {
       formLoading = false
-      deleteAvatar = false
+    }
+  }
+
+  async function removeAttachment(filename) {
+    if (!selectedId) return
+    if (!confirm('Permanently remove this showcase image?')) return
+
+    formLoading = true
+    try {
+      const updated = await pb.collection('testimonials').update(selectedId, {
+        'attachments-': [filename],
+      })
+      // Update local state
+      testimonials = testimonials.map((t) => (t.id === updated.id ? updated : t))
+      formAttachments = updated.attachments || []
+    } catch (err) {
+      toast.error('Failed to remove image')
+    } finally {
+      formLoading = false
     }
   }
 
   async function deleteTestimonial(id) {
     if (!confirm('Delete this testimonial?')) return
     try {
-      // Find the testimonial to check for avatar
-      const t = testimonials.find((item) => item.id === id)
-      if (t?.authorAvatar) {
-        const attachId = extractIdFromUrl(t.authorAvatar)
-        if (attachId) await deleteAttachment(attachId)
-      }
-
       await pb.collection('testimonials').delete(id)
       testimonials = testimonials.filter((t) => t.id !== id)
       if (selectedId === id) newTestimonial()
@@ -233,21 +221,29 @@
         {selectedId ? 'Edit Testimonial' : 'Create Testimonial'}
       </h3>
 
-      {#if currentAvatarUrl && currentAvatarUrl !== ''}
-        <div class="w-20 h-20 rounded-full bg-slate-100 overflow-hidden flex-shrink-0">
-          <img src={currentAvatarUrl} alt={formName} class="w-full h-full object-cover" />
-        </div>
-      {/if}
-
       <div class="space-y-4">
-        <label class="block">
-          <span class="text-sm font-bold text-slate-700">Client Name</span>
-          <input
-            bind:value={formName}
-            class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
-            placeholder="Enter client name"
-          />
-        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <label class="block sm:col-span-1">
+            <span class="text-sm font-bold text-slate-700">Title</span>
+            <select
+              bind:value={formTitle}
+              class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none bg-white"
+            >
+              <option value="Mr">Mr</option>
+              <option value="Ms">Ms</option>
+              <option value="Mrs">Mrs</option>
+            </select>
+          </label>
+
+          <label class="block sm:col-span-3">
+            <span class="text-sm font-bold text-slate-700">Client Name</span>
+            <input
+              bind:value={formName}
+              class="w-full mt-1 p-3 border rounded-xl focus:ring-2 focus:ring-[#d4af37]/50 outline-none"
+              placeholder="Enter client name"
+            />
+          </label>
+        </div>
 
         <label class="block">
           <span class="text-sm font-bold text-slate-700">Client Role</span>
@@ -295,34 +291,44 @@
           </label>
         </div>
 
-        <label class="block">
-          <span class="text-sm font-bold text-slate-700">Avatar Image</span>
+        <div class="pt-4 border-t border-slate-100">
+          <FileUploadTracker
+            bind:this={trackerEl}
+            label={selectedId ? 'Append New Showcase Photos' : 'Showcase Gallery'}
+            maxFiles={1 - (formAttachments?.length || 0)}
+            accept="image/*"
+          />
 
-          <div class="relative mt-1">
-            <input
-              type="file"
-              bind:this={fileInputEl}
-              bind:files={avatarFile}
-              accept="image/*"
-              class="w-full pr-10 text-sm text-slate-500
-             file:mr-4 file:py-2 file:px-4 file:rounded-full
-             file:border-0 file:bg-[#d4af37]/10
-             file:text-[#d4af37] file:font-bold"
-            />
-
-            {#if avatarFile && avatarFile.length > 0}
-              <button
-                type="button"
-                onclick={clearAvatarSelection}
-                class="absolute right-2 top-1/2 -translate-y-1/2
-               text-red-600 font-bold hover:scale-110"
-                aria-label="Clear selected file"
-              >
-                ✕
-              </button>
-            {/if}
-          </div>
-        </label>
+          {#if formAttachments.length > 0}
+            <div class="mt-4 space-y-3">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                Currently Live Showcases
+              </span>
+              <div class="grid grid-cols-3 gap-3">
+                {#each testimonials.find((i) => i.id === selectedId)?.attachments || [] as filename}
+                  <div class="relative group aspect-video rounded-2xl overflow-hidden shadow-sm">
+                    <img
+                      src={pb.files.getURL(
+                        testimonials.find((i) => i.id === selectedId),
+                        filename
+                      )}
+                      class="w-full h-full object-cover"
+                      alt="Gallery"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Remove attachment"
+                      onclick={() => removeAttachment(filename)}
+                      class="absolute inset-0 bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                    >
+                      <span class="i-lucide-trash-2 text-xl"></span>
+                    </button>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+        </div>
       </div>
 
       <div class="flex gap-3 mt-6">

@@ -342,6 +342,12 @@ export type SocialsRecord = {
 	updated: IsoAutoDateString
 }
 
+export enum TestimonialsTitleOptions {
+	"Mr" = "Mr",
+	"Ms" = "Ms",
+	"Mrs" = "Mrs",
+}
+
 export enum TestimonialsSourceOptions {
 	"web" = "web",
 	"email" = "email",
@@ -349,8 +355,7 @@ export enum TestimonialsSourceOptions {
 	"facebook" = "facebook",
 }
 export type TestimonialsRecord = {
-	authorAvatar?: RecordIdString
-	authorAvatarUrl?: string
+	attachments?: FileNameString[]
 	authorName: string
 	authorRole?: string
 	content?: HTMLString
@@ -359,6 +364,7 @@ export type TestimonialsRecord = {
 	project?: RecordIdString
 	rating?: number
 	source?: TestimonialsSourceOptions
+	title?: TestimonialsTitleOptions
 	updated: IsoAutoDateString
 }
 

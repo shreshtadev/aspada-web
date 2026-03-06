@@ -1,6 +1,6 @@
 <script lang="ts">
-  import pb from '$lib/pb'
-  import type { VenturesResponse } from '$types/pocketbase-types'
+  import pb from '../../lib/pb'
+  import type { VenturesResponse } from '../../types/pocketbase-types'
 
   let { onSelect, activeId } = $props<{
     onSelect: (id: string, title: string) => void

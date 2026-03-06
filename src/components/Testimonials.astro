@@ -1,71 +1,164 @@
 ---
+import { marked } from 'marked'
 import pb from '../lib/pb'
 import type { TestimonialsResponse } from '../types/pocketbase-types'
 import type { TestimonialInfoExpand } from '../types'
 interface Testimonial {
+  id: string
   name: string
   role: string
   text: string
-  avatar: string
+  rating: number
+  initials: string
+  attachments?: string[]
 }
 const testimonialsFromBe = await pb
   .collection('testimonials')
   .getFullList<TestimonialsResponse<TestimonialInfoExpand>>({
     sort: '-created',
     limit: 3,
-    expand: 'authorAvatar',
+    expand: 'attachments',
   })
-const testimonials = testimonialsFromBe.map((t) => ({
-  name: t.authorName,
-  role: t.authorRole,
-  text: t.content,
-  avatar: pb.files.getURL(t.expand.authorAvatar, t.expand.authorAvatar?.attachment),
-}))
+const testimonials = testimonialsFromBe.map((testimonial) => {
+  const name = testimonial.authorName || 'Valued Client'
+  const initials = name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  return {
+    id: testimonial.id,
+    name,
+    title: testimonial.title || '',
+    role: testimonial.authorRole,
+    text: testimonial.content,
+    rating: testimonial.rating || 5,
+    initials,
+    // Fix: Using the testimonial record for URL generation
+    attachments: testimonial.attachments?.map((filename) => pb.files.getURL(testimonial, filename)),
+  }
+})
 ---
 
-<section class="py-8 px-6 overflow-hidden">
-  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-    <div class="space-y-6">
-      <span class="text-aspada-gold font-bold tracking-[0.3em] uppercase text-xs">Testimonials</span
-      >
-      <h2 class="text-5xl font-bold text-aspada-steel tracking-tight">
-        Voice of <br />
-        <span class="text-aspada-gold/70 italic font-light">Confidence.</span>
-      </h2>
-      <p class="text-aspada-steel/60 text-lg max-w-md">
-        Our legacy is built on the trust of our clients. Tap to shuffle or wait to see more stories <a
-          class="text-aspada-gold text-2xl hover:text-aspada-steel hover:underline transition-all duration-300"
-          href="/testimonials">here</a
-        >.
+<section class="py-24 px-6 overflow-hidden bg-white/30">
+  <div class="max-w-7xl mx-auto flex flex-col items-center gap-20">
+    <!-- Header Section -->
+    <div class="text-center space-y-8 max-w-3xl">
+      <div class="space-y-4">
+        <span class="text-aspada-gold font-black tracking-[0.4em] uppercase text-[10px] bg-aspada-gold/10 px-4 py-1.5 rounded-full inline-block">Testimonials</span>
+        <h2 class="text-6xl md:text-7xl font-display font-black text-aspada-navy tracking-tight leading-[1.1]">
+          Voice of <br />
+          <span class="text-aspada-gold italic font-serif font-light">Confidence.</span>
+        </h2>
+      </div>
+      
+      <p class="text-aspada-steel font-medium text-lg max-w-2xl mx-auto leading-relaxed">
+        Our legacy is built on the trust of our clients. Experience the stories of those who found their dream spaces with us.
       </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-8">
+        <a
+          class="group flex items-center gap-3 bg-aspada-navy text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-aspada-gold transition-all duration-500 shadow-xl hover:shadow-aspada-gold/20"
+          href="/testimonials"
+        >
+          View All Stories
+          <div class="i-lucide-arrow-right w-5 h-5 group-hover:translate-x-1 transition-transform"></div>
+        </a>
+        
+        <div class="flex items-center gap-4">
+          <div class="flex -space-x-3">
+            {testimonials.map((testimonial) => (
+               <div class="w-12 h-12 rounded-full border-2 border-white bg-aspada-cream flex items-center justify-center text-[10px] font-black text-aspada-navy shadow-sm ring-2 ring-aspada-gold/10 uppercase">
+                 {testimonial.initials}
+               </div>
+            ))}
+            <div class="w-12 h-12 rounded-full bg-aspada-navy border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-sm ring-2 ring-aspada-gold/10">
+              +150
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-aspada-navy/40 uppercase tracking-widest leading-none">Families Impacted</span>
+        </div>
+      </div>
     </div>
 
-    <div class="relative h-[450px] w-full max-w-md mx-auto lg:mx-0 group" id="card-stack">
+    <!-- Card Stack Section -->
+    <div class="relative h-[800px] md:h-[600px] w-full max-w-5xl mx-auto" id="card-stack">
       {
-        testimonials.map((t, i) => (
+        testimonials.map((testimonial, i) => (
           <div
             data-testimonial-card
-            class="absolute inset-0 bg-white/5 backdrop-blur-xl p-8 rounded-3xl cursor-pointer select-none transition-all duration-500 ease-out border border-white/10 shadow-2xl"
+            class="absolute inset-0 bg-white/40 backdrop-blur-3xl rounded-[3rem] cursor-pointer select-none transition-all duration-700 ease-out border border-white/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden group/card"
           >
-            <div class="flex items-center gap-4 mb-8">
-              <img
-                src={t.avatar}
-                class="w-24 h-24 rounded-full border-2 border-aspada-gold/50 p-1"
-                alt={t.name}
-              />
-              <div>
-                <h4 class="font-bold text-aspada-navy text-lg">{t.name}</h4>
-                <p class="text-[10px] uppercase text-aspada-gold tracking-[0.2em] font-black">
-                  {t.role}
-                </p>
-              </div>
-            </div>
-            <div class="relative">
-              <div class="i-lucide-quote text-4xl text-[#d4af37]/20 absolute -top-4 -left-2 rotate-180" />
-              <p class="text-aspada-steel-200 italic text-xl leading-relaxed relative z-10 pl-4">
-                {t.text.slice(0, 100)}
-                {t.text.length > 120 && '...'}
-              </p>
+            <div class="flex flex-col md:flex-row h-full">
+               <!-- Editorial Image Section (Magazine style) -->
+               <div class="w-full md:w-[45%] h-64 md:h-auto relative overflow-hidden bg-aspada-cream shrink-0">
+                  {testimonial.attachments && testimonial.attachments.length > 0 ? (
+                    <img 
+                      src={testimonial.attachments[0]} 
+                      class="w-full h-full object-cover grayscale-[0.2] group-hover/card:grayscale-0 group-hover/card:scale-105 transition-all duration-1000"
+                      alt="Project showcase" 
+                    />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center text-aspada-gold/20">
+                      <div class="i-lucide-building-2 w-32 h-32" />
+                    </div>
+                  )}
+                  
+                  <!-- Floating Initials Badge on Image -->
+                  {/* <div class="absolute bottom-8 left-8 flex items-center gap-4">
+                     <div class="w-16 h-16 rounded-2xl bg-aspada-steel backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl font-display font-black text-white shadow-2xl">
+                        {testimonial.initials}
+                     </div>
+                     <div class="text-aspada-steel">
+                        <p class="text-[10px] font-black uppercase tracking-widest">Verified Project</p>
+                        <p class="text-xs font-bold leading-tight">Property Showcase</p>
+                     </div>
+                  </div> */}
+               </div>
+
+               <!-- Editorial Content Section -->
+               <div class="flex-1 p-10 md:p-14 flex flex-row">
+                 <div class="flex flex-col h-full w-full">
+                    <!-- Rating & Quote Icon -->
+                    <div class="flex justify-between items-start mb-8">
+                      <div class="flex text-aspada-gold gap-1">
+                        {Array.from({ length: 5 }).map((_, starI) => (
+                          <div class={`i-lucide-star w-4 h-4 ${starI < testimonial.rating ? 'fill-current' : 'opacity-20'}`} />
+                        ))}
+                      </div>
+                      <div class="i-lucide-quote w-10 h-10 text-aspada-gold/20" />
+                    </div>
+
+                    <!-- Client Identity -->
+                    <div class="mb-10">
+                      <h4 class="font-display font-black text-[10px] text-aspada-gold uppercase tracking-[0.4em] mb-3">{testimonial.role}</h4>
+                      <p class="text-4xl md:text-5xl font-display font-black text-aspada-navy tracking-tighter leading-none italic">
+                        {testimonial.title && <span>{testimonial.title}. </span>}{testimonial.name}
+                      </p>
+                    </div>
+
+                    <!-- Main Text -->
+                    <div class="relative flex-grow">
+                      <div 
+                        class="text-aspada-steel font-medium italic text-xl md:text-2xl leading-relaxed text-balance prose-custom" 
+                        set:html={marked.parse(testimonial.text || '')} 
+                      />
+                    </div>
+
+                    <!-- Additional Images (Miniatures) -->
+                    {testimonial.attachments && testimonial.attachments.length > 1 && (
+                      <div class="mt-8 pt-8 border-t border-slate-100 flex gap-4">
+                        {testimonial.attachments.slice(1, 4).map((img) => (
+                          <div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                            <img src={img} class="w-full h-full object-cover" alt="Detail" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                 </div>
+               </div>
             </div>
           </div>
         ))

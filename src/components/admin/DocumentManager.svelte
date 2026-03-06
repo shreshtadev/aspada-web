@@ -1,7 +1,7 @@
 <script lang="ts">
-  import pb from '$lib/pb'
-  import { downloadFile } from '$lib/utils'
-  import { Collections, type DocumentsResponse } from '$types/pocketbase-types'
+  import pb from '../../lib/pb'
+  import { downloadFile } from '../../lib/utils'
+  import { Collections, type DocumentsResponse } from '../../types/pocketbase-types'
   import FileUploadTracker from './FileUploadTracker.svelte'
 
   let { stepId } = $props<{ stepId: string }>()

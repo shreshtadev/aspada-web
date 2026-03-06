@@ -1,12 +1,12 @@
 ---
 import toast from 'svelte-french-toast'
+import ActionDock from '../../components/ActionDock.astro'
+import PostList from '../../components/blog/PostList.astro'
+import Footer from '../../components/Footer.astro'
+import Navbar from '../../components/Navbar.astro'
+import Layout from '../../layouts/Layout.astro'
 import pb from '../../lib/pb'
 import { type CompaniesResponse, Collections } from '../../types/pocketbase-types'
-const Layout = await import('../../layouts/Layout.astro')
-const PostList = await import('../../components/blog/PostList.astro')
-const Navbar = await import('../../components/Navbar.astro')
-const Footer = await import('../../components/Footer.astro')
-const ActionDock = await import('../../components/ActionDock.astro')
 
 // Fetch posts
 let posts: string | any[] = []
@@ -24,11 +24,11 @@ try {
 }
 ---
 
-<Layout.default
+<Layout
   title="Blog - Aspada Developers"
   description="Insights, updates, and stories from the world of luxury real estate development."
 >
-  <Navbar.default companyProfile={companyProfile} />
+  <Navbar companyProfile={companyProfile} />
   <!-- Simple Hero -->
   <section class="relative bg-aspada-navy py-24 px-4 sm:py-30 sm:px-8 overflow-hidden">
     <div class="max-w-7xl mx-auto relative z-10">
@@ -50,7 +50,7 @@ try {
     <div class="max-w-7xl mx-auto">
       {
         posts.length > 0 ? (
-          <PostList.default posts={posts} />
+          <PostList posts={posts} />
         ) : (
           <div class="text-center py-24 text-slate-500">
             <p class="text-xl">No stories published yet.</p>
@@ -59,6 +59,6 @@ try {
       }
     </div>
   </main>
-  <Footer.default companyProfile={companyProfile} />
-  <ActionDock.default companyProfile={companyProfile} />
-</Layout.default>
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
+</Layout>
