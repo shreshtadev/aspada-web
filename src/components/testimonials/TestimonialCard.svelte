@@ -1,4 +1,5 @@
 <script>
+  import { marked } from 'marked'
   let { testimonial } = $props()
 
   // Initials logic
@@ -93,7 +94,7 @@
       <p
         class="font-sans text-slate-600 font-medium italic relative z-10 leading-relaxed text-xl line-clamp-5 group-hover:text-aspada-navy transition-colors duration-500"
       >
-        {testimonial.content}
+        {@html marked.parse(testimonial.content || '')}
       </p>
     </div>
 

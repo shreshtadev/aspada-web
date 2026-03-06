@@ -1,14 +1,13 @@
 ---
-const Layout = await import('../../layouts/Layout.astro')
-const Navbar = await import('../../components/Navbar.astro')
-const Footer = await import('../../components/Footer.astro')
 import { marked } from 'marked'
 import toast from 'svelte-french-toast'
+import Footer from '../../components/Footer.astro'
+import Navbar from '../../components/Navbar.astro'
+import Layout from '../../layouts/Layout.astro'
 import pb from '../../lib/pb'
 import type { TestimonialInfoExpand } from '../../types'
 import {
   Collections,
-  type AttachmentsResponse,
   type ProjectsResponse,
   type TestimonialsResponse,
 } from '../../types/pocketbase-types'
@@ -20,32 +19,33 @@ const companyProfile = await pb
 
 let testimonial: TestimonialsResponse<TestimonialInfoExpand>
 let project: ProjectsResponse
-let authorAvatar: AttachmentsResponse
 if (id === undefined) {
   return Astro.redirect('/404')
 }
 
 try {
   testimonial = await pb.collection('testimonials').getOne(String(id), {
-    expand: 'project,authorAvatar',
+    expand: 'project',
   })
   project = testimonial.expand?.project
-  authorAvatar = testimonial.expand?.authorAvatar
 } catch (e) {
   console.error('Error fetching testimonial:', e)
   toast.error('Error fetching testimonial')
   return Astro.redirect('/404')
 }
 
-const avatarUrl = testimonial.authorAvatar
-  ? pb.files.getURL(authorAvatar, authorAvatar.attachment)
-  : 'https://i.pravatar.cc/150?u=' + testimonial.id
+const initials = (testimonial.authorName || 'VC')
+  .split(' ')
+  .map((n) => n[0])
+  .join('')
+  .slice(0, 2)
+  .toUpperCase()
 
 const testimonialContent = await marked.parse(testimonial.content)
 ---
 
-<Layout.default title={`${testimonial.authorName} - Testimonial | Aspada Developers`}>
-  <Navbar.default />
+<Layout title={`${testimonial.authorName} - Testimonial | Aspada Developers`}>
+  <Navbar />
 
   <main class="min-h-screen bg-slate-50 flex flex-col">
     <!-- Breadcrumb / Header -->
@@ -88,11 +88,11 @@ const testimonialContent = await marked.parse(testimonial.content)
               <div class="absolute inset-0 bg-[#d4af37]/10"></div>
 
               <div class="relative z-10">
-                <img
-                  src={avatarUrl}
-                  alt={testimonial.authorName}
-                  class="w-32 h-32 rounded-full object-cover border-4 border-[#d4af37]/50 shadow-xl mb-6"
-                />
+                <div
+                  class="relative w-32 h-32 rounded-[2.5rem] border-4 border-[#d4af37]/50 shadow-xl mb-6 bg-white flex items-center justify-center text-4xl font-display font-black text-aspada-navy rotate-3"
+                >
+                  {initials}
+                </div>
                 <h1 class="text-2xl font-bold text-white mb-2">
                   {testimonial.authorName}
                 </h1>
@@ -135,14 +135,30 @@ const testimonialContent = await marked.parse(testimonial.content)
                   />
                 </p>
 
-                <div class="mt-8 pt-8 border-t border-slate-100">
-                  <span class="text-sm text-slate-400">
-                    <span class="i-lucide-stars bg-aspada-gold"></span> Trusted Client
-                  </span>
-                </div>
+                {
+                  testimonial.attachments && testimonial.attachments.length > 0 && (
+                    <div class="mt-8 pt-8 border-t border-slate-100">
+                      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-aspada-navy/30 mb-6">
+                        Verified Project Showcase
+                      </p>
+                      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {testimonial.attachments.map((filename) => (
+                          <div class="relative group/img overflow-hidden rounded-2xl aspect-square shadow-md border border-slate-100">
+                            <img
+                              src={pb.files.getURL(testimonial, filename)}
+                              class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
+                              alt="Project showcase"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                }
+
                 <a
                   href="/testimonials"
-                  class="text-slate-400 hover:text-aspada-gold mt-6 transition-colors flex items-center gap-2 text-md font-bold uppercase tracking-widest"
+                  class="text-slate-400 hover:text-aspada-gold mt-10 transition-colors flex items-center gap-2 text-md font-bold uppercase tracking-widest"
                 >
                   ← Back to client stories
                 </a>
@@ -154,5 +170,5 @@ const testimonialContent = await marked.parse(testimonial.content)
     </div>
   </main>
 
-  <Footer.default companyProfile={companyProfile} />
-</Layout.default>
+  <Footer companyProfile={companyProfile} />
+</Layout>
