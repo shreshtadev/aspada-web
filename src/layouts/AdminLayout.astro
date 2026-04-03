@@ -6,198 +6,236 @@ const result = Astro.getActionResult(actions.logout)
 if (result && !result.error) {
   return Astro.redirect('/admin/login')
 }
+import '../styles/global.css'
+interface Props {
+  title: string
+  description?: string
+  image?: string
+}
+
+const { title, description = 'Aspada - Admin', image = '../assets/3D.jpg' } = Astro.props
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
-<div class="flex min-h-screen bg-aspada-silver/10 relative overflow-x-hidden">
-  {result && !result.error && <script is:inline>window.location.href = "/admin/login";</script>}
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
 
-  <!-- Mobile Toggle Button -->
-  <button
-    id="mobile-sidebar-toggle"
-    class="lg:hidden fixed top-4 right-4 z-[60] bg-aspada-steel text-white p-2 rounded-lg shadow-lg hover:bg-aspada-steel/90 transition-all"
-    aria-label="Toggle Menu"
-  >
-    <span class="i-lucide-menu text-2xl block group-open:hidden" id="menu-icon"></span>
-    <span class="i-lucide-x text-2xl hidden" id="close-icon"></span>
-  </button>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
 
-  <!-- Backdrop for mobile -->
-  <div
-    id="sidebar-overlay"
-    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity"
-  >
-  </div>
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.url)} />
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(var(--aspada-steel-rgb), 0.1);
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex min-h-screen bg-aspada-silver/10 relative overflow-x-hidden">
+      {result && !result.error && <script is:inline>window.location.href = "/admin/login";</script>}
 
-  <!-- Sidebar -->
-  <aside
-    id="admin-sidebar"
-    class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-aspada-cream text-aspada-steel p-6 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-aspada-steel/10 backdrop-blur-md lg:backdrop-blur-none"
-  >
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-      <div class="flex items-center justify-between mb-10">
-        <h2 class="text-aspada-steel font-bold text-xl tracking-tighter">ASPADA ADMIN</h2>
+      <!-- Mobile Toggle Button -->
+      <button
+        id="mobile-sidebar-toggle"
+        class="lg:hidden fixed top-4 right-4 z-[60] bg-aspada-steel text-white p-2 rounded-lg shadow-lg hover:bg-aspada-steel/90 transition-all"
+        aria-label="Toggle Menu"
+      >
+        <span class="i-lucide-menu text-2xl block group-open:hidden" id="menu-icon"></span>
+        <span class="i-lucide-x text-2xl hidden" id="close-icon"></span>
+      </button>
+
+      <!-- Backdrop for mobile -->
+      <div
+        id="sidebar-overlay"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity"
+      >
       </div>
 
-      <nav class="space-y-1">
-        <a
-          href="/admin/projects"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-layout-grid text-lg opacity-70"></span>
-          Projects
-        </a>
-        <a
-          href="/admin/socials"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-share-2 text-lg opacity-70"></span>
-          Social Details
-        </a>
-        <a
-          href="/admin/gallery"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-image text-lg opacity-70"></span>
-          Gallery
-        </a>
-        <a
-          href="/admin/company"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-building text-lg opacity-70"></span>
-          Company Profile
-        </a>
-        <a
-          href="/admin/testimonials"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-message-square text-lg opacity-70"></span>
-          Testimonials
-        </a>
-        <a
-          href="/admin/stats"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-bar-chart-3 text-lg opacity-70"></span>
-          Stats
-        </a>
-        <a
-          href="/admin/blog"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-        >
-          <span class="i-lucide-pen-tool text-lg opacity-70"></span>
-          Blog
-        </a>
-
-        <div class="mt-8 pt-4 border-t border-aspada-steel/5">
-          <p class="text-aspada-steel/40 text-[10px] font-bold mb-3 uppercase tracking-widest px-3">
-            Business Tools
-          </p>
-          <div class="space-y-1">
-            <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">CRM</p>
-            <a
-              href="/crm"
-              class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-            >
-              Dashboard
-            </a>
-            <a
-              href="/crm/pipeline"
-              class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-            >
-              Pipeline
-            </a>
-            <a
-              href="/crm/agents"
-              class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-            >
-              Agents
-            </a>
-            <a
-              href="/crm/admin"
-              class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-            >
-              Manage
-            </a>
-          </div>
-
-          <div class="mt-6 space-y-1">
-            <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">DMS</p>
-            <a
-              href="/admin/dms"
-              class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-            >
-              Dashboard
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
-
-    <form method="POST" action={actions.logout} class="mt-auto pt-6">
-      <button
-        type="submit"
-        class="w-full bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white py-2.5 px-4 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 border border-red-500/20"
+      <!-- Sidebar -->
+      <aside
+        id="admin-sidebar"
+        class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-aspada-cream text-aspada-steel p-6 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-aspada-steel/10 backdrop-blur-md lg:backdrop-blur-none"
       >
-        <span class="i-lucide-log-out text-lg"></span>
-        Logout
-      </button>
-    </form>
-  </aside>
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+          <div class="flex items-center justify-between mb-10">
+            <h2 class="text-aspada-steel font-bold text-xl tracking-tighter">ASPADA ADMIN</h2>
+          </div>
 
-  <main class="flex-1 p-4 lg:p-10 min-w-0">
-    <div class="max-w-full mx-auto">
-      <slot />
+          <nav class="space-y-1">
+            <a
+              href="/admin/projects"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-layout-grid text-lg opacity-70"></span>
+              Projects
+            </a>
+            <a
+              href="/admin/socials"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-share-2 text-lg opacity-70"></span>
+              Social Details
+            </a>
+            <a
+              href="/admin/gallery"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-image text-lg opacity-70"></span>
+              Gallery
+            </a>
+            <a
+              href="/admin/company"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-building text-lg opacity-70"></span>
+              Company Profile
+            </a>
+            <a
+              href="/admin/testimonials"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-message-square text-lg opacity-70"></span>
+              Testimonials
+            </a>
+            <a
+              href="/admin/stats"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-bar-chart-3 text-lg opacity-70"></span>
+              Stats
+            </a>
+            <a
+              href="/admin/blog"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+            >
+              <span class="i-lucide-pen-tool text-lg opacity-70"></span>
+              Blog
+            </a>
+
+            <div class="mt-8 pt-4 border-t border-aspada-steel/5">
+              <p
+                class="text-aspada-steel/40 text-[10px] font-bold mb-3 uppercase tracking-widest px-3"
+              >
+                Business Tools
+              </p>
+              <div class="space-y-1">
+                <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">CRM</p>
+                <a
+                  href="/crm"
+                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                >
+                  Dashboard
+                </a>
+                <a
+                  href="/crm/pipeline"
+                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                >
+                  Pipeline
+                </a>
+                <a
+                  href="/crm/agents"
+                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                >
+                  Agents
+                </a>
+                <a
+                  href="/crm/admin"
+                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                >
+                  Manage
+                </a>
+              </div>
+
+              <div class="mt-6 space-y-1">
+                <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">DMS</p>
+                <a
+                  href="/admin/dms"
+                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                >
+                  Dashboard
+                </a>
+              </div>
+            </div>
+          </nav>
+        </div>
+
+        <form method="POST" action={actions.logout} class="mt-auto pt-6">
+          <button
+            type="submit"
+            class="w-full bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white py-2.5 px-4 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 border border-red-500/20"
+          >
+            <span class="i-lucide-log-out text-lg"></span>
+            Logout
+          </button>
+        </form>
+      </aside>
+
+      <main class="flex-1 p-4 lg:p-10 min-w-0">
+        <div class="max-w-full mx-auto">
+          <slot />
+        </div>
+        <Toaster client:load />
+      </main>
     </div>
-    <Toaster client:load />
-  </main>
-</div>
 
-<script>
-  const sidebar = document.getElementById('admin-sidebar')
-  const overlay = document.getElementById('sidebar-overlay')
-  const toggleBtn = document.getElementById('mobile-sidebar-toggle')
-  const menuIcon = document.getElementById('menu-icon')
-  const closeIcon = document.getElementById('close-icon')
+    <script>
+      const sidebar = document.getElementById('admin-sidebar')
+      const overlay = document.getElementById('sidebar-overlay')
+      const toggleBtn = document.getElementById('mobile-sidebar-toggle')
+      const menuIcon = document.getElementById('menu-icon')
+      const closeIcon = document.getElementById('close-icon')
 
-  function toggleSidebar() {
-    const isOpen = !sidebar?.classList.contains('-translate-x-full')
+      function toggleSidebar() {
+        const isOpen = !sidebar?.classList.contains('-translate-x-full')
 
-    if (isOpen) {
-      sidebar?.classList.add('-translate-x-full')
-      overlay?.classList.add('hidden')
-      menuIcon?.classList.remove('hidden')
-      closeIcon?.classList.add('hidden')
-      document.body.style.overflow = ''
-    } else {
-      sidebar?.classList.remove('-translate-x-full')
-      overlay?.classList.remove('hidden')
-      menuIcon?.classList.add('hidden')
-      closeIcon?.classList.remove('hidden')
-      document.body.style.overflow = 'hidden'
-    }
-  }
+        if (isOpen) {
+          sidebar?.classList.add('-translate-x-full')
+          overlay?.classList.add('hidden')
+          menuIcon?.classList.remove('hidden')
+          closeIcon?.classList.add('hidden')
+          document.body.style.overflow = ''
+        } else {
+          sidebar?.classList.remove('-translate-x-full')
+          overlay?.classList.remove('hidden')
+          menuIcon?.classList.add('hidden')
+          closeIcon?.classList.remove('hidden')
+          document.body.style.overflow = 'hidden'
+        }
+      }
 
-  toggleBtn?.addEventListener('click', toggleSidebar)
-  overlay?.addEventListener('click', toggleSidebar)
+      toggleBtn?.addEventListener('click', toggleSidebar)
+      overlay?.addEventListener('click', toggleSidebar)
 
-  // Close sidebar on link click (for mobile SPA-like feel)
-  sidebar?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      if (window.innerWidth < 1024) toggleSidebar()
-    })
-  })
-</script>
-
-<style>
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(var(--aspada-steel-rgb), 0.1);
-    border-radius: 10px;
-  }
-</style>
+      // Close sidebar on link click (for mobile SPA-like feel)
+      sidebar?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 1024) toggleSidebar()
+        })
+      })
+    </script>
+  </body>
+</html>
