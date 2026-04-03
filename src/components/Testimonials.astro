@@ -47,15 +47,21 @@ const testimonials = testimonialsFromBe.map((testimonial) => {
     <!-- Header Section -->
     <div class="text-center space-y-8 max-w-3xl">
       <div class="space-y-4">
-        <span class="text-aspada-gold font-black tracking-[0.4em] uppercase text-[10px] bg-aspada-gold/10 px-4 py-1.5 rounded-full inline-block">Testimonials</span>
-        <h2 class="text-6xl md:text-7xl font-display font-black text-aspada-navy tracking-tight leading-[1.1]">
+        <span
+          class="text-aspada-gold font-black tracking-[0.4em] uppercase text-[10px] bg-aspada-gold/10 px-4 py-1.5 rounded-full inline-block"
+          >Testimonials</span
+        >
+        <h2
+          class="text-6xl md:text-7xl font-display font-black text-aspada-navy tracking-tight leading-[1.1]"
+        >
           Voice of <br />
           <span class="text-aspada-gold italic font-serif font-light">Confidence.</span>
         </h2>
       </div>
-      
+
       <p class="text-aspada-steel font-medium text-lg max-w-2xl mx-auto leading-relaxed">
-        Our legacy is built on the trust of our clients. Experience the stories of those who found their dream spaces with us.
+        Our legacy is built on the trust of our clients. Experience the stories of those who found
+        their dream spaces with us.
       </p>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -64,21 +70,29 @@ const testimonials = testimonialsFromBe.map((testimonial) => {
           href="/testimonials"
         >
           View All Stories
-          <div class="i-lucide-arrow-right w-5 h-5 group-hover:translate-x-1 transition-transform"></div>
+          <div class="i-lucide-arrow-right w-5 h-5 group-hover:translate-x-1 transition-transform">
+          </div>
         </a>
-        
+
         <div class="flex items-center gap-4">
           <div class="flex -space-x-3">
-            {testimonials.map((testimonial) => (
-               <div class="w-12 h-12 rounded-full border-2 border-white bg-aspada-cream flex items-center justify-center text-[10px] font-black text-aspada-navy shadow-sm ring-2 ring-aspada-gold/10 uppercase">
-                 {testimonial.initials}
-               </div>
-            ))}
-            <div class="w-12 h-12 rounded-full bg-aspada-navy border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-sm ring-2 ring-aspada-gold/10">
+            {
+              testimonials.map((testimonial) => (
+                <div class="w-12 h-12 rounded-full border-2 border-white bg-aspada-cream flex items-center justify-center text-[10px] font-black text-aspada-navy shadow-sm ring-2 ring-aspada-gold/10 uppercase">
+                  {testimonial.initials}
+                </div>
+              ))
+            }
+            <div
+              class="w-12 h-12 rounded-full bg-aspada-navy border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-sm ring-2 ring-aspada-gold/10"
+            >
               +150
             </div>
           </div>
-          <span class="text-[10px] font-bold text-aspada-navy/40 uppercase tracking-widest leading-none">Families Impacted</span>
+          <span
+            class="text-[10px] font-bold text-aspada-navy/40 uppercase tracking-widest leading-none"
+            >Families Impacted</span
+          >
         </div>
       </div>
     </div>
@@ -92,22 +106,22 @@ const testimonials = testimonialsFromBe.map((testimonial) => {
             class="absolute inset-0 bg-white/40 backdrop-blur-3xl rounded-[3rem] cursor-pointer select-none transition-all duration-700 ease-out border border-white/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden group/card"
           >
             <div class="flex flex-col md:flex-row h-full">
-               <!-- Editorial Image Section (Magazine style) -->
-               <div class="w-full md:w-[45%] h-64 md:h-auto relative overflow-hidden bg-aspada-cream shrink-0">
-                  {testimonial.attachments && testimonial.attachments.length > 0 ? (
-                    <img 
-                      src={testimonial.attachments[0]} 
-                      class="w-full h-full object-cover grayscale-[0.2] group-hover/card:grayscale-0 group-hover/card:scale-105 transition-all duration-1000"
-                      alt="Project showcase" 
-                    />
-                  ) : (
-                    <div class="w-full h-full flex items-center justify-center text-aspada-gold/20">
-                      <div class="i-lucide-building-2 w-32 h-32" />
-                    </div>
-                  )}
-                  
-                  <!-- Floating Initials Badge on Image -->
-                  {/* <div class="absolute bottom-8 left-8 flex items-center gap-4">
+              <!-- Editorial Image Section (Magazine style) -->
+              <div class="w-full md:w-[45%] h-64 md:h-auto relative overflow-hidden bg-aspada-cream shrink-0">
+                {testimonial.attachments && testimonial.attachments.length > 0 ? (
+                  <img
+                    src={testimonial.attachments[0]}
+                    class="w-full h-full object-cover grayscale-[0.2] group-hover/card:grayscale-0 group-hover/card:scale-105 transition-all duration-1000"
+                    alt="Project showcase"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-aspada-gold/20">
+                    <div class="i-lucide-building-2 w-32 h-32" />
+                  </div>
+                )}
+
+                {/* Floating Initials Badge on Image */}
+                {/* <div class="absolute bottom-8 left-8 flex items-center gap-4">
                      <div class="w-16 h-16 rounded-2xl bg-aspada-steel backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl font-display font-black text-white shadow-2xl">
                         {testimonial.initials}
                      </div>
@@ -116,49 +130,54 @@ const testimonials = testimonialsFromBe.map((testimonial) => {
                         <p class="text-xs font-bold leading-tight">Property Showcase</p>
                      </div>
                   </div> */}
-               </div>
+              </div>
 
-               <!-- Editorial Content Section -->
-               <div class="flex-1 p-10 md:p-14 flex flex-row">
-                 <div class="flex flex-col h-full w-full">
-                    <!-- Rating & Quote Icon -->
-                    <div class="flex justify-between items-start mb-8">
-                      <div class="flex text-aspada-gold gap-1">
-                        {Array.from({ length: 5 }).map((_, starI) => (
-                          <div class={`i-lucide-star w-4 h-4 ${starI < testimonial.rating ? 'fill-current' : 'opacity-20'}`} />
-                        ))}
-                      </div>
-                      <div class="i-lucide-quote w-10 h-10 text-aspada-gold/20" />
+              <!-- Editorial Content Section -->
+              <div class="flex-1 p-10 md:p-14 flex flex-row">
+                <div class="flex flex-col h-full w-full">
+                  {/* Rating & Quote Icon */}
+                  <div class="flex justify-between items-start mb-8">
+                    <div class="flex text-aspada-gold gap-1">
+                      {Array.from({ length: 5 }).map((_, starI) => (
+                        <div
+                          class={`i-lucide-star w-4 h-4 ${starI < testimonial.rating ? 'fill-current' : 'opacity-20'}`}
+                        />
+                      ))}
                     </div>
+                    <div class="i-lucide-quote w-10 h-10 text-aspada-gold/20" />
+                  </div>
 
-                    <!-- Client Identity -->
-                    <div class="mb-10">
-                      <h4 class="font-display font-black text-[10px] text-aspada-gold uppercase tracking-[0.4em] mb-3">{testimonial.role}</h4>
-                      <p class="text-4xl md:text-5xl font-display font-black text-aspada-navy tracking-tighter leading-none italic">
-                        {testimonial.title && <span>{testimonial.title}. </span>}{testimonial.name}
-                      </p>
+                  {/* Client Identity */}
+                  <div class="mb-10">
+                    <h4 class="font-display font-black text-[10px] text-aspada-gold uppercase tracking-[0.4em] mb-3">
+                      {testimonial.role}
+                    </h4>
+                    <p class="text-4xl md:text-5xl font-display font-black text-aspada-navy tracking-tighter leading-none italic">
+                      {testimonial.title && <span>{testimonial.title}. </span>}
+                      {testimonial.name}
+                    </p>
+                  </div>
+
+                  {/* Main Text */}
+                  <div class="relative flex-grow">
+                    <div
+                      class="text-aspada-steel font-medium italic text-xl md:text-2xl leading-relaxed text-balance prose-custom"
+                      set:html={marked.parse(testimonial.text || '')}
+                    />
+                  </div>
+
+                  {/* Additional Images (Miniatures) */}
+                  {testimonial.attachments && testimonial.attachments.length > 1 && (
+                    <div class="mt-8 pt-8 border-t border-slate-100 flex gap-4">
+                      {testimonial.attachments.slice(1, 4).map((img) => (
+                        <div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                          <img src={img} class="w-full h-full object-cover" alt="Detail" />
+                        </div>
+                      ))}
                     </div>
-
-                    <!-- Main Text -->
-                    <div class="relative flex-grow">
-                      <div 
-                        class="text-aspada-steel font-medium italic text-xl md:text-2xl leading-relaxed text-balance prose-custom" 
-                        set:html={marked.parse(testimonial.text || '')} 
-                      />
-                    </div>
-
-                    <!-- Additional Images (Miniatures) -->
-                    {testimonial.attachments && testimonial.attachments.length > 1 && (
-                      <div class="mt-8 pt-8 border-t border-slate-100 flex gap-4">
-                        {testimonial.attachments.slice(1, 4).map((img) => (
-                          <div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
-                            <img src={img} class="w-full h-full object-cover" alt="Detail" />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                 </div>
-               </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         ))

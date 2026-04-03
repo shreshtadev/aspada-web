@@ -1,23 +1,23 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-const Navbar = await import("../../../components/Navbar.astro");
-const Footer = await import("../../../components/Footer.astro");
-const ActionDock = await import("../../../components/ActionDock.astro");
-import ProjectList from '../../../components/projects/ProjectList.svelte'
-import pb from "../../../lib/pb";
+import Layout from "@/layouts/Layout.astro";
+import Navbar from "@/components/Navbar.astro";
+import Footer from "@/components/Footer.astro";
+import ActionDock from "@/components/ActionDock.astro";
+import ProjectList from '@/components/projects/ProjectList.svelte'
+import pb from "@/lib/pb";
 import toast from "svelte-french-toast";
 import {
   Collections,
   ProjectsStatusOptions,
   type CompaniesResponse,
   type ProjectsResponse,
-} from "../../../types/pocketbase-types";
-import type { ProjectExpand } from "../../../types";
-import layout from '../../../assets/layout.webp'
-import commercial from '../../../assets/commercial.webp'
-import residential from '../../../assets/residential.webp'
+} from "@/types/pocketbase-types";
+import type { ProjectExpand } from "@/types";
+import layout from '@/assets/layout.webp'
+import commercial from '@/assets/commercial.webp'
+import residential from '@/assets/residential.webp'
 import { Image } from "astro:assets";
-const LoadingSection = await import("../../../components/LoadingSection.astro");
+import LoadingSection from "@/components/LoadingSection.astro";
 
 // Fetch projects
 // Using fullList to get all projects for the index page.
@@ -55,8 +55,8 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 ---
 
 <Layout title="Our Projects | Aspada Developers">
-  <Navbar.default companyProfile={companyProfile} />
-      <LoadingSection.default
+  <Navbar companyProfile={companyProfile} />
+  <LoadingSection
       sectionId="mainSection"
       skeletonCount={5}
       minHeight="600px"
@@ -110,39 +110,35 @@ companyProfile = await pb.collection(Collections.Companies).getFirstListItem("co
 
       {
         completedProjects.length > 0 && (
-                <div class="mb-20 text-center max-w-3xl mx-auto">
-        <h1
-          class="text-3xl sm:text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8"
-        >
-          Completed<span class="text-aspada-gold/70 italic font-light"
-            >Projects</span
-          >
-        </h1>
-      </div>
-      <div>
-          <ProjectList client:visible projects={completedProjects} />
-      </div>
+          <>
+            <div class="mb-20 text-center max-w-3xl mx-auto">
+              <h1 class="text-3xl sm:text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8">
+                Completed<span class="text-aspada-gold/70 italic font-light">Projects</span>
+              </h1>
+            </div>
+            <section>
+              <ProjectList client:visible projects={completedProjects} />
+            </section>
+          </>
         )
       }
       {
         upcomingProjects.length > 0 && (
-                <div class="mb-20 text-center max-w-3xl mx-auto">
-        <h1
-          class="text-3xl sm:text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8"
-        >
-          Upcoming<span class="text-aspada-gold/70 italic font-light"
-            >Projects</span
-          >
-        </h1>
-      </div>
-      <div>
-          <ProjectList client:visible projects={upcomingProjects} />
-      </div>
+          <>
+            <div class="mb-20 text-center max-w-3xl mx-auto">
+              <h1 class="text-3xl sm:text-5xl md:text-7xl font-semibold mt-6 text-aspada-steel mb-8">
+                Upcoming<span class="text-aspada-gold/70 italic font-light">Projects</span>
+              </h1>
+            </div>
+            <section>
+              <ProjectList client:visible projects={upcomingProjects} />
+            </section>
+          </>
         )
       }
     </div>
   </main>
-</LoadingSection.default>
-  <Footer.default companyProfile={companyProfile} />
-  <ActionDock.default companyProfile={companyProfile} />
+  </LoadingSection>
+  <Footer companyProfile={companyProfile} />
+  <ActionDock companyProfile={companyProfile} />
 </Layout>
