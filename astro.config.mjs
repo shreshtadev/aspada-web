@@ -1,13 +1,10 @@
 import netlify from '@astrojs/netlify'
-import node from '@astrojs/node'
+import sitemap from '@astrojs/sitemap'
+import svelte from '@astrojs/svelte'
 import { defineConfig } from 'astro/config'
 import { fileURLToPath } from 'node:url'
 import UnoCSS from 'unocss/astro'
 import { loadEnv } from 'vite'
-
-import svelte from '@astrojs/svelte'
-
-import sitemap from '@astrojs/sitemap'
 
 const { PUBLIC_PB_URL, PUBLIC_SITE_URL } = loadEnv(
   process.env.NODE_ENV || 'development',
@@ -19,12 +16,7 @@ export default defineConfig({
   site: PUBLIC_SITE_URL,
   output: 'server',
   integrations: [UnoCSS(), svelte({ extensions: ['.svelte'] }), sitemap()],
-  adapter:
-    process.env.NODE_ENV === 'production'
-      ? netlify()
-      : node({
-          mode: 'standalone',
-        }),
+  adapter: netlify({ edgeMiddleware: true }),
   image: {
     domains: [
       'images.unsplash.com',
@@ -66,6 +58,16 @@ export default defineConfig({
             }
             // Default: let Astro/Vite handle everything else
           },
+        },
+        onwarn(warning, warn) {
+          // Ignore the specific internal-helpers warning
+          if (
+            warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
+            warning.exporter === '@astrojs/internal-helpers/remote'
+          ) {
+            return
+          }
+          warn(warning)
         },
       },
     },
