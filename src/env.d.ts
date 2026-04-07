@@ -15,7 +15,6 @@ declare module "*.jpg" {
   export default content;
 }
 
-import type PocketBase from 'pocketbase'
 
 interface ImportMetaEnv {
   readonly PUBLIC_PB_URL: string
@@ -31,8 +30,8 @@ interface ImportMeta {
 declare global {
   namespace App {
     interface Locals {
-      pb: PocketBase
-      user: any
+      user?: Record<string, any>
+      token?: string
     }
   }
 }

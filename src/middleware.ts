@@ -1,5 +1,5 @@
-import { sequence } from 'astro:middleware'
 import type { MiddlewareHandler } from 'astro'
+import { sequence } from 'astro:middleware'
 import pb from './lib/pb'
 
 // Log middleware
@@ -53,8 +53,8 @@ const authMiddleware: MiddlewareHandler = async (context, next) => {
   }
 
   // Store authenticated PocketBase instance in locals
-  context.locals.pb = pb
   context.locals.user = pb.authStore.record
+  context.locals.token = pb.authStore.token
 
   const response = await next()
 
