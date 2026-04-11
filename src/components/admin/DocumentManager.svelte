@@ -146,7 +146,7 @@
 </script>
 
 <div class="space-y-8">
-  <div class="flex items-center justify-between gap-4">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Step Assets</h3>
       <p class="text-sm font-bold text-slate-500">Manage required documentation</p>
@@ -154,7 +154,7 @@
     <button
       type="button"
       onclick={newDoc}
-      class="bg-aspada-navy text-white px-4 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2"
+      class="bg-aspada-navy text-white px-4 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2 min-h-[44px] w-full sm:w-auto justify-center"
     >
       <span class="i-lucide-plus-circle text-base"></span>
       New
@@ -176,7 +176,7 @@
           <button
             type="button"
             onclick={() => selectDoc(doc)}
-            class="group w-full flex items-center justify-between p-4 rounded-[1.5rem] border-2 transition-all duration-300
+            class="group w-full flex items-center justify-between p-4 sm:p-4 rounded-[1.5rem] border-2 transition-all duration-300
               {selectedId === doc.id
               ? 'border-aspada-gold bg-aspada-gold/5 shadow-md'
               : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 hover:bg-white'}"
@@ -214,7 +214,7 @@
             title="move-left"
             onclick={() => (currentPage -= 1)}
             disabled={currentPage === 1 || loading}
-            class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
+            class="p-2 sm:p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <span class="i-lucide-arrow-left text-sm"></span>
           </button>
@@ -226,7 +226,7 @@
             title="move-right"
             onclick={() => (currentPage += 1)}
             disabled={currentPage === totalPages || loading}
-            class="p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all"
+            class="p-2 sm:p-2 rounded-xl border border-slate-100 hover:bg-white disabled:opacity-30 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <span class="i-lucide-arrow-right text-sm"></span>
           </button>
@@ -245,7 +245,7 @@
   <!-- ── Form ──────────────────────────────────────────────────── -->
   <form
     onsubmit={handleSave}
-    class="bg-slate-50/50 p-6 rounded-[2rem] border-2 border-slate-100 space-y-6"
+    class="bg-slate-50/50 p-4 sm:p-6 rounded-[2rem] border-2 border-slate-100 space-y-6"
   >
     <div class="flex items-center gap-3 mb-2">
       <div class="w-1.5 h-6 bg-aspada-gold rounded-full"></div>
@@ -264,7 +264,7 @@
         bind:value={formTitle}
         placeholder="e.g. KYC Documents, Site Photos..."
         required
-        class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all"
+        class="w-full bg-white border-2 border-slate-100 p-4 sm:p-4 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all min-h-[44px]"
       />
     </div>
 
@@ -336,13 +336,13 @@
       </div>
     {/if}
 
-    <div class="flex gap-3 pt-2">
+    <div class="flex flex-col sm:flex-row gap-3 pt-2">
       <button
         type="submit"
         disabled={uploading ||
           !formTitle ||
           (isNew && (trackerComponent?.getSelectedFiles()?.length ?? 0) === 0)}
-        class="flex-1 bg-aspada-navy text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50 cursor-pointer"
+        class="flex-1 bg-aspada-navy text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50 cursor-pointer min-h-[44px]"
       >
         {uploading ? 'Processing…' : isNew ? 'Submit Entry' : 'Sync Changes'}
       </button>
@@ -352,7 +352,7 @@
           type="button"
           onclick={deleteDoc}
           disabled={uploading}
-          class="px-6 py-4 rounded-2xl border-2 border-red-50/50 text-red-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95 cursor-pointer"
+          class="px-6 py-4 rounded-2xl border-2 border-red-50/50 text-red-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-95 cursor-pointer min-h-[44px] w-full sm:w-auto"
           aria-label="Delete Entry"
         >
           <span class="i-lucide-trash-2 text-lg"></span>

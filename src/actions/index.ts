@@ -1,7 +1,7 @@
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai'
 import { defineAction } from 'astro:actions'
 import { z } from 'astro:schema'
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai'
-import pb from '../lib/pb'
+import { getAuthPB, getPublicPB } from '../lib/server/pb'
 import { Collections } from '../types/pocketbase-types'
 
 const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY)
@@ -17,6 +17,7 @@ export const server = {
   logout: defineAction({
     accept: 'form',
     handler: async (_, context) => {
+      const pb = getAuthPB(context.request)
       pb.authStore.clear()
       context.cookies.delete('pb_auth', { path: '/' })
       // Also clear any other potential auth cookies if the name varies,
@@ -43,6 +44,7 @@ export const server = {
       sessionId: z.string(),
     }),
     handler: async ({ message, history, sessionId }) => {
+      const pb = getPublicPB();
       const cleanMsg = message.trim().toLowerCase()
       const exactMatch = await pb
         .collection(Collections.ChatCache)
@@ -181,6 +183,7 @@ export const server = {
       isHelpful: z.boolean(),
     }),
     handler: async ({ cacheId, isHelpful }) => {
+      const pb = getPublicPB()
       const field = isHelpful ? 'helpful_count+' : 'unhelpful_count+'
       // Atomic increment in PocketBase
       return await pb.collection(Collections.ChatCache).update(cacheId, {
@@ -200,7 +203,8 @@ export const server = {
         .regex(/^[6-9]\d{9}$/, 'Invalid Indian phone number'),
       interest: z.string().max(512),
     }),
-    handler: async ({ fullName, contactEmail, contactNo, interest }) => {
+    handler: async ({ fullName, contactEmail, contactNo, interest }, context) => {
+      const pb = getAuthPB(context.request)
       return await pb.collection(Collections.Leads).create({
         fullName,
         contactEmail,

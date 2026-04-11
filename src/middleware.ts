@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from 'astro'
 import { sequence } from 'astro:middleware'
-import pb from './lib/pb'
+import { createPB } from './lib/pb'
 
 // Log middleware
 const logMiddleware: MiddlewareHandler = async (context, next) => {
@@ -34,7 +34,7 @@ const authMiddleware: MiddlewareHandler = async (context, next) => {
 
   // Validate authentication for protected admin routes
   const cookieHeader = context.request.headers.get('cookie') ?? ''
-
+  const pb = createPB(cookieHeader);
   // Load the auth store from the cookie
   pb.authStore.loadFromCookie(cookieHeader)
   try {

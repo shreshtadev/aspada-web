@@ -171,16 +171,16 @@
 </script>
 
 <div class="space-y-6">
-  <div class="flex gap-2">
+  <div class="flex flex-col sm:flex-row gap-2">
     <input
       bind:value={stepTitle}
       placeholder="New step..."
-      class="flex-1 bg-slate-50 border border-slate-200 p-3 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all placeholder:text-slate-400"
+      class="flex-1 bg-slate-50 border border-slate-200 p-3 sm:p-3 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all placeholder:text-slate-400 min-h-[44px]"
     />
     <button
       type="button"
       onclick={addStep}
-      class="bg-aspada-navy text-white px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all active:scale-95 shadow-lg shadow-aspada-navy/10"
+      class="bg-aspada-navy text-white px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-aspada-gold hover:text-white transition-all active:scale-95 shadow-lg shadow-aspada-navy/10 min-h-[44px] w-full sm:w-auto"
     >
       Add
     </button>
@@ -216,7 +216,7 @@
             hoverIndex = null
           }}
         >
-          <div class="flex items-start gap-4">
+          <div class="flex items-start gap-2 sm:gap-4">
             <div
               class="flex flex-col items-center justify-center text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-500 transition-colors pt-1"
             >
@@ -287,7 +287,7 @@
                   </span>
                   <button
                     onclick={(e) => startEditing(step, e)}
-                    class="text-slate-300 hover:text-aspada-gold p-1 rounded-lg hover:bg-aspada-gold/5 transition-all cursor-pointer opacity-0 group-hover/title:opacity-100"
+                    class="text-slate-300 hover:text-aspada-gold p-1 rounded-lg hover:bg-aspada-gold/5 transition-all cursor-pointer opacity-0 group-hover/title:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
                     title="Edit Title"
                   >
                     <span class="i-lucide-edit-2 text-sm"></span>
@@ -295,7 +295,7 @@
                 </div>
               {/if}
               <div
-                class="grid grid-cols-2 gap-2"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-2"
                 onclick={(e) => e.stopPropagation()}
                 role="presentation"
               >
@@ -303,7 +303,7 @@
                   value={step.status}
                   onchange={(e) =>
                     updateStatus(step.id, e.currentTarget.value as ProcessesStatusOptions)}
-                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider"
+                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 sm:px-3 sm:py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider min-h-[44px]"
                 >
                   {#each Object.values(ProcessesStatusOptions) as opt}
                     <option value={opt}>{opt.replace('_', ' ')}</option>
@@ -314,7 +314,7 @@
                   value={step.parent}
                   disabled={!step.parent}
                   onchange={(e) => updateParent(step.id, e.currentTarget.value)}
-                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider"
+                  class="text-[10px] border-2 border-slate-100 rounded-xl bg-white px-3 py-2 sm:px-3 sm:py-2 font-black text-slate-600 cursor-pointer hover:border-slate-300 outline-none transition-all uppercase tracking-wider min-h-[44px]"
                 >
                   <option value={null}>No Parent</option>
                   {#each allSteps as parentStep}
@@ -336,7 +336,7 @@
       <button
         onclick={() => (currentPage -= 1)}
         disabled={currentPage === 1 || loading}
-        class="p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+        class="p-2 sm:p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label="Previous page"
       >
         <span class="i-lucide-chevron-left text-lg"></span>
@@ -347,9 +347,9 @@
           <button
             onclick={() => (currentPage = i + 1)}
             title={`Page ${i + 1}`}
-            class="w-1.5 h-1.5 rounded-full transition-all {currentPage === i + 1
+            class="w-1.5 h-1.5 sm:w-1.5 sm:h-1.5 rounded-full transition-all {currentPage === i + 1
               ? 'bg-aspada-navy w-4'
-              : 'bg-slate-200 hover:bg-slate-400'}"
+              : 'bg-slate-200 hover:bg-slate-400'} min-w-[44px] min-h-[44px] flex items-center justify-center"
           ></button>
         {/each}
       </div>
@@ -357,7 +357,7 @@
       <button
         onclick={() => (currentPage += 1)}
         disabled={currentPage === totalPages || loading}
-        class="p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+        class="p-2 sm:p-2 rounded-xl border-2 border-slate-100 hover:bg-white hover:border-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label="Next page"
       >
         <span class="i-lucide-chevron-right text-lg"></span>

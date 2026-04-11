@@ -28,11 +28,13 @@
     })
   )
 
-  const autoplay = Autoplay({
-    delay: props.durationPerImage ?? 5000,
-    stopOnInteraction: false,
-    stopOnMouseEnter: false,
-  })
+  const autoplay = $derived(
+    Autoplay({
+      delay: props.durationPerImage ?? 5000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: false,
+    })
+  )
 
   function goToPrev() {
     if (!emblaApi) return

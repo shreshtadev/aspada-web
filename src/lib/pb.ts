@@ -1,23 +1,33 @@
 import PocketBase from 'pocketbase'
 import type { TypedPocketBase } from '../types/pocketbase-types'
 
-// 1. Helper to get the URL regardless of environment
-const getPbUrl = () => {
-  // Check Vite/Astro context first (Client & Server SSR)
+// Resolve URL at runtime (Netlify Functions first)
+function getPbUrl(): string {
+  // 1. Runtime (Netlify SSR / Functions)
+  if (typeof process !== 'undefined' && process.env.PUBLIC_PB_URL) {
+    return process.env.PUBLIC_PB_URL
+  }
+
+  // 2. Build-time (Astro/Vite)
   if (import.meta.env?.PUBLIC_PB_URL) {
     return import.meta.env.PUBLIC_PB_URL
   }
 
-  // Fallback to Node.js process.env (Scripts or certain SSR environments)
-  if (typeof process !== 'undefined' && process.env?.PUBLIC_PB_URL) {
-    return process.env.PUBLIC_PB_URL
-  }
-
-  // Local fallback
+  // 3. Local fallback
   return 'http://127.0.0.1:8090'
 }
 
-// 2. Initialize the Singleton
+// Factory: create a fresh instance per request
+export function createPB(cookie?: string): TypedPocketBase {
+  const pb = new PocketBase(getPbUrl()) as TypedPocketBase
+
+  if (cookie) {
+    pb.authStore.loadFromCookie(cookie)
+  }
+
+  return pb
+}
+
 const pb = new PocketBase(getPbUrl()) as TypedPocketBase
 
-export default pb
+export default pb;
