@@ -1,9 +1,7 @@
 <script lang="ts">
-  import DocumentManager from './DocumentManager.svelte'
+  import DMSExplorer from './DMSExplorer.svelte'
   import Modal from './Modal.svelte'
   import ProcessFlow from './ProcessFlow.svelte'
-  import ProcessManager from './ProcessManager.svelte'
-  import VentureManager from './VentureManager.svelte'
 
   // Core navigation state using Runes
   let selectedVentureId = $state<string | null>(null)
@@ -29,17 +27,17 @@
     }
   })
 
-  function handleVentureSelect(id: string, title: string) {
-    selectedVentureId = id
-    activeVentureTitle = title
-    selectedParentProcessId = null
-    selectedStepId = null
-    mobileView = 'parentProcesses'
+  // function handleVentureSelect(id: string, title: string) {
+  //   selectedVentureId = id
+  //   activeVentureTitle = title
+  //   selectedParentProcessId = null
+  //   selectedStepId = null
+  //   mobileView = 'parentProcesses'
 
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
+  //   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+  //     window.scrollTo({ top: 0, behavior: 'smooth' })
+  //   }
+  // }
 
   function handleParentProcessSelect(id: string, title: string) {
     if (selectedParentProcessId === id) return
@@ -63,13 +61,26 @@
     }
   }
 
+  function handleVentureSelect(id: string | null) {
+    selectedVentureId = id
+    if (!id) {
+      selectedParentProcessId = null
+      selectedStepId = null
+    }
+  }
+
+  // Listen for open-flow event from Explorer
+  if (typeof window !== 'undefined') {
+    window.addEventListener('open-flow', (e: any) => {
+      selectedVentureId = e.detail.ventureId
+      showFlowModal = true
+    })
+  }
+
   function backTo(view: 'ventures' | 'parentProcesses' | 'steps') {
-    mobileView = view
+    // This function is mostly legacy now but keeping it for mobile logic if needed
     if (view === 'ventures') {
       selectedVentureId = null
-      selectedParentProcessId = null
-    }
-    if (view === 'parentProcesses') {
       selectedParentProcessId = null
     }
     selectedStepId = null
@@ -129,178 +140,8 @@
     </div>
   </div>
 
-  <div class="max-w-[1600px] mx-auto p-4 lg:p-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start h-[calc(100vh-10rem)]">
-      <!-- Left Column: Ventures & Process Groups -->
-      <div
-        class="h-full transition-all duration-300 flex flex-col gap-6 {mobileView !== 'ventures' &&
-        mobileView !== 'parentProcesses'
-          ? 'hidden lg:flex lg:opacity-50'
-          : 'flex'}"
-        id="navigation-column"
-      >
-        <!-- Ventures -->
-        <div
-          class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex flex-col flex-1"
-        >
-          <div class="bg-aspada-navy p-6 flex items-center justify-between">
-            <div class="flex items-center gap-3 text-white">
-              <span class="i-lucide-briefcase text-2xl"></span>
-              <h2 class="text-xl font-black uppercase tracking-tight">Ventures</h2>
-            </div>
-            {#if mobileView !== 'ventures' && typeof window !== 'undefined' && window.innerWidth >= 1024}
-              <button
-                onclick={() => backTo('ventures')}
-                class="text-[10px] font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors text-white uppercase"
-                >Change</button
-              >
-            {/if}
-          </div>
-          <div class="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
-            <VentureManager onSelect={handleVentureSelect} activeId={selectedVentureId} />
-          </div>
-        </div>
-
-        <!-- Process Groups -->
-        <div
-          class="h-full transition-all duration-300 flex flex-col flex-1 {mobileView === 'steps' ||
-          mobileView === 'documents'
-            ? 'lg:opacity-50'
-            : ''}"
-        >
-          {#if selectedVentureId}
-            <div
-              class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex flex-col h-full"
-            >
-              <div
-                class="bg-aspada-emerald p-6 flex items-center justify-between"
-                style="background-color: #10B981;"
-              >
-                <div class="flex items-center gap-3 text-white">
-                  <span class="i-lucide-folder-tree text-2xl"></span>
-                  <h2 class="text-xl font-black uppercase tracking-tight text-white">Groups</h2>
-                </div>
-                <button
-                  onclick={() => (showFlowModal = true)}
-                  class="text-[10px] bg-white text-emerald-600 px-3 py-1.5 rounded-full font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 uppercase shadow-lg shadow-emerald-900/20"
-                >
-                  <span class="i-lucide-git-graph text-sm"></span>
-                  Map
-                </button>
-              </div>
-
-              <div class="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
-                <ProcessManager
-                  ventureId={selectedVentureId}
-                  onStepSelect={handleParentProcessSelect}
-                  activeStepId={selectedParentProcessId}
-                  mode="parents"
-                />
-              </div>
-            </div>
-          {:else}
-            <div
-              class="hidden lg:flex flex-col items-center justify-center p-6 border-4 border-dashed rounded-[2.5rem] text-slate-300 bg-white/40 h-full"
-            >
-              <div
-                class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4"
-              >
-                <span class="i-lucide-arrow-left text-2xl"></span>
-              </div>
-              <p class="font-bold text-center text-xs">
-                Select a venture to<br />view its process groups
-              </p>
-            </div>
-          {/if}
-        </div>
-      </div>
-
-      <!-- Specific Process Steps Column -->
-      <div
-        class="h-full transition-all duration-300 flex flex-col {mobileView !== 'steps'
-          ? 'hidden lg:flex'
-          : 'flex'} {mobileView === 'documents' ? 'lg:opacity-50' : ''}"
-        id="steps-column"
-      >
-        {#if selectedParentProcessId}
-          <div
-            class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex flex-col h-full"
-          >
-            <div class="bg-aspada-gold p-6 flex items-center justify-between">
-              <div class="flex items-center gap-3 text-aspada-navy">
-                <span class="i-lucide-list-checks text-2xl"></span>
-                <h2 class="text-xl font-black uppercase tracking-tight text-aspada-navy">
-                  Processes
-                </h2>
-              </div>
-              <button
-                onclick={() => (showFlowModal = true)}
-                class="text-[10px] bg-aspada-navy text-white px-3 py-1.5 rounded-full font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 uppercase shadow-lg shadow-aspada-navy/20"
-              >
-                <span class="i-lucide-git-graph text-sm"></span>
-                Map
-              </button>
-            </div>
-
-            <div class="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
-              <ProcessManager
-                ventureId={selectedVentureId}
-                onStepSelect={handleStepSelect}
-                activeStepId={selectedStepId}
-                mode="children"
-                parentProcessId={selectedParentProcessId}
-              />
-            </div>
-          </div>
-        {:else}
-          <div
-            class="hidden lg:flex flex-col items-center justify-center p-12 border-4 border-dashed rounded-[2.5rem] text-slate-300 bg-white/40 h-full"
-          >
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <span class="i-lucide-arrow-left text-3xl"></span>
-            </div>
-            <p class="font-bold text-center">
-              Select a process group to<br />view its specific steps
-            </p>
-          </div>
-        {/if}
-      </div>
-
-      <!-- Documents Column -->
-      <div
-        class="h-full transition-all duration-300 flex flex-col {mobileView !== 'documents'
-          ? 'hidden lg:flex'
-          : 'flex'}"
-        id="documents-column"
-      >
-        {#if selectedStepId}
-          <div
-            class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex flex-col h-full"
-          >
-            <div class="bg-aspada-steel p-6 flex items-center justify-between">
-              <div class="flex items-center gap-3 text-white">
-                <span class="i-lucide-file-text text-2xl"></span>
-                <h2 class="text-xl font-black uppercase tracking-tight">Documents</h2>
-              </div>
-            </div>
-            <div class="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
-              <DocumentManager stepId={selectedStepId} />
-            </div>
-          </div>
-        {:else}
-          <div
-            class="hidden lg:flex flex-col items-center justify-center p-12 border-4 border-dashed rounded-[2.5rem] text-slate-300 bg-white/40 h-full"
-          >
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <span class="i-lucide-files text-3xl"></span>
-            </div>
-            <p class="font-bold italic text-center text-sm">
-              Select a process step to<br />manage associated files
-            </p>
-          </div>
-        {/if}
-      </div>
-    </div>
+  <div class="max-w-[1600px] mx-auto p-4 lg:p-8 h-[calc(100vh-4rem)]">
+    <DMSExplorer onVentureSelect={handleVentureSelect} />
   </div>
 </div>
 

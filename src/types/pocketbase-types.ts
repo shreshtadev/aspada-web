@@ -372,11 +372,19 @@ export enum UsersRoleOptions {
 	"admin" = "admin",
 	"staff" = "staff",
 }
+
+export enum UsersFeatureOptions {
+	"website" = "website",
+	"blog" = "blog",
+	"crm" = "crm",
+	"dms" = "dms",
+}
 export type UsersRecord = {
 	avatar?: FileNameString
 	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
+	feature?: UsersFeatureOptions[]
 	id: string
 	name?: string
 	password: string

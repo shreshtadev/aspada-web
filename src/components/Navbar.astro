@@ -70,9 +70,17 @@ const { companyProfile } = Astro.props
   }
 
   /* Hamburger Icon Switch */
+  #close-icon {
+    display: none;
+  }
+
   html[data-menu-open] #menu-icon {
-    /* Changes menu icon to an 'X' via Lucide class if available, or simple rotation */
-    transform: rotate(90deg);
+    display: none;
+  }
+
+  html[data-menu-open] #close-icon {
+    display: block;
+    color: white;
   }
 
   /* Default state (Large) */
@@ -104,14 +112,14 @@ const { companyProfile } = Astro.props
 <nav id="main-navbar" class="fixed top-0 left-0 w-full z-[100]">
   <div
     id="navbar-container"
-    class="px-6 py-0 md:h-20 flex justify-between items-center transition-all duration-300"
+    class="relative z-[120] px-6 py-0 md:h-20 flex justify-between items-center transition-all duration-300"
   >
     <div class="hidden md:flex flex-1"></div>
 
     <div class="flex items-center gap-8 justify-center shrink-0">
       <a href="/" class="group relative flex items-start">
         <div
-          class="logo-shield absolute top-0 -translate-x-[200%] z-[110]
+          class="logo-shield absolute top-0 left-1/2 -translate-x-1/2 md:left-0 md:-translate-x-[200%] z-[110]
            bg-aspada-navy shadow-xl flex items-center justify-center
            transition-all duration-500 ease-in-out
            html-scrolled:w-20 html-scrolled:h-24"
@@ -156,8 +164,9 @@ const { companyProfile } = Astro.props
         }
       </div>
 
-      <button id="mobile-menu-toggle" class="md:hidden z-[120] relative p-2" aria-label="Open Menu">
+      <button id="mobile-menu-toggle" class="md:hidden z-[130] relative p-2" aria-label="Toggle Menu">
         <div id="menu-icon" class="i-lucide-menu text-3xl transition-transform"></div>
+        <div id="close-icon" class="i-lucide-x text-3xl transition-transform"></div>
       </button>
     </div>
   </div>

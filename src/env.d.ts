@@ -27,10 +27,12 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+export {}
+
 declare global {
   namespace App {
     interface Locals {
-      user?: Record<string, any>
+      user?: import('./types/pocketbase-types').UsersResponse
       token?: string
     }
   }

@@ -2,11 +2,7 @@
 import { actions } from 'astro:actions'
 import { Toaster } from 'svelte-french-toast'
 import '../styles/global.css'
-const result = Astro.getActionResult(actions.logout)
-if (result && !result.error) {
-  return Astro.redirect('/admin/login')
-}
-import '../styles/global.css'
+import { UsersFeatureOptions } from '@/types/pocketbase-types'
 interface Props {
   title: string
   description?: string
@@ -16,6 +12,13 @@ interface Props {
 const { title, description = 'Aspada - Admin', image = '../assets/3D.jpg' } = Astro.props
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+
+const { user } = Astro.locals
+const features = user?.feature || []
+const hasWebsite = features.includes(UsersFeatureOptions.website)
+const hasCms = features.includes(UsersFeatureOptions.blog)
+const hasCrm = features.includes(UsersFeatureOptions.crm)
+const hasDms = features.includes(UsersFeatureOptions.dms)
 ---
 
 <html lang="en" class="scroll-smooth">
@@ -56,8 +59,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
   </head>
   <body>
     <div class="flex min-h-screen bg-aspada-silver/10 relative overflow-x-hidden">
-      {result && !result.error && <script is:inline>window.location.href = "/admin/login";</script>}
-
       <!-- Mobile Toggle Button -->
       <button
         id="mobile-sidebar-toggle"
@@ -86,104 +87,127 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
           </div>
 
           <nav class="space-y-1">
-            <a
-              href="/admin/projects"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-layout-grid text-lg opacity-70"></span>
-              Projects
-            </a>
-            <a
-              href="/admin/socials"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-share-2 text-lg opacity-70"></span>
-              Social Details
-            </a>
-            <a
-              href="/admin/gallery"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-image text-lg opacity-70"></span>
-              Gallery
-            </a>
-            <a
-              href="/admin/company"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-building text-lg opacity-70"></span>
-              Company Profile
-            </a>
-            <a
-              href="/admin/testimonials"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-message-square text-lg opacity-70"></span>
-              Testimonials
-            </a>
-            <a
-              href="/admin/stats"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-bar-chart-3 text-lg opacity-70"></span>
-              Stats
-            </a>
-            <a
-              href="/admin/blog"
-              class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
-            >
-              <span class="i-lucide-pen-tool text-lg opacity-70"></span>
-              Blog
-            </a>
+            {
+              hasWebsite && (
+                <>
+                  <a
+                    href="/admin/projects"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-layout-grid text-lg opacity-70" />
+                    Projects
+                  </a>
+                  <a
+                    href="/admin/socials"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-share-2 text-lg opacity-70" />
+                    Social Details
+                  </a>
+                  <a
+                    href="/admin/gallery"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-image text-lg opacity-70" />
+                    Gallery
+                  </a>
+                  <a
+                    href="/admin/company"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-building text-lg opacity-70" />
+                    Company Profile
+                  </a>
+                  <a
+                    href="/admin/testimonials"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-message-square text-lg opacity-70" />
+                    Testimonials
+                  </a>
+                  <a
+                    href="/admin/stats"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
+                  >
+                    <span class="i-lucide-bar-chart-3 text-lg opacity-70" />
+                    Stats
+                  </a>
+                </>
+              )
+            }
 
-            <div class="mt-8 pt-4 border-t border-aspada-steel/5">
-              <p
-                class="text-aspada-steel/40 text-[10px] font-bold mb-3 uppercase tracking-widest px-3"
-              >
-                Business Tools
-              </p>
-              <div class="space-y-1">
-                <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">CRM</p>
+            {
+              hasCms && (
                 <a
-                  href="/crm"
-                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                  href="/admin/blog"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-aspada-steel/5 transition-colors font-medium"
                 >
-                  Dashboard
+                  <span class="i-lucide-pen-tool text-lg opacity-70" />
+                  Blog
                 </a>
-                <a
-                  href="/crm/pipeline"
-                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-                >
-                  Pipeline
-                </a>
-                <a
-                  href="/crm/agents"
-                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-                >
-                  Agents
-                </a>
-                <a
-                  href="/crm/admin"
-                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-                >
-                  Manage
-                </a>
-              </div>
+              )
+            }
 
-              <div class="mt-6 space-y-1">
-                <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">DMS</p>
-                <a
-                  href="/admin/dms"
-                  class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
-                >
-                  Dashboard
-                </a>
-              </div>
-            </div>
+            {
+              (hasCrm || hasDms) && (
+                <div class="mt-8 pt-4 border-t border-aspada-steel/5">
+                  <p class="text-aspada-steel/40 text-[10px] font-bold mb-3 uppercase tracking-widest px-3">
+                    Business Tools
+                  </p>
+
+                  {hasCrm && (
+                    <div class="space-y-1">
+                      <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">CRM</p>
+                      <a
+                        href="/crm"
+                        class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                      >
+                        Dashboard
+                      </a>
+                      <a
+                        href="/crm/pipeline"
+                        class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                      >
+                        Pipeline
+                      </a>
+                      <a
+                        href="/crm/agents"
+                        class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                      >
+                        Agents
+                      </a>
+                      <a
+                        href="/crm/admin"
+                        class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                      >
+                        Manage
+                      </a>
+                    </div>
+                  )}
+
+                  {hasDms && (
+                    <div class="mt-6 space-y-1">
+                      <p class="text-xs font-bold text-aspada-steel/60 px-3 mb-1">DMS</p>
+                      <a
+                        href="/admin/dms"
+                        class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-aspada-steel/5 transition-colors text-sm"
+                      >
+                        Dashboard
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )
+            }
           </nav>
         </div>
 
-        <form method="POST" action={actions.logout} class="mt-auto pt-6">
+        <form
+          id="logout-form"
+          method="POST"
+          action={actions.logout}
+          class="mt-auto pt-6"
+        >
           <button
             type="submit"
             class="w-full bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white py-2.5 px-4 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 border border-red-500/20"
@@ -203,6 +227,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     </div>
 
     <script>
+      import { actions } from 'astro:actions'
       const sidebar = document.getElementById('admin-sidebar')
       const overlay = document.getElementById('sidebar-overlay')
       const toggleBtn = document.getElementById('mobile-sidebar-toggle')
@@ -236,6 +261,32 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
           if (window.innerWidth < 1024) toggleSidebar()
         })
       })
+      function setupLogout() {
+        const form = document.getElementById('logout-form') as HTMLFormElement
+        if (!form) return
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+
+          try {
+            // 1. Execute the action
+            await actions.logout(new FormData(form))
+
+            // 2. Force navigation to login
+            // We use window.location.origin to ensure a clean redirect
+            window.location.href = '/admin/login'
+          } catch (err) {
+            console.error('Logout execution failed', err)
+            // Fallback: just redirect anyway to clear local state
+            window.location.href = '/admin/login'
+          }
+        })
+      }
+
+      // Run on initial load
+      setupLogout()
+      // Run every time the page swaps (for View Transitions)
+      document.addEventListener('astro:after-swap', setupLogout)
     </script>
   </body>
 </html>

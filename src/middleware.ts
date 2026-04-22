@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from 'astro'
 import { sequence } from 'astro:middleware'
 import { createPB } from './lib/pb'
+import { UsersFeatureOptions } from './types/pocketbase-types'
 
 // Log middleware
 const logMiddleware: MiddlewareHandler = async (context, next) => {
@@ -17,8 +18,8 @@ const logMiddleware: MiddlewareHandler = async (context, next) => {
 const authMiddleware: MiddlewareHandler = async (context, next) => {
   const { pathname } = context.url
 
-  // Only apply to admin routes
-  if (!pathname.startsWith('/admin')) {
+  // Only apply to admin and crm routes
+  if (!pathname.startsWith('/admin') && !pathname.startsWith('/crm')) {
     return next()
   }
 
@@ -53,8 +54,36 @@ const authMiddleware: MiddlewareHandler = async (context, next) => {
   }
 
   // Store authenticated PocketBase instance in locals
-  context.locals.user = pb.authStore.record
+  context.locals.user = pb.authStore.record as any
   context.locals.token = pb.authStore.token
+
+  // Feature-based access control
+  const user = pb.authStore.record
+  const features = user?.feature || []
+
+  const featureRouteMap = [
+    { path: '/admin/projects', feature: UsersFeatureOptions.website },
+    { path: '/admin/socials', feature: UsersFeatureOptions.website },
+    { path: '/admin/gallery', feature: UsersFeatureOptions.website },
+    { path: '/admin/company', feature: UsersFeatureOptions.website },
+    { path: '/admin/testimonials', feature: UsersFeatureOptions.website },
+    { path: '/admin/stats', feature: UsersFeatureOptions.website },
+    { path: '/admin/blog', feature: UsersFeatureOptions.blog },
+    { path: '/admin/dms', feature: UsersFeatureOptions.dms },
+    { path: '/crm', feature: UsersFeatureOptions.crm },
+  ]
+
+  for (const route of featureRouteMap) {
+    if (pathname.startsWith(route.path)) {
+      if (!features.includes(route.feature)) {
+        // If user doesn't have the feature, redirect to admin dashboard
+        // But only if we are not already on the admin dashboard to avoid loops
+        if (pathname !== '/admin') {
+          return Response.redirect(new URL('/admin', context.url), 302)
+        }
+      }
+    }
+  }
 
   const response = await next()
 
