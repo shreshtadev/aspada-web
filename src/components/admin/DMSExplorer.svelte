@@ -10,6 +10,7 @@
     ProcessesStatusOptions,
     type VenturesResponse,
   } from '../../types/pocketbase-types'
+  import FilePreview from './FilePreview.svelte'
   import FileUploadTracker from './FileUploadTracker.svelte'
   import Modal from './Modal.svelte'
 
@@ -52,6 +53,11 @@
   let trackerComponent = $state<ReturnType<typeof FileUploadTracker>>()
   let showFilesModal = $state(false)
   let selectedDocument = $state<DocumentsResponse | null>(null)
+  let showRenameModal = $state(false)
+  let renameTitle = $state('')
+  let renameTarget = $state<ExplorerItem | null>(null)
+  let showPreviewModal = $state(false)
+  let previewFileIndex = $state(0)
 
   // --- Derived ---
   let currentLocation = $derived(currentPath[currentPath.length - 1])
@@ -73,15 +79,21 @@
       if (loc.type === 'root') {
         const res = await pb.collection(Collections.Ventures).getList<VenturesResponse>(1, 100, {
           sort: '-created',
-          fields: 'id,title,slug,created,updated',
+          fields: 'id,title,slug,created,updated,@collectionId,@collectionName',
           requestKey,
         })
-        newItems = res.items.map((v) => ({ id: v.id, type: 'venture' as const, title: v.title, data: v }))
+        newItems = res.items.map((v) => ({
+          id: v.id,
+          type: 'venture' as const,
+          title: v.title,
+          data: v,
+        }))
       } else if (loc.type === 'venture') {
         const res = await pb.collection(Collections.Processes).getList<ProcessesResponse>(1, 100, {
           filter: `project = "${loc.id}" && (parent = "" || parent = null)`,
           sort: 'sequence',
-          fields: 'id,title,project,parent,sequence,status,created,updated',
+          fields:
+            'id,title,project,parent,sequence,status,created,updated,@collectionId,@collectionName',
           requestKey,
         })
         newItems = res.items.map((p) => ({
@@ -101,7 +113,6 @@
           pb.collection(Collections.Documents).getList<DocumentsResponse>(1, 100, {
             filter: `step = "${loc.id}"`,
             sort: '-created',
-            fields: 'id,title,slug,step,attachments,created,updated',
             requestKey: `${requestKey}-docs`,
           }),
         ])
@@ -151,6 +162,10 @@
     loadItems()
   }
 
+  function isPreviewable(filename: string) {
+    return /\.(jpg|jpeg|png|gif|webp|svg|pdf)$/i.test(filename)
+  }
+
   function handleItemClick(item: ExplorerItem) {
     if (item.type === 'venture') {
       navigateTo(item.id, item.title, 'venture')
@@ -158,12 +173,29 @@
       navigateTo(item.id, item.title, 'process')
     } else if (item.type === 'document') {
       const doc = item.data as DocumentsResponse
-      if (doc.attachments && doc.attachments.length > 1) {
+      const attachments = doc.attachments || []
+
+      if (attachments.length > 1) {
         selectedDocument = doc
         showFilesModal = true
-      } else if (doc.attachments && doc.attachments.length === 1) {
-        downloadFile(doc, doc.attachments[0])
+      } else if (attachments.length === 1) {
+        if (isPreviewable(attachments[0])) {
+          selectedDocument = doc
+          previewFileIndex = 0
+          showPreviewModal = true
+        } else {
+          downloadFile(doc, attachments[0])
+        }
       }
+    }
+  }
+
+  function handleFileInModalClick(doc: DocumentsResponse, filename: string, index: number) {
+    if (isPreviewable(filename)) {
+      previewFileIndex = index
+      showPreviewModal = true
+    } else {
+      downloadFile(doc, filename)
     }
   }
 
@@ -171,8 +203,8 @@
   function onContextMenu(e: MouseEvent, item: ExplorerItem | null = null) {
     e.preventDefault()
     contextMenu = {
-      x: e.clientX,
-      y: e.clientY,
+      x: Math.min(e.clientX, window.innerWidth - 220),
+      y: Math.min(e.clientY, window.innerHeight - 300),
       visible: true,
       targetItem: item,
     }
@@ -261,6 +293,40 @@
     }
     closeContextMenu()
   }
+  function openRenameModal(item: ExplorerItem) {
+    renameTarget = item
+    renameTitle = item.title
+    showRenameModal = true
+    closeContextMenu()
+  }
+
+  async function handleRename() {
+    if (!renameTitle || !renameTarget) return
+
+    loading = true
+    try {
+      if (renameTarget.type === 'venture') {
+        const slug = renameTitle.toLowerCase().replace(/\s+/g, '-')
+        await pb
+          .collection(Collections.Ventures)
+          .update(renameTarget.id, { title: renameTitle, slug })
+      } else if (renameTarget.type === 'process') {
+        await pb.collection(Collections.Processes).update(renameTarget.id, { title: renameTitle })
+      } else if (renameTarget.type === 'document') {
+        const slug = renameTitle.toLowerCase().trim().replace(/\s+/g, '-')
+        await pb
+          .collection(Collections.Documents)
+          .update(renameTarget.id, { title: renameTitle, slug })
+      }
+      toast.success('Renamed successfully')
+      showRenameModal = false
+      loadItems()
+    } catch (err: any) {
+      toast.error(err.message || 'Rename failed')
+    } finally {
+      loading = false
+    }
+  }
 
   onMount(() => {
     loadItems()
@@ -272,11 +338,11 @@
 <div
   role="main"
   aria-label="DMS Explorer"
-  class="flex flex-col h-[calc(100vh-10rem)] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100"
+  class="flex flex-col h-[calc(100vh-8rem)] sm:h-[calc(100vh-10rem)] bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100"
   oncontextmenu={(e) => onContextMenu(e, null)}
 >
   <!-- Header / Breadcrumbs -->
-  <div class="bg-aspada-navy p-4 sm:p-6 flex flex-col gap-6">
+  <div class="bg-aspada-navy p-4 sm:p-6 flex flex-col gap-3 sm:gap-6 shrink-0">
     <!-- Top Row: Title & Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <!-- Title Section -->
@@ -361,7 +427,7 @@
   </div>
 
   <!-- Content Area -->
-  <div class="flex-1 overflow-y-auto p-8 relative min-h-[400px]">
+  <div class="flex-1 overflow-y-auto p-4 sm:p-8 relative min-h-0 custom-scrollbar">
     {#if loading && items.length === 0}
       <div class="flex flex-col items-center justify-center h-full text-slate-400">
         <span class="i-lucide-loader-2 text-4xl animate-spin mb-4 text-aspada-gold"></span>
@@ -521,6 +587,16 @@
         {contextMenu.targetItem.type === 'document' ? 'Download' : 'Open'}
       </button>
 
+      <button
+        onclick={() => openRenameModal(contextMenu.targetItem!)}
+        class="w-full px-4 py-2.5 text-left text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-aspada-navy flex items-center gap-3"
+      >
+        <span class="i-lucide-edit-2 text-blue-400"></span>
+        Rename
+      </button>
+
+      <div class="h-px bg-slate-50 my-1"></div>
+
       {#if contextMenu.targetItem.type === 'venture'}
         <button
           onclick={() => {
@@ -603,11 +679,43 @@
   </div>
 </Modal>
 
-<Modal
-  show={showFilesModal}
-  title="Download Attachments"
-  onClose={() => (showFilesModal = false)}
->
+<Modal show={showRenameModal} title="Rename Item" onClose={() => (showRenameModal = false)}>
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <label
+        class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1"
+        for="rename-name"
+      >
+        New Name
+      </label>
+      <input
+        id="rename-name"
+        bind:value={renameTitle}
+        placeholder="Enter new name..."
+        class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-aspada-gold/10 focus:border-aspada-gold/30 outline-none transition-all"
+        onkeydown={(e) => e.key === 'Enter' && handleRename()}
+      />
+    </div>
+
+    <div class="flex gap-3 pt-4">
+      <button
+        onclick={() => (showRenameModal = false)}
+        class="flex-1 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all"
+      >
+        Cancel
+      </button>
+      <button
+        onclick={handleRename}
+        disabled={loading}
+        class="flex-1 bg-aspada-navy text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aspada-gold transition-all shadow-xl active:scale-95 disabled:opacity-50"
+      >
+        {loading ? 'Renaming...' : 'Rename'}
+      </button>
+    </div>
+  </div>
+</Modal>
+
+<Modal show={showFilesModal} title="Download Attachments" onClose={() => (showFilesModal = false)}>
   <div class="space-y-6">
     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-2">
       <div class="flex items-center gap-3">
@@ -627,16 +735,24 @@
 
     <div class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
       {#if selectedDocument?.attachments}
-        {#each selectedDocument.attachments as filename}
+        {#each selectedDocument.attachments as filename, idx}
           <div
-            class="flex items-center justify-between bg-white border border-slate-100 rounded-2xl px-4 py-3 shadow-sm group hover:border-aspada-gold/30 transition-all"
+            class="flex items-center justify-between bg-white border border-slate-100 rounded-2xl px-4 py-3 shadow-sm group hover:border-aspada-gold/30 transition-all cursor-pointer"
+            onclick={() => handleFileInModalClick(selectedDocument!, filename, idx)}
           >
             <div class="flex items-center gap-3 min-w-0">
-              <span class="i-lucide-file-text text-slate-300 group-hover:text-aspada-gold"></span>
+              <span
+                class="i-lucide-file-text {isPreviewable(filename)
+                  ? 'text-aspada-gold'
+                  : 'text-slate-300'} group-hover:scale-110 transition-transform"
+              ></span>
               <span class="text-xs text-slate-600 truncate font-bold">{filename}</span>
             </div>
             <button
-              onclick={() => downloadFile(selectedDocument!, filename)}
+              onclick={(e) => {
+                e.stopPropagation()
+                downloadFile(selectedDocument!, filename)
+              }}
               class="text-slate-400 hover:text-aspada-gold hover:bg-aspada-gold/5 transition-all p-2 rounded-lg"
               title="Download"
             >
@@ -658,6 +774,14 @@
   </div>
 </Modal>
 
+{#if showPreviewModal && selectedDocument}
+  <FilePreview
+    record={selectedDocument}
+    activeFileIndex={previewFileIndex}
+    onClose={() => (showPreviewModal = false)}
+  />
+{/if}
+
 <style>
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -665,5 +789,19 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.1);
   }
 </style>
